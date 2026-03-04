@@ -9,6 +9,30 @@ from pptx.enum.chart import XL_CHART_TYPE
 from pptx.chart.data import CategoryChartData
 import math
 
+def _set_shape_alpha(shape, alpha_val):
+    try:
+        from pptx.oxml.ns import qn
+        from lxml import etree
+        sp_pr = shape._element.spPr
+        solid_fill = sp_pr.find(qn('a:solidFill'))
+        if solid_fill is not None:
+            srgb = solid_fill.find(qn('a:srgbClr'))
+            if srgb is not None:
+                alpha_el = srgb.find(qn('a:alpha'))
+                if alpha_el is None:
+                    alpha_el = etree.SubElement(srgb, qn('a:alpha'))
+                alpha_el.set('val', str(alpha_val))
+    except Exception:
+        pass
+
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+LOGO_WHITE = os.path.join(ASSETS_DIR, "Royal Purple White Logo.png")
+LOGO_SYNTHETIC = os.path.join(ASSETS_DIR, "RPMO_logo_BF_Outline.png")
+LOGO_EXPERT_YELLOW = os.path.join(ASSETS_DIR, "RP_Synthetic_Expert_Logo_Yellow_Text.png")
+LOGO_EXPERT_BLACK = os.path.join(ASSETS_DIR, "RP_Synthetic_Expert_Logo_Black_Text.png")
+BG_LINKEDIN = os.path.join(ASSETS_DIR, "25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg")
+IMG_BETTER_OIL = os.path.join(ASSETS_DIR, "Better Oil Starts Here.png")
+
 
 C = {
     "purple": "4B2D8A",
@@ -151,6 +175,11 @@ def add_footer(slide, page_num, total_slides):
     bar.fill.fore_color.rgb = rgb(C["purple"])
     bar.line.fill.background()
 
+    if os.path.exists(LOGO_WHITE):
+        slide.shapes.add_picture(
+            LOGO_WHITE, Inches(0.15), Inches(5.345), Inches(1.1), Inches(0.18)
+        )
+
     tf = bar.text_frame
     tf.word_wrap = False
     p = tf.paragraphs[0]
@@ -163,19 +192,24 @@ def add_footer(slide, page_num, total_slides):
 
 
 def add_royal_purple_badge(slide):
-    txBox = slide.shapes.add_textbox(
-        Inches(7.8), Inches(0.12), Inches(2.0), Inches(0.3)
-    )
-    tf = txBox.text_frame
-    tf.word_wrap = False
-    p = tf.paragraphs[0]
-    p.alignment = PP_ALIGN.RIGHT
-    run = p.add_run()
-    run.text = "ROYAL PURPLE"
-    run.font.size = Pt(10)
-    run.font.bold = True
-    run.font.color.rgb = rgb(C["gold"])
-    run.font.name = "Calibri"
+    if os.path.exists(LOGO_WHITE):
+        slide.shapes.add_picture(
+            LOGO_WHITE, Inches(7.7), Inches(0.08), Inches(2.0), Inches(0.4)
+        )
+    else:
+        txBox = slide.shapes.add_textbox(
+            Inches(7.8), Inches(0.12), Inches(2.0), Inches(0.3)
+        )
+        tf = txBox.text_frame
+        tf.word_wrap = False
+        p = tf.paragraphs[0]
+        p.alignment = PP_ALIGN.RIGHT
+        run = p.add_run()
+        run.text = "ROYAL PURPLE"
+        run.font.size = Pt(10)
+        run.font.bold = True
+        run.font.color.rgb = rgb(C["gold"])
+        run.font.name = "Calibri"
 
 
 def add_slide_header(slide, title, subtitle=None):
@@ -289,22 +323,28 @@ def build_cover_slide(prs, stores, month_year, total_slides):
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     add_slide_background(slide, C["dark"])
 
+    if os.path.exists(BG_LINKEDIN):
+        slide.shapes.add_picture(
+            BG_LINKEDIN, Inches(0), Inches(0), Inches(10), Inches(5.625)
+        )
+
+    overlay = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(5.625))
+    overlay.fill.solid()
+    overlay.fill.fore_color.rgb = rgb(C["dark"])
+    _set_shape_alpha(overlay, 60000)
+    overlay.line.fill.background()
+
     bar = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.08))
     bar.fill.solid()
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    txBox = slide.shapes.add_textbox(Inches(0.8), Inches(1.2), Inches(6), Inches(0.5))
-    tf = txBox.text_frame
-    p = tf.paragraphs[0]
-    run = p.add_run()
-    run.text = "ROYAL PURPLE"
-    run.font.size = Pt(16)
-    run.font.bold = True
-    run.font.color.rgb = rgb(C["gold"])
-    run.font.name = "Calibri"
+    if os.path.exists(LOGO_EXPERT_YELLOW):
+        slide.shapes.add_picture(
+            LOGO_EXPERT_YELLOW, Inches(0.6), Inches(0.6), Inches(3.2), Inches(1.2)
+        )
 
-    txBox2 = slide.shapes.add_textbox(Inches(0.8), Inches(1.7), Inches(6), Inches(1.0))
+    txBox2 = slide.shapes.add_textbox(Inches(0.8), Inches(1.9), Inches(6), Inches(1.0))
     tf2 = txBox2.text_frame
     p2 = tf2.paragraphs[0]
     run2 = p2.add_run()
@@ -1009,12 +1049,27 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     add_slide_background(slide, C["dark"])
 
-    bar = slide.shapes.add_shape(1, Inches(0), Inches(2.3), Inches(10), Inches(0.06))
+    if os.path.exists(BG_LINKEDIN):
+        slide.shapes.add_picture(
+            BG_LINKEDIN, Inches(0), Inches(0), Inches(10), Inches(5.625)
+        )
+        overlay = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(5.625))
+        overlay.fill.solid()
+        overlay.fill.fore_color.rgb = rgb(C["dark"])
+        _set_shape_alpha(overlay, 70000)
+        overlay.line.fill.background()
+
+    if os.path.exists(LOGO_WHITE):
+        slide.shapes.add_picture(
+            LOGO_WHITE, Inches(3.5), Inches(1.0), Inches(3.0), Inches(0.6)
+        )
+
+    bar = slide.shapes.add_shape(1, Inches(2.5), Inches(1.8), Inches(5), Inches(0.05))
     bar.fill.solid()
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    t_box = slide.shapes.add_textbox(Inches(1), Inches(2.5), Inches(8), Inches(0.7))
+    t_box = slide.shapes.add_textbox(Inches(1), Inches(2.1), Inches(8), Inches(0.7))
     tf = t_box.text_frame
     p = tf.paragraphs[0]
     p.alignment = PP_ALIGN.CENTER
@@ -1025,7 +1080,7 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
     r.font.color.rgb = rgb(C["white"])
     r.font.name = "Calibri"
 
-    s_box = slide.shapes.add_textbox(Inches(1), Inches(3.2), Inches(8), Inches(0.4))
+    s_box = slide.shapes.add_textbox(Inches(1), Inches(2.8), Inches(8), Inches(0.4))
     tf2 = s_box.text_frame
     p2 = tf2.paragraphs[0]
     p2.alignment = PP_ALIGN.CENTER
@@ -1240,28 +1295,32 @@ def build_closing_slide(prs, stores, month_year, total_slides):
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     add_slide_background(slide, C["dark"])
 
+    if os.path.exists(BG_LINKEDIN):
+        slide.shapes.add_picture(
+            BG_LINKEDIN, Inches(0), Inches(0), Inches(10), Inches(5.625)
+        )
+        overlay = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(5.625))
+        overlay.fill.solid()
+        overlay.fill.fore_color.rgb = rgb(C["dark"])
+        _set_shape_alpha(overlay, 60000)
+        overlay.line.fill.background()
+
     bar = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(0.08))
     bar.fill.solid()
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    t_box = slide.shapes.add_textbox(Inches(1), Inches(1.0), Inches(8), Inches(0.5))
-    tf = t_box.text_frame
-    p = tf.paragraphs[0]
-    p.alignment = PP_ALIGN.CENTER
-    r = p.add_run()
-    r.text = "Thank You"
-    r.font.size = Pt(34)
-    r.font.bold = True
-    r.font.color.rgb = rgb(C["white"])
-    r.font.name = "Calibri"
+    if os.path.exists(LOGO_EXPERT_YELLOW):
+        slide.shapes.add_picture(
+            LOGO_EXPERT_YELLOW, Inches(3.2), Inches(0.3), Inches(3.6), Inches(1.35)
+        )
 
-    s_box = slide.shapes.add_textbox(Inches(1), Inches(1.5), Inches(8), Inches(0.4))
+    s_box = slide.shapes.add_textbox(Inches(1), Inches(1.65), Inches(8), Inches(0.4))
     tf2 = s_box.text_frame
     p2 = tf2.paragraphs[0]
     p2.alignment = PP_ALIGN.CENTER
     r2 = p2.add_run()
-    r2.text = f"Royal Purple Installer Program | {month_year}"
+    r2.text = f"Installer Program Report | {month_year}"
     r2.font.size = Pt(12)
     r2.font.color.rgb = rgb(C["purpleLight"])
     r2.font.name = "Calibri"
