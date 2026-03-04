@@ -1,0 +1,193 @@
+Royal Purple Monthly Report Skill
+Produces a polished, branded 23-slide PowerPoint presentation from a Royal
+Purple installer program Excel report. The output matches the approved design
+template: deep purple + gold palette, ThrottlePro branding, executive summary
+first then store-level drill-downs.
+Brand Authority
+This skill inherits core brand rules from the matrix-brand-guide skill.
+For Matrix/Throttle master specs (colors, PMS/CMYK, typography, logo rules,
+editorial standards), refer to the brand guide SKILL.md and
+references/visual-specs.md. Logo assets live in the brand guide's assets/
+directory. Note: Royal Purple uses its own purple + gold palette (not
+Matrix navy + blue) for the report body, but Throttle branding still applies
+to the footer, cover and closing slides per the brand guide.
+This report is produced by ThrottlePro — an AI-driven customer retention
+and acquisition platform for quick lube and auto service. ThrottlePro is
+not a configurable CRM — it is a true Customer Data Platform (CDP) that
+acts on customer behavior automatically. See the Throttle Brand Context
+section below before customizing any copy or sales messaging in the report.
+
+Quick Start
+
+Read this file fully before writing any code.
+Parse the Excel file → see references/excel-schema.md
+Run the generator script → see scripts/generate.js
+QA visually → convert to PDF, spot-check key slides
+
+
+Throttle Brand Context
+The report footer, cover, and closing slides carry ThrottlePro branding.
+Keep all copy consistent with these positioning pillars:
+AttributeValueCompany nameThrottlePro (report branding) / Throttle (product name)Tagline"More Cars. More Loyalty. Less Stress."Brand colorsThrottle Blue #00AEEF (UI), report uses Royal Purple palettePositioningAI-driven CDP for quick lube + auto service. Automated retention & acquisition.Key differentiatorBuilt to act on customer data automatically — not configure and manage itvs. CinchThrottle = automated intelligence. Cinch = manual configuration.CapabilitiesLifecycle journeys, at-risk/lapsed detection, geofencing, direct mail + email + SMS, ROAS reportingAudienceQuick lube operators, auto service franchises, multi-location groupsProof pointsAutomated customer journeys, clear attribution, measurable ROAS, no ongoing config burden
+Never position Throttle as a CRM. It is a CDP with built-in AI automation.
+
+Inputs
+InputDescription.xlsx fileRoyal Purple monthly report (one sheet per store + "Report Summary" sheet)Month/yearParsed from invoice dates in the data, or ask the user
+The Excel file follows this structure:
+
+One sheet per installer location (e.g., "Aurora Oil & Lube", "Duke Valpo")
+"Report Summary" sheet — combined data across all locations
+Each sheet has columns: Invoice Date, # of Invoices, # of Vehicles, Operation Code + Desc, Vehicle: Year/Make, Vehicle: Model, Total Rev/Inv, Total Rev
+The final row of each sheet is a totals row with null in the date column
+
+See references/excel-schema.md for full column details and edge cases.
+
+Output
+A .pptx file saved to /mnt/user-data/outputs/Royal_Purple_Installer_Report_[Mon][YYYY].pptx
+
+Slide Structure (always in this order)
+#SlideContent1CoverBranded title, month/year, store count, region + January Summary stat box (top-right)2Table of Contents6 sections with numbered cards3Executive Summary KPIs4 stat cards + revenue leaderboard (top 8 stores, ranked bars)4Executive Summary Observations4 narrative insight cards5Revenue OverviewPurple hero panel (left) + full store share-of-total list (right)6Store Performance RankingFull ranked table — auto-paginating if >12 stores7Store Performance MatrixDual-metric bar chart (volume + avg ticket) — auto-paginating8Product Mix Analysis3 category cards (RS/HMX/Other %) + stacked SKU revenue bar9Section Divider"Store-Level Deep Dives" interstitial10–21Store Deep DivesAll 12 stores — one full slide each, ranked by revenue22Next Steps & Recommendations4 action cards23Closing / Thank YouSummary stats + contact info
+
+Critical rules:
+
+Every store gets a full deep dive slide — no "snapshot" tiles or 2-per-page condensed views
+Slides 6 and 7 auto-paginate — if stores exceed page capacity, add continuation pages with "(1 of N)" subtitle
+January Summary stat box appears on BOTH the cover (slide 1) AND the closing slide (slide 23)
+Executive summary (slides 3–4) always precedes store-level detail (slides 10+)
+
+
+
+Design System
+Never deviate from these values — they define the approved Royal Purple look.
+javascriptconst C = {
+  purple:      "4B2D8A",   // Primary brand purple
+  purpleMid:   "6B44B8",   // Secondary purple
+  purpleLight: "9B6FD4",   // Tertiary purple
+  gold:        "C8973A",   // Primary accent / gold
+  goldLight:   "E8B85A",   // Light gold
+  white:       "FFFFFF",
+  offWhite:    "F8F5FF",   // Slide background (purple-tinted)
+  lightGray:   "F2F2F2",
+  midGray:     "94A3B8",
+  darkGray:    "334155",
+  dark:        "1E1035",   // Near-black purple (cover/divider bg)
+  green:       "22C55E",
+  teal:        "0D9488",
+};
+Typography: Calibri throughout. Titles 22pt bold, body 9–11pt, stat callouts 20–26pt bold.
+Recurring elements:
+
+Gold top-bar accent on every stat card (h: 0.06)
+Purple left-bar accent on slide headers (w: 0.07)
+Purple top bar on every slide (h: 0.55)
+"ROYAL PURPLE" gold text top-right on every content slide
+Purple footer bar every slide with page number
+
+Stat cards: White background with gold top stripe, purple number, dark gray label, gray sub-label. Font size: 26pt for short values, 20pt for values >8 chars.
+See references/design-system.md for complete component specs.
+
+Workflow
+Step 1 — Install dependencies
+bashpip install openpyxl --break-system-packages -q
+npm list -g pptxgenjs || npm install -g pptxgenjs
+Step 2 — Parse Excel data
+Use Python + openpyxl to extract store data. For each sheet (excluding "Report Summary"):
+pythonimport openpyxl
+wb = openpyxl.load_workbook('/mnt/user-data/uploads/YOUR_FILE.xlsx')
+
+stores = {}
+for sheet_name in wb.sheetnames:
+    if sheet_name == 'Report Summary':
+        continue
+    ws = wb[sheet_name]
+    rows = list(ws.iter_rows(values_only=True))
+    # rows[0] = header, rows[1:] = data
+    # Skip rows where rows[i][0] is None (totals row)
+    ...
+Build a JSON summary per store:
+json{
+  "name": "Palos Oil & Lube",
+  "invoices": 292,
+  "vehicles": 292,
+  "totalRevenue": 39666.85,
+  "avgRevPerInvoice": 135.85,
+  "topProduct": "ROYAL PURPLE HIGH MILEAGE",
+  "productBreakdown": [
+    { "code": "HMX0W20", "revenue": 8980.03 },
+    ...
+  ]
+}
+Write extracted data to /home/claude/store_data.json.
+See references/excel-schema.md for product code meanings and edge cases.
+Step 3 — Generate PPTX
+Run the template generator, passing in the extracted JSON:
+bashnode /home/claude/generate_report.js /home/claude/store_data.json "January 2026"
+The generator script template is at scripts/generate.js.
+Copy it to /home/claude/generate_report.js and modify for the current data.
+Step 4 — QA
+bash# Convert to PDF
+python3 /mnt/skills/public/pptx/scripts/office/soffice.py --headless --convert-to pdf /mnt/user-data/outputs/Royal_Purple_Installer_Report_*.pptx
+
+# Render slides as images
+pdftoppm -jpeg -r 120 Royal_Purple_Installer_Report_*.pdf slide
+
+# Inspect cover, exec summary, ranking table, one deep dive, closing
+Check for:
+
+Stat card values not overflowing (use shrinkText: true and adaptive font size)
+Footer page numbers correct
+All 12 store names present in ranking table
+Top 5 stores have full deep-dive slides
+
+
+Key Calculations
+Total Revenue     = sum of all store totalRevenue
+Total Invoices    = sum of all store invoices
+Avg Rev/Invoice   = totalRevenue / totalInvoices
+Top Store         = store with highest totalRevenue
+Avg per Invoice   = store.totalRevenue / store.invoices
+
+Product breakdown per store:
+  - Group rows by Operation Code prefix (RS0W20, HMX5W30, etc.)
+  - Sum Total Rev for each group
+  - Sort descending by revenue
+  - Top product = category name of highest-revenue group
+    (HMX* = "High Mileage", RS* = "Royal Purple High", RSD* = "Duralec")
+
+Deep Dive Slide Requirements
+Every store gets a full deep-dive slide. No store is relegated to a snapshot or summary tile.
+Each deep dive slide contains:
+
+Slide header — "Store Deep Dive: [Store Name]" + "Rank #N of [Total] by Revenue | [Month Year]"
+4 KPI stat cards — Total Revenue, Oil Changes (invoices), Avg Rev/Invoice, Network Rank
+Bar chart — Revenue by Product SKU (top 5-6 SKUs, purple/gold color scheme)
+Location Notes box — Purple background, gold "Location Notes" label, white body text, gold "Top Product: [name]" footer
+Footer — standard page number footer
+
+Sort order for deep dives: ranked by total revenue descending (rank 1 = highest revenue).
+For stores where per-SKU revenue data is unavailable, estimate from the store's total revenue
+and known product mix (RS-dominant vs HMX-dominant based on customer demographics/notes).
+
+Auto-Pagination Rules
+Slide 6 — Store Performance Ranking Table
+TABLE_TOP   = 1.55"
+FOOTER_Y    = 5.33"
+ROW_H       = 0.285"
+ROWS_PER_PAGE = floor((FOOTER_Y - TABLE_TOP) / ROW_H) - 1  // subtract 1 for header
+Loop over sorted stores in chunks of ROWS_PER_PAGE. Each page gets its own slide.
+Subtitle format when paginating: "...ranked by total revenue — [Month]  (1 of 2)"
+Slide 7 — Store Performance Matrix
+ROW_Y0      = 1.83"
+LEGEND_H    = 0.30"
+ROW_H       = 0.258"
+ROWS_PER_PAGE = floor((5.33 - ROW_Y0 - LEGEND_H) / ROW_H)
+Same loop pattern. Legend repeats on each page.
+
+Common Issues & Fixes
+IssueFixStat card value wrapping to 2 linesUse shrinkText: true; set fontSize: value.length > 8 ? 20 : 26PPTX won't openCheck for # in hex colors — strip all # prefixesShadow causing corrupt fileNever use 8-char hex for shadow color; use opacity property separatelyWrong page count in footerCount slides before building; pass TOTAL_SLIDES constantProduct name is raw codeMap: HMX* → "High Mileage", RS* → "Royal Purple High", RSD* → "Duralec"Rows overrunning footerCalculate ROWS_PER_PAGE dynamically from FOOTER_Y − TABLE_TOP − header; never hardcode row countoval shapes not renderingPptxGenJS ovals do not render reliably in LibreOffice — use rect shapes insteadscatter / quadrant chartsPptxGenJS does not support native scatter; use custom rect bar rows insteadREVENUE column header stacking verticallyGive text box at least w: 0.85 for the word "REVENUE" at 7.5pt with charSpacingVolume bar label overlapping at max widthCheck volW > VOL_BAR_W * 0.88 — if true, render label inside bar in whiteAll-stores ranking table overflowUse auto-paginating loop — never addTable with all rows in one callDeep dive chart area font renderingSet catAxisFontSize: 8, valAxisFontSize: 7 explicitly; omit shadow objects entirely
+
+Reference Files
+
+references/excel-schema.md — Full Excel column spec, product code map, edge cases
+references/design-system.md — Component specs: stat cards, headers, footers, charts
+scripts/generate.js — Full generator script template (copy + modify)
