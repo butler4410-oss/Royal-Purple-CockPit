@@ -1,7 +1,10 @@
 import streamlit as st
 import tempfile
 import os
-from report_generator import generate_report, parse_excel, fmt_currency, fmt_number
+from report_generator import (
+    generate_report, parse_excel, fmt_currency, fmt_number,
+    PRODUCT_DESCRIPTIONS, get_product_display_name,
+)
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
@@ -15,31 +18,34 @@ st.set_page_config(
 with st.sidebar:
     if os.path.exists(LOGO_SIDEBAR_PATH):
         st.image(LOGO_SIDEBAR_PATH, use_container_width=True)
-    st.markdown("---")
-    st.markdown("**Royal Purple**")
-    st.markdown("Installer Program Report Generator")
+    st.markdown("")
+    st.markdown("**Installer Program Report Generator**")
     st.markdown("---")
     st.caption("Upload a monthly Excel report to generate a branded 23-slide PowerPoint deck with executive summary, store rankings, and individual store deep dives.")
+    st.markdown("---")
+    with st.expander("Product Reference"):
+        for cat, desc in PRODUCT_DESCRIPTIONS.items():
+            st.markdown(f"**{cat}**")
+            st.caption(desc)
 
 if os.path.exists(LOGO_PATH):
-    col_logo, col_title = st.columns([1, 4])
+    col_logo, col_title = st.columns([1, 5])
     with col_logo:
-        st.image(LOGO_PATH, width=200)
+        st.image(LOGO_PATH, width=180)
     with col_title:
         st.markdown(
-            "<h1 style='color:#4B2D8A; margin-top: 10px;'>Installer Report Generator</h1>",
+            "<h1 style='color:#4B2D8A; margin: 0; padding-top: 20px;'>Installer Report Generator</h1>"
+            "<p style='color:#94A3B8; margin: 4px 0 0 0;'>Upload a Royal Purple monthly Excel report to generate a branded PowerPoint presentation.</p>",
             unsafe_allow_html=True,
         )
 else:
     st.markdown(
-        "<h1 style='color:#4B2D8A;'>Royal Purple Installer Report Generator</h1>",
+        "<h1 style='color:#4B2D8A;'>Royal Purple Installer Report Generator</h1>"
+        "<p style='color:#94A3B8;'>Upload a Royal Purple monthly Excel report to generate a branded PowerPoint presentation.</p>",
         unsafe_allow_html=True,
     )
 
-st.markdown(
-    "<p style='color:#94A3B8;'>Upload a Royal Purple monthly Excel report to generate a branded PowerPoint presentation.</p>",
-    unsafe_allow_html=True,
-)
+st.markdown("")
 
 uploaded_file = st.file_uploader(
     "Upload Royal Purple Excel Report (.xlsx)",
@@ -68,6 +74,7 @@ if uploaded_file is not None:
         col3.metric("Avg Rev/Invoice", f"${avg_rev:.2f}")
         col4.metric("Unique Vehicles", fmt_number(total_veh))
 
+        st.markdown("")
         st.subheader("Store Rankings")
         ranking_data = []
         for s in stores:
@@ -83,6 +90,7 @@ if uploaded_file is not None:
             })
         st.dataframe(ranking_data, use_container_width=True, hide_index=True)
 
+        st.markdown("")
         if st.button("Generate PowerPoint Report", type="primary"):
             with st.spinner("Generating branded presentation..."):
                 output_filename = f"Royal_Purple_Installer_Report_{month_year.replace(' ', '_')}.pptx"

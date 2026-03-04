@@ -56,10 +56,52 @@ PRODUCT_MAP = {
     "RS": "Royal Purple High",
     "RP": "Royal Purple Syn",
     "RSD": "Duralec",
-    "11722": "Royal Purple",
+    "11722": "Max-Clean",
     "11755": "Royal Purple Premium",
     "18000": "Max-Atomizer",
 }
+
+PRODUCT_FULL_NAMES = {
+    "11722": "Max-Clean Fuel System Cleaner",
+    "18000": "Max-Atomizer Fuel Injector Cleaner",
+    "HMX0W20": "HMX 0W-20 High Mileage",
+    "HMX5W20": "HMX 5W-20 High Mileage",
+    "HMX5W30": "HMX 5W-30 High Mileage",
+    "RMS5W20": "HMX Syn 5W-20 High Mileage",
+    "RMS5W30": "HMX Syn 5W-30 High Mileage",
+    "RS0W16": "RP High Perf 0W-16",
+    "RS0W20": "RP High Perf 0W-20",
+    "RS0W40": "RP High Perf 0W-40",
+    "RS5W20": "RP High Perf 5W-20",
+    "RS5W30": "RP High Perf 5W-30",
+    "RS5W40": "RP High Perf 5W-40",
+    "RP0W16": "RP Synthetic 0W-16",
+    "RP0W20": "RP Synthetic 0W-20",
+    "RP0W40": "RP Synthetic 0W-40",
+    "RP5W20": "RP Synthetic 5W-20",
+    "RP5W30": "RP Synthetic 5W-30",
+    "RP5W40": "RP Synthetic 5W-40",
+    "RSD15W40": "Duralec Super 15W-40",
+    "RSD5W40": "Duralec Super 5W-40",
+    "11755": "RP Premium Motor Oil",
+}
+
+PRODUCT_DESCRIPTIONS = {
+    "High Mileage": "Synthetic motor oil for engines with 75,000+ miles. Reduces oil consumption, revitalizes seals, and removes deposits using Synerlec additive technology.",
+    "High Mileage Syn": "Full synthetic high mileage formulation with enhanced seal conditioning and superior wear protection for high-mileage engines.",
+    "Royal Purple High": "High-performance full synthetic oil with Synerlec technology for superior wear protection, reduced heat, and increased fuel efficiency.",
+    "Royal Purple Syn": "Premium full synthetic oil exceeding API/ILSAC standards. Enhanced film strength minimizes metal-to-metal contact in modern engines.",
+    "Duralec": "Premium synthetic diesel engine oil (API CK-4) for emission-controlled engines with DPF, EGR, and SCR systems. Extends drain intervals.",
+    "Max-Clean": "High-performance fuel system cleaner and stabilizer. Deeply cleans injectors, carburetors, intake valves, and combustion chambers.",
+    "Max-Atomizer": "Advanced fuel injector cleaner for optimized spray patterns and improved combustion efficiency.",
+    "Royal Purple Premium": "Premium synthetic motor oil with proprietary Synerlec additive technology for maximum engine protection.",
+}
+
+def get_product_display_name(code):
+    return PRODUCT_FULL_NAMES.get(code, code)
+
+def get_product_category_desc(category):
+    return PRODUCT_DESCRIPTIONS.get(category, "")
 
 def rgb(hex_str):
     return RGBColor.from_string(hex_str)
@@ -113,12 +155,13 @@ def parse_excel(file_path):
             avg_rev_inv = total_revenue / total_invoices if total_invoices else 0
             total_vehicles = sum(r[8] for r in data_rows if r[8])
 
+        sorted_prefixes = sorted(PRODUCT_MAP.keys(), key=len, reverse=True)
         product_breakdown = []
         for code, rev in sorted(product_revenue.items(), key=lambda x: -x[1]):
             cat = "Other"
-            for prefix, name in PRODUCT_MAP.items():
+            for prefix in sorted_prefixes:
                 if code.startswith(prefix):
-                    cat = name
+                    cat = PRODUCT_MAP[prefix]
                     break
             product_breakdown.append({
                 "code": code,
@@ -177,7 +220,7 @@ def add_footer(slide, page_num, total_slides):
 
     if os.path.exists(LOGO_WHITE):
         slide.shapes.add_picture(
-            LOGO_WHITE, Inches(0.15), Inches(5.345), Inches(1.1), Inches(0.18)
+            LOGO_WHITE, Inches(0.2), Inches(5.35), Inches(0.95), Inches(0.17)
         )
 
     tf = bar.text_frame
@@ -194,7 +237,7 @@ def add_footer(slide, page_num, total_slides):
 def add_royal_purple_badge(slide):
     if os.path.exists(LOGO_WHITE):
         slide.shapes.add_picture(
-            LOGO_WHITE, Inches(7.7), Inches(0.08), Inches(2.0), Inches(0.4)
+            LOGO_WHITE, Inches(7.8), Inches(0.1), Inches(1.8), Inches(0.35)
         )
     else:
         txBox = slide.shapes.add_textbox(
@@ -341,10 +384,10 @@ def build_cover_slide(prs, stores, month_year, total_slides):
 
     if os.path.exists(LOGO_EXPERT_YELLOW):
         slide.shapes.add_picture(
-            LOGO_EXPERT_YELLOW, Inches(0.6), Inches(0.6), Inches(3.2), Inches(1.2)
+            LOGO_EXPERT_YELLOW, Inches(0.7), Inches(0.5), Inches(2.8), Inches(1.05)
         )
 
-    txBox2 = slide.shapes.add_textbox(Inches(0.8), Inches(1.9), Inches(6), Inches(1.0))
+    txBox2 = slide.shapes.add_textbox(Inches(0.8), Inches(1.65), Inches(6), Inches(1.0))
     tf2 = txBox2.text_frame
     p2 = tf2.paragraphs[0]
     run2 = p2.add_run()
@@ -1024,7 +1067,7 @@ def build_product_mix(prs, stores, month_year, total_slides, page_num):
         p_n = tf_n.paragraphs[0]
         p_n.alignment = PP_ALIGN.RIGHT
         r_n = p_n.add_run()
-        r_n.text = code
+        r_n.text = get_product_display_name(code)
         r_n.font.size = Pt(7)
         r_n.font.color.rgb = rgb(C["darkGray"])
         r_n.font.name = "Calibri"
@@ -1061,10 +1104,10 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
 
     if os.path.exists(LOGO_WHITE):
         slide.shapes.add_picture(
-            LOGO_WHITE, Inches(3.5), Inches(1.0), Inches(3.0), Inches(0.6)
+            LOGO_WHITE, Inches(3.6), Inches(1.05), Inches(2.8), Inches(0.55)
         )
 
-    bar = slide.shapes.add_shape(1, Inches(2.5), Inches(1.8), Inches(5), Inches(0.05))
+    bar = slide.shapes.add_shape(1, Inches(2.5), Inches(1.75), Inches(5), Inches(0.04))
     bar.fill.solid()
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
@@ -1143,8 +1186,8 @@ def build_deep_dive(prs, store, stores, month_year, total_slides, page_num):
             p_n = tf_n.paragraphs[0]
             p_n.alignment = PP_ALIGN.RIGHT
             r_n = p_n.add_run()
-            r_n.text = prod["code"]
-            r_n.font.size = Pt(8)
+            r_n.text = get_product_display_name(prod["code"])
+            r_n.font.size = Pt(7)
             r_n.font.color.rgb = rgb(C["darkGray"])
             r_n.font.name = "Calibri"
 
@@ -1192,12 +1235,16 @@ def build_deep_dive(prs, store, stores, month_year, total_slides, page_num):
     top_cat = max(cat_breakdown.items(), key=lambda x: x[1])[0] if cat_breakdown else "N/A"
     top_cat_pct = (cat_breakdown.get(top_cat, 0) / store["totalRevenue"] * 100) if store["totalRevenue"] else 0
 
+    top_cat_desc = get_product_category_desc(top_cat)
+    desc_line = f" {top_cat_desc}" if top_cat_desc else ""
+
     note_text = (
         f"This location contributes {pct:.1f}% of total network revenue. "
         f"With {fmt_number(store['invoices'])} oil changes and an average ticket of "
         f"${store['avgRevPerInvoice']:.2f}, {store['name']} "
         f"{'leads' if store['rank'] == 1 else 'ranks #' + str(store['rank'])} in the network. "
-        f"{top_cat} products represent {top_cat_pct:.0f}% of this location's revenue."
+        f"{top_cat} products represent {top_cat_pct:.0f}% of this location's mix."
+        f"{desc_line}"
     )
 
     n_body = slide.shapes.add_textbox(Inches(notes_x + 0.15), Inches(notes_y + 0.4), Inches(notes_w - 0.3), Inches(notes_h - 0.85))
@@ -1312,10 +1359,10 @@ def build_closing_slide(prs, stores, month_year, total_slides):
 
     if os.path.exists(LOGO_EXPERT_YELLOW):
         slide.shapes.add_picture(
-            LOGO_EXPERT_YELLOW, Inches(3.2), Inches(0.3), Inches(3.6), Inches(1.35)
+            LOGO_EXPERT_YELLOW, Inches(3.4), Inches(0.35), Inches(3.2), Inches(1.2)
         )
 
-    s_box = slide.shapes.add_textbox(Inches(1), Inches(1.65), Inches(8), Inches(0.4))
+    s_box = slide.shapes.add_textbox(Inches(1), Inches(1.6), Inches(8), Inches(0.4))
     tf2 = s_box.text_frame
     p2 = tf2.paragraphs[0]
     p2.alignment = PP_ALIGN.CENTER
