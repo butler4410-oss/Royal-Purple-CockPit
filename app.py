@@ -22,7 +22,7 @@ with st.sidebar:
     st.markdown("")
     st.markdown("**Installer Program Report Generator**")
     st.markdown("---")
-    st.caption("Upload a monthly Excel report to generate a branded 23-slide PowerPoint deck with executive summary, store rankings, and individual store deep dives.")
+    st.caption("Upload a monthly Excel report to generate a branded PowerPoint deck with executive summary, store rankings, distribution maps, and individual store deep dives.")
     st.markdown("---")
     with st.expander("Product Reference"):
         for cat, desc in PRODUCT_DESCRIPTIONS.items():
@@ -54,8 +54,21 @@ st.markdown("")
 uploaded_file = st.file_uploader(
     "Upload Royal Purple Excel Report (.xlsx)",
     type=["xlsx"],
-    help="One sheet per installer location + a Report Summary sheet",
+    help="Each worksheet should represent one installer location with data columns for products, revenue, invoices, etc.",
 )
+
+map_files = st.file_uploader(
+    "Upload Distribution Map Images (optional)",
+    type=["png", "jpg", "jpeg"],
+    accept_multiple_files=True,
+    help="Upload ABE consumer distribution territory maps to include as slides in the report.",
+)
+
+if map_files:
+    st.caption(f"{len(map_files)} map image(s) uploaded — will be included before store deep dives.")
+    with st.expander("Preview Maps"):
+        for mf in map_files:
+            st.image(mf, caption=mf.name, use_container_width=True)
 
 if uploaded_file is not None:
     with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
@@ -96,31 +109,54 @@ if uploaded_file is not None:
 
         st.markdown("")
         if st.button("Generate PowerPoint Report", type="primary"):
-            with st.spinner("Generating branded presentation..."):
-                output_filename = f"Royal_Purple_Installer_Report_{month_year.replace(' ', '_')}.pptx"
-                output_path = os.path.join(tempfile.gettempdir(), output_filename)
-                generate_report(tmp_path, output_path)
+            map_temp_paths = []
+            try:
+                for mf in (map_files or []):
+                    ext = os.path.splitext(mf.name)[1] or ".png"
+                    with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as mtmp:
+                        mtmp.write(mf.getvalue())
+                        raw_name = os.path.splitext(mf.name)[0].replace("_", " ").replace("-", " ")
+                        map_temp_paths.append({
+                            "path": mtmp.name,
+                            "title": raw_name,
+                        })
 
-                with open(output_path, "rb") as f:
-                    pptx_data = f.read()
+                with st.spinner("Generating branded presentation..."):
+                    slide_count = len(stores) + len(map_temp_paths)
+                    output_filename = f"Royal_Purple_Installer_Report_{month_year.replace(' ', '_')}.pptx"
+                    output_path = os.path.join(tempfile.gettempdir(), output_filename)
+                    generate_report(tmp_path, output_path, map_images=map_temp_paths if map_temp_paths else None)
 
-                st.success(f"Report generated successfully — {len(stores)} store deep dives included.")
+                    with open(output_path, "rb") as f:
+                        pptx_data = f.read()
 
-                st.download_button(
-                    label="Download PowerPoint Report",
-                    data=pptx_data,
-                    file_name=output_filename,
-                    mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                    type="primary",
-                )
+                    map_note = f" + {len(map_temp_paths)} distribution map(s)" if map_temp_paths else ""
+                    st.success(f"Report generated — {len(stores)} store deep dives{map_note} included.")
 
-                os.unlink(output_path)
+                    st.download_button(
+                        label="Download PowerPoint Report",
+                        data=pptx_data,
+                        file_name=output_filename,
+                        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                        type="primary",
+                    )
+
+                    os.unlink(output_path)
+            finally:
+                for mp in map_temp_paths:
+                    try:
+                        os.unlink(mp["path"])
+                    except OSError:
+                        pass
 
     except Exception as e:
         st.error(f"Error processing file: {str(e)}")
         import traceback
         st.code(traceback.format_exc())
     finally:
-        os.unlink(tmp_path)
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
 else:
-    st.info("Upload an Excel file to get started. The file should contain one sheet per installer location and a 'Report Summary' sheet.")
+    st.info("Upload an Excel file to get started. Each worksheet should represent one installer location with data columns for products, revenue, invoices, etc.")

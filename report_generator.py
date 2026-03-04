@@ -107,54 +107,152 @@ def get_product_category_desc(category):
 def rgb(hex_str):
     return RGBColor.from_string(hex_str)
 
+HEADER_PATTERNS = {
+    "date": ["invoice date", "date", "service date", "trans date", "transaction date"],
+    "product": ["operation code", "op code", "product", "description", "item", "service", "operation"],
+    "invoices": ["# of invoices", "invoices", "invoice count", "num invoices", "count", "qty", "quantity", "transactions"],
+    "revenue": ["total rev", "revenue", "total sales", "sales", "amount", "total amount", "net sales", "gross"],
+    "avg_rev": ["rev/inv", "avg rev", "average rev", "avg sale", "per invoice", "avg amount"],
+    "vehicles": ["# of vehicles", "vehicles", "vehicle count", "num vehicles", "cars", "unique vehicles"],
+}
+
+SKIP_SHEETS = ["report summary", "summary", "totals", "notes", "instructions", "template", "info"]
+
+
+def _find_column_index(header, field):
+    patterns = HEADER_PATTERNS.get(field, [])
+    header_lower = [str(h).lower().strip() if h else "" for h in header]
+    for pattern in patterns:
+        for i, h in enumerate(header_lower):
+            if pattern in h:
+                return i
+    return None
+
+
+def _safe_float(val, default=0):
+    if val is None:
+        return default
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return default
+
+
+def _safe_int(val, default=0):
+    if val is None:
+        return default
+    try:
+        return int(float(val))
+    except (ValueError, TypeError):
+        return default
+
+
+def _detect_date(data_rows, col_map):
+    date_idx = col_map.get("date")
+    if date_idx is None:
+        return None
+    for row in data_rows:
+        if date_idx >= len(row):
+            continue
+        date_val = row[date_idx]
+        if date_val is None:
+            continue
+        if hasattr(date_val, 'strftime'):
+            return date_val.strftime("%B %Y")
+        elif isinstance(date_val, str):
+            date_val = date_val.strip()
+            parts = date_val.split()
+            if len(parts) >= 3:
+                return f"{parts[0]} {parts[2].rstrip(',')}"
+            elif len(parts) == 2:
+                return date_val
+    return None
+
+
+def _get_val(row, idx, default=None):
+    if idx is None or idx >= len(row):
+        return default
+    return row[idx]
+
+
 def parse_excel(file_path):
     wb = openpyxl.load_workbook(file_path)
     stores = []
     month_year = None
 
     for sheet_name in wb.sheetnames:
-        if sheet_name == "Report Summary":
+        if sheet_name.lower().strip() in SKIP_SHEETS:
             continue
         ws = wb[sheet_name]
         rows = list(ws.iter_rows(values_only=True))
         if len(rows) < 2:
             continue
 
+        header_row_idx = 0
         header = rows[0]
-        data_rows = [r for r in rows[1:] if r[0] is not None]
-        totals_row = rows[-1] if rows[-1][0] is None else None
+        for i, row in enumerate(rows[:5]):
+            row_strs = [str(c).lower() if c else "" for c in row]
+            if any(p in s for s in row_strs for p in ["invoice", "date", "revenue", "product", "operation", "sales"]):
+                header = row
+                header_row_idx = i
+                break
 
-        if not month_year and data_rows:
-            date_val = data_rows[0][0]
-            if hasattr(date_val, 'strftime'):
-                month_year = date_val.strftime("%B %Y")
-            elif isinstance(date_val, str):
-                parts = date_val.split()
-                if len(parts) >= 3:
-                    month_year = f"{parts[0]} {parts[2].rstrip(',')}"
+        col_map = {}
+        for field in HEADER_PATTERNS:
+            idx = _find_column_index(header, field)
+            if idx is not None:
+                col_map[field] = idx
+
+        if "revenue" not in col_map and "invoices" not in col_map:
+            continue
+
+        all_data_rows = rows[header_row_idx + 1:]
+        first_col = col_map.get("date", col_map.get("product", 0))
+        data_rows = [r for r in all_data_rows if len(r) > first_col and r[first_col] is not None]
+
+        last_row = all_data_rows[-1] if all_data_rows else None
+        totals_row = None
+        if last_row and len(last_row) > first_col and last_row[first_col] is None:
+            totals_row = last_row
+
+        if not month_year:
+            month_year = _detect_date(data_rows, col_map)
+
+        product_idx = col_map.get("product")
+        revenue_idx = col_map.get("revenue")
 
         product_revenue = {}
+        total_rev_calc = 0
+        total_inv_calc = 0
+        total_veh_calc = 0
         for row in data_rows:
-            op_desc = str(row[1]) if row[1] else ""
-            code = op_desc.split(" - ")[0].strip() if " - " in op_desc else op_desc.strip()
-            rev = row[6] if row[6] else 0
-            try:
-                rev = float(rev)
-            except (ValueError, TypeError):
-                rev = 0
+            if product_idx is not None:
+                op_desc = str(_get_val(row, product_idx, "")) if _get_val(row, product_idx) else ""
+                code = op_desc.split(" - ")[0].strip() if " - " in op_desc else op_desc.strip()
+            else:
+                code = ""
+
+            rev = _safe_float(_get_val(row, revenue_idx))
+            total_rev_calc += rev
+            total_inv_calc += _safe_int(_get_val(row, col_map.get("invoices")))
+            total_veh_calc += _safe_int(_get_val(row, col_map.get("vehicles")))
+
             if code:
                 product_revenue[code] = product_revenue.get(code, 0) + rev
 
         if totals_row:
-            total_invoices = totals_row[5] or 0
-            total_revenue = totals_row[6] or 0
-            avg_rev_inv = totals_row[7] or 0
-            total_vehicles = totals_row[8] or 0
+            total_invoices = _safe_int(_get_val(totals_row, col_map.get("invoices"))) or total_inv_calc
+            total_revenue = _safe_float(_get_val(totals_row, col_map.get("revenue"))) or total_rev_calc
+            avg_rev_inv = _safe_float(_get_val(totals_row, col_map.get("avg_rev")))
+            total_vehicles = _safe_int(_get_val(totals_row, col_map.get("vehicles"))) or total_veh_calc
         else:
-            total_invoices = sum(r[5] for r in data_rows if r[5])
-            total_revenue = sum(r[6] for r in data_rows if r[6])
-            avg_rev_inv = total_revenue / total_invoices if total_invoices else 0
-            total_vehicles = sum(r[8] for r in data_rows if r[8])
+            total_invoices = total_inv_calc
+            total_revenue = total_rev_calc
+            avg_rev_inv = 0
+            total_vehicles = total_veh_calc
+
+        if not avg_rev_inv and total_invoices:
+            avg_rev_inv = total_revenue / total_invoices
 
         sorted_prefixes = sorted(PRODUCT_MAP.keys(), key=len, reverse=True)
         product_breakdown = []
@@ -187,10 +285,11 @@ def parse_excel(file_path):
         s["rank"] = i + 1
 
     if not month_year:
-        month_year = "January 2025"
+        from datetime import datetime
+        month_year = datetime.now().strftime("%B %Y")
 
     if not stores:
-        raise ValueError("No store data found in the Excel file. Ensure the workbook has at least one store sheet besides 'Report Summary'.")
+        raise ValueError("No store data found in the Excel file. Ensure the workbook has at least one data sheet with recognizable column headers (e.g., Revenue, Invoices, Product).")
 
     return stores, month_year
 
@@ -403,7 +502,7 @@ def build_cover_slide(prs, stores, month_year, total_slides):
     tf3 = txBox3.text_frame
     p3 = tf3.paragraphs[0]
     run3 = p3.add_run()
-    run3.text = f"{month_year} | {len(stores)} Locations | Chicago Region"
+    run3.text = f"{month_year} | {len(stores)} Locations"
     run3.font.size = Pt(14)
     run3.font.color.rgb = rgb(C["purpleLight"])
     run3.font.name = "Calibri"
@@ -1484,7 +1583,66 @@ def build_closing_slide(prs, stores, month_year, total_slides):
     add_footer(slide, total_slides, total_slides)
 
 
-def calculate_total_slides(num_stores):
+def build_distribution_map_slide(prs, map_image_path, title, total_slides, page_num):
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    add_slide_background(slide, C["offWhite"])
+
+    hdr_bar = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(1.1))
+    hdr_bar.fill.solid()
+    hdr_bar.fill.fore_color.rgb = rgb(C["purple"])
+    hdr_bar.line.fill.background()
+
+    t_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.15), Inches(7), Inches(0.45))
+    tf = t_box.text_frame
+    p = tf.paragraphs[0]
+    r = p.add_run()
+    r.text = title
+    r.font.size = Pt(22)
+    r.font.bold = True
+    r.font.color.rgb = rgb(C["white"])
+    r.font.name = "Calibri"
+
+    s_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.62), Inches(7), Inches(0.3))
+    tf2 = s_box.text_frame
+    p2 = tf2.paragraphs[0]
+    r2 = p2.add_run()
+    r2.text = "ABE Consumer Distribution Territory Map"
+    r2.font.size = Pt(11)
+    r2.font.color.rgb = rgb(C["goldLight"])
+    r2.font.name = "Calibri"
+
+    add_royal_purple_badge(slide)
+
+    map_top = 1.2
+    map_bottom = 5.2
+    available_h = map_bottom - map_top
+    available_w = 9.0
+    margin_x = 0.5
+
+    from PIL import Image as PILImage
+    try:
+        img = PILImage.open(map_image_path)
+        img_w, img_h = img.size
+        aspect = img_w / img_h
+        fit_w = available_w
+        fit_h = fit_w / aspect
+        if fit_h > available_h:
+            fit_h = available_h
+            fit_w = fit_h * aspect
+        center_x = margin_x + (available_w - fit_w) / 2
+        center_y = map_top + (available_h - fit_h) / 2
+        slide.shapes.add_picture(
+            map_image_path, Inches(center_x), Inches(center_y), Inches(fit_w), Inches(fit_h)
+        )
+    except Exception:
+        slide.shapes.add_picture(
+            map_image_path, Inches(margin_x), Inches(map_top), Inches(available_w), Inches(available_h)
+        )
+
+    add_footer(slide, page_num, total_slides)
+
+
+def calculate_total_slides(num_stores, num_maps=0):
     TABLE_TOP = 1.55
     FOOTER_Y = 5.33
     ROW_H = 0.285
@@ -1507,6 +1665,7 @@ def calculate_total_slides(num_stores):
         rank_pages +  # ranking table
         matrix_pages +  # performance matrix
         1 +  # product mix
+        num_maps +  # distribution maps
         1 +  # section divider
         num_stores +  # deep dives
         1 +  # next steps
@@ -1515,15 +1674,16 @@ def calculate_total_slides(num_stores):
     return total
 
 
-def generate_report(file_path, output_path=None):
+def generate_report(file_path, output_path=None, map_images=None):
     stores, month_year = parse_excel(file_path)
+    maps = map_images or []
 
     if not output_path:
         month_abbr = month_year.split()[0][:3] if month_year else "Jan"
         year = month_year.split()[-1] if month_year else "2025"
         output_path = f"Royal_Purple_Installer_Report_{month_abbr}{year}.pptx"
 
-    total_slides = calculate_total_slides(len(stores))
+    total_slides = calculate_total_slides(len(stores), len(maps))
 
     prs = Presentation()
     prs.slide_width = Inches(10)
@@ -1544,6 +1704,12 @@ def generate_report(file_path, output_path=None):
 
     build_product_mix(prs, stores, month_year, total_slides, page)
     page += 1
+
+    for i, map_info in enumerate(maps):
+        map_path = map_info.get("path", map_info) if isinstance(map_info, dict) else map_info
+        map_title = map_info.get("title", f"Distribution Map {i + 1}") if isinstance(map_info, dict) else f"Distribution Map {i + 1}"
+        build_distribution_map_slide(prs, map_path, map_title, total_slides, page)
+        page += 1
 
     build_section_divider(prs, "Store-Level Deep Dives", f"Individual performance analysis — {month_year}", total_slides, page)
     page += 1
