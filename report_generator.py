@@ -30,7 +30,8 @@ LOGO_WHITE = os.path.join(ASSETS_DIR, "Royal Purple White Logo.png")
 LOGO_SYNTHETIC = os.path.join(ASSETS_DIR, "RPMO_logo_BF_Outline.png")
 LOGO_EXPERT_YELLOW = os.path.join(ASSETS_DIR, "RP_Synthetic_Expert_Logo_Yellow_Text.png")
 LOGO_EXPERT_BLACK = os.path.join(ASSETS_DIR, "RP_Synthetic_Expert_Logo_Black_Text.png")
-BG_LINKEDIN = os.path.join(ASSETS_DIR, "25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg")
+LOGO_EXPERT_WHITE = os.path.join(ASSETS_DIR, "rp_synthetic_expert_white.png")
+BG_NEVER_SETTLE = os.path.join(ASSETS_DIR, "25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg")
 IMG_BETTER_OIL = os.path.join(ASSETS_DIR, "Better Oil Starts Here.png")
 
 
@@ -366,9 +367,9 @@ def build_cover_slide(prs, stores, month_year, total_slides):
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     add_slide_background(slide, C["dark"])
 
-    if os.path.exists(BG_LINKEDIN):
+    if os.path.exists(BG_NEVER_SETTLE):
         slide.shapes.add_picture(
-            BG_LINKEDIN, Inches(0), Inches(0), Inches(10), Inches(5.625)
+            BG_NEVER_SETTLE, Inches(0), Inches(0), Inches(10), Inches(5.625)
         )
 
     overlay = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(5.625))
@@ -382,12 +383,13 @@ def build_cover_slide(prs, stores, month_year, total_slides):
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    if os.path.exists(LOGO_EXPERT_YELLOW):
+    logo_path = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else LOGO_EXPERT_YELLOW
+    if os.path.exists(logo_path):
         slide.shapes.add_picture(
-            LOGO_EXPERT_YELLOW, Inches(0.7), Inches(0.5), Inches(2.8), Inches(1.05)
+            logo_path, Inches(0.7), Inches(0.4), Inches(2.6), Inches(1.1)
         )
 
-    txBox2 = slide.shapes.add_textbox(Inches(0.8), Inches(1.65), Inches(6), Inches(1.0))
+    txBox2 = slide.shapes.add_textbox(Inches(0.8), Inches(1.6), Inches(6), Inches(1.0))
     tf2 = txBox2.text_frame
     p2 = tf2.paragraphs[0]
     run2 = p2.add_run()
@@ -397,7 +399,7 @@ def build_cover_slide(prs, stores, month_year, total_slides):
     run2.font.color.rgb = rgb(C["white"])
     run2.font.name = "Calibri"
 
-    txBox3 = slide.shapes.add_textbox(Inches(0.8), Inches(2.7), Inches(6), Inches(0.5))
+    txBox3 = slide.shapes.add_textbox(Inches(0.8), Inches(2.55), Inches(6), Inches(0.5))
     tf3 = txBox3.text_frame
     p3 = tf3.paragraphs[0]
     run3 = p3.add_run()
@@ -405,6 +407,16 @@ def build_cover_slide(prs, stores, month_year, total_slides):
     run3.font.size = Pt(14)
     run3.font.color.rgb = rgb(C["purpleLight"])
     run3.font.name = "Calibri"
+
+    ns_box = slide.shapes.add_textbox(Inches(0.8), Inches(3.05), Inches(3), Inches(0.35))
+    tf_ns = ns_box.text_frame
+    p_ns = tf_ns.paragraphs[0]
+    r_ns = p_ns.add_run()
+    r_ns.text = "NEVER SETTLE"
+    r_ns.font.size = Pt(16)
+    r_ns.font.bold = True
+    r_ns.font.color.rgb = rgb(C["white"])
+    r_ns.font.name = "Calibri"
 
     total_rev = sum(s["totalRevenue"] for s in stores)
     total_inv = sum(s["invoices"] for s in stores)
@@ -1092,9 +1104,9 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     add_slide_background(slide, C["dark"])
 
-    if os.path.exists(BG_LINKEDIN):
+    if os.path.exists(BG_NEVER_SETTLE):
         slide.shapes.add_picture(
-            BG_LINKEDIN, Inches(0), Inches(0), Inches(10), Inches(5.625)
+            BG_NEVER_SETTLE, Inches(0), Inches(0), Inches(10), Inches(5.625)
         )
         overlay = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(5.625))
         overlay.fill.solid()
@@ -1102,17 +1114,18 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
         _set_shape_alpha(overlay, 70000)
         overlay.line.fill.background()
 
-    if os.path.exists(LOGO_WHITE):
+    logo_div = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else LOGO_WHITE
+    if os.path.exists(logo_div):
         slide.shapes.add_picture(
-            LOGO_WHITE, Inches(3.6), Inches(1.05), Inches(2.8), Inches(0.55)
+            logo_div, Inches(3.3), Inches(0.7), Inches(3.4), Inches(1.4)
         )
 
-    bar = slide.shapes.add_shape(1, Inches(2.5), Inches(1.75), Inches(5), Inches(0.04))
+    bar = slide.shapes.add_shape(1, Inches(2.5), Inches(2.25), Inches(5), Inches(0.04))
     bar.fill.solid()
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    t_box = slide.shapes.add_textbox(Inches(1), Inches(2.1), Inches(8), Inches(0.7))
+    t_box = slide.shapes.add_textbox(Inches(1), Inches(2.5), Inches(8), Inches(0.7))
     tf = t_box.text_frame
     p = tf.paragraphs[0]
     p.alignment = PP_ALIGN.CENTER
@@ -1123,7 +1136,7 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
     r.font.color.rgb = rgb(C["white"])
     r.font.name = "Calibri"
 
-    s_box = slide.shapes.add_textbox(Inches(1), Inches(2.8), Inches(8), Inches(0.4))
+    s_box = slide.shapes.add_textbox(Inches(1), Inches(3.2), Inches(8), Inches(0.4))
     tf2 = s_box.text_frame
     p2 = tf2.paragraphs[0]
     p2.alignment = PP_ALIGN.CENTER
@@ -1132,6 +1145,17 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
     r2.font.size = Pt(12)
     r2.font.color.rgb = rgb(C["purpleLight"])
     r2.font.name = "Calibri"
+
+    ns_box = slide.shapes.add_textbox(Inches(1), Inches(3.65), Inches(8), Inches(0.35))
+    tf_ns = ns_box.text_frame
+    p_ns = tf_ns.paragraphs[0]
+    p_ns.alignment = PP_ALIGN.CENTER
+    r_ns = p_ns.add_run()
+    r_ns.text = "NEVER SETTLE"
+    r_ns.font.size = Pt(14)
+    r_ns.font.bold = True
+    r_ns.font.color.rgb = rgb(C["goldLight"])
+    r_ns.font.name = "Calibri"
 
     add_footer(slide, page_num, total_slides)
 
@@ -1342,9 +1366,9 @@ def build_closing_slide(prs, stores, month_year, total_slides):
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     add_slide_background(slide, C["dark"])
 
-    if os.path.exists(BG_LINKEDIN):
+    if os.path.exists(BG_NEVER_SETTLE):
         slide.shapes.add_picture(
-            BG_LINKEDIN, Inches(0), Inches(0), Inches(10), Inches(5.625)
+            BG_NEVER_SETTLE, Inches(0), Inches(0), Inches(10), Inches(5.625)
         )
         overlay = slide.shapes.add_shape(1, Inches(0), Inches(0), Inches(10), Inches(5.625))
         overlay.fill.solid()
@@ -1357,9 +1381,10 @@ def build_closing_slide(prs, stores, month_year, total_slides):
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    if os.path.exists(LOGO_EXPERT_YELLOW):
+    logo_path = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else LOGO_EXPERT_YELLOW
+    if os.path.exists(logo_path):
         slide.shapes.add_picture(
-            LOGO_EXPERT_YELLOW, Inches(3.4), Inches(0.35), Inches(3.2), Inches(1.2)
+            logo_path, Inches(3.5), Inches(0.3), Inches(3.0), Inches(1.25)
         )
 
     s_box = slide.shapes.add_textbox(Inches(1), Inches(1.6), Inches(8), Inches(0.4))
@@ -1435,7 +1460,18 @@ def build_closing_slide(prs, stores, month_year, total_slides):
         r_lb.font.color.rgb = rgb(C["purpleLight"])
         r_lb.font.name = "Calibri"
 
-    contact = slide.shapes.add_textbox(Inches(1), Inches(4.5), Inches(8), Inches(0.5))
+    ns_box = slide.shapes.add_textbox(Inches(1), Inches(4.3), Inches(8), Inches(0.35))
+    tf_ns = ns_box.text_frame
+    p_ns = tf_ns.paragraphs[0]
+    p_ns.alignment = PP_ALIGN.CENTER
+    r_ns = p_ns.add_run()
+    r_ns.text = "NEVER SETTLE"
+    r_ns.font.size = Pt(16)
+    r_ns.font.bold = True
+    r_ns.font.color.rgb = rgb(C["goldLight"])
+    r_ns.font.name = "Calibri"
+
+    contact = slide.shapes.add_textbox(Inches(1), Inches(4.7), Inches(8), Inches(0.5))
     tf_c = contact.text_frame
     p_c = tf_c.paragraphs[0]
     p_c.alignment = PP_ALIGN.CENTER

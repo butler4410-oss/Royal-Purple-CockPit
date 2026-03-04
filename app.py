@@ -8,6 +8,7 @@ from report_generator import (
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
+LOGO_NEVER_SETTLE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg")
 
 st.set_page_config(
     page_title="Royal Purple Report Generator",
@@ -27,6 +28,9 @@ with st.sidebar:
         for cat, desc in PRODUCT_DESCRIPTIONS.items():
             st.markdown(f"**{cat}**")
             st.caption(desc)
+    st.markdown("---")
+    if os.path.exists(LOGO_NEVER_SETTLE):
+        st.image(LOGO_NEVER_SETTLE, use_container_width=True)
 
 if os.path.exists(LOGO_PATH):
     col_logo, col_title = st.columns([1, 5])
