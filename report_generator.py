@@ -110,10 +110,12 @@ def rgb(hex_str):
 HEADER_PATTERNS = {
     "date": ["invoice date", "date", "service date", "trans date", "transaction date"],
     "product": ["operation code", "op code", "product", "description", "item", "service", "operation"],
-    "invoices": ["# of invoices", "invoices", "invoice count", "num invoices", "count", "qty", "quantity", "transactions"],
-    "revenue": ["total rev", "revenue", "total sales", "sales", "amount", "total amount", "net sales", "gross"],
-    "avg_rev": ["rev/inv", "avg rev", "average rev", "avg sale", "per invoice", "avg amount"],
+    "invoices": ["# of invoices", "invoices", "invoice count", "num invoices", "transactions", "oil changes", "ticket count"],
+    "revenue": ["total rev", "revenue", "total sales", "sales amount", "net sales", "gross rev", "gross sales"],
+    "avg_rev": ["rev/inv", "avg rev", "average rev", "avg sale", "per invoice", "avg amount", "average sale", "rev per"],
     "vehicles": ["# of vehicles", "vehicles", "vehicle count", "num vehicles", "cars", "unique vehicles"],
+    "qty": ["qty", "quantity", "count", "units"],
+    "amount": ["amount", "sales", "total"],
 }
 
 SKIP_SHEETS = ["report summary", "summary", "totals", "notes", "instructions", "template", "info"]
@@ -198,10 +200,24 @@ def parse_excel(file_path):
                 break
 
         col_map = {}
-        for field in HEADER_PATTERNS:
+        for field in ["date", "product", "invoices", "revenue", "avg_rev", "vehicles"]:
             idx = _find_column_index(header, field)
             if idx is not None:
                 col_map[field] = idx
+
+        if "revenue" not in col_map:
+            for fallback_field in ["amount"]:
+                idx = _find_column_index(header, fallback_field)
+                if idx is not None:
+                    col_map["revenue"] = idx
+                    break
+
+        if "invoices" not in col_map:
+            for fallback_field in ["qty"]:
+                idx = _find_column_index(header, fallback_field)
+                if idx is not None:
+                    col_map["invoices"] = idx
+                    break
 
         if "revenue" not in col_map and "invoices" not in col_map:
             continue
@@ -251,8 +267,13 @@ def parse_excel(file_path):
             avg_rev_inv = 0
             total_vehicles = total_veh_calc
 
-        if not avg_rev_inv and total_invoices:
+        if (not avg_rev_inv or avg_rev_inv < 1) and total_invoices and total_revenue:
             avg_rev_inv = total_revenue / total_invoices
+
+        if "invoices" not in col_map and total_invoices == 0 and len(data_rows) > 0:
+            total_invoices = len(data_rows)
+            if total_revenue:
+                avg_rev_inv = total_revenue / total_invoices
 
         sorted_prefixes = sorted(PRODUCT_MAP.keys(), key=len, reverse=True)
         product_breakdown = []
@@ -492,7 +513,7 @@ def build_cover_slide(prs, stores, month_year, total_slides):
     tf2 = txBox2.text_frame
     p2 = tf2.paragraphs[0]
     run2 = p2.add_run()
-    run2.text = "Installer Program Report"
+    run2.text = "Partnership Hub Report"
     run2.font.size = Pt(36)
     run2.font.bold = True
     run2.font.color.rgb = rgb(C["white"])
@@ -1491,7 +1512,7 @@ def build_closing_slide(prs, stores, month_year, total_slides):
     p2 = tf2.paragraphs[0]
     p2.alignment = PP_ALIGN.CENTER
     r2 = p2.add_run()
-    r2.text = f"Installer Program Report | {month_year}"
+    r2.text = f"Partnership Hub Report | {month_year}"
     r2.font.size = Pt(12)
     r2.font.color.rgb = rgb(C["purpleLight"])
     r2.font.name = "Calibri"
@@ -1681,7 +1702,7 @@ def generate_report(file_path, output_path=None, map_images=None):
     if not output_path:
         month_abbr = month_year.split()[0][:3] if month_year else "Jan"
         year = month_year.split()[-1] if month_year else "2025"
-        output_path = f"Royal_Purple_Installer_Report_{month_abbr}{year}.pptx"
+        output_path = f"Royal_Purple_Partnership_Report_{month_abbr}{year}.pptx"
 
     total_slides = calculate_total_slides(len(stores), len(maps))
 
