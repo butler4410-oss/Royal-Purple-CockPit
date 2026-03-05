@@ -205,11 +205,12 @@ elif nav == "Customer Map":
                 with open(report_path, "rb") as f:
                     report_data = f.read()
 
-                failed_note = f" {stats.get('failed_geo', 0)} accounts failed to geolocate (see last sheet)." if stats.get('failed_geo', 0) > 0 else ""
                 st.success(
-                    f"Report generated — {stats['not_on_c4c']} accounts not on C4C, "
-                    f"{stats['c4c_matched']} matched, across {stats['states']} states. "
-                    f"{stats['sheets']} sheets.{failed_note}"
+                    f"Report generated — {stats['sheets']} sheets including: "
+                    f"{stats['not_on_c4c']} not on C4C, {stats['c4c_matched']} matched, "
+                    f"{stats['states']} states, {stats.get('c4c_dupes', 0)} C4C duplicates, "
+                    f"{stats.get('promo_dupes', 0)} promo duplicates, "
+                    f"{stats.get('failed_geo', 0)} failed geolocations."
                 )
 
                 st.download_button(
