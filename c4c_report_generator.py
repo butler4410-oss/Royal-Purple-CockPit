@@ -1,11 +1,17 @@
 import json
 import os
+import openpyxl as oxl
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+import pgeocode
 from distribution_data import STATE_DISTRIBUTORS, DISTRIBUTOR_COLORS, ALL_DISTRIBUTORS
 
 CUSTOMERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "customers.json")
+INSTALLER_EXCEL = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "attached_assets", "Installer_Accounts_Not_On_C4C_1772753485907.xlsx"
+)
 
 HEADER_FILL = PatternFill(start_color="1B1464", end_color="1B1464", fill_type="solid")
 HEADER_FONT = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
@@ -24,6 +30,83 @@ THIN_BORDER = Border(
     top=Side(style="thin", color="E2E8F0"),
     bottom=Side(style="thin", color="E2E8F0"),
 )
+
+
+def _get_failed_geolocations():
+    if not os.path.exists(INSTALLER_EXCEL):
+        return []
+
+    nomi = pgeocode.Nominatim('us')
+    wb = oxl.load_workbook(INSTALLER_EXCEL)
+    failed = []
+    seen = set()
+
+    for sheet_name in ['Not on C4C List', 'Matched Accounts']:
+        if sheet_name not in wb.sheetnames:
+            continue
+        ws = wb[sheet_name]
+        source = "Not on C4C" if "Not" in sheet_name else "C4C Matched"
+
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            name = row[0]
+            address = row[1]
+            city = row[3]
+            state = row[4]
+            zipcode = row[5]
+            phone = row[6] if len(row) > 6 else None
+            email = row[7] if len(row) > 7 else None
+
+            if not name:
+                continue
+            name = str(name).strip()
+            if name in ['-', '(RESIDENCE)'] or name.startswith('('):
+                continue
+
+            address = str(address).strip() if address else ""
+            city = str(city).strip() if city else ""
+            state = str(state).strip().upper() if state else ""
+            z = str(zipcode).strip() if zipcode else ""
+            z_clean = z.split('-')[0][:5]
+            phone = str(phone).strip() if phone else ""
+            email = str(email).strip() if email else ""
+            if phone == "None":
+                phone = ""
+            if email == "None":
+                email = ""
+
+            key = (name.upper(), city.upper(), state)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            reason = ""
+            if not city or not state:
+                reason = "Missing city/state"
+            elif len(state) != 2 or not state.isalpha():
+                reason = f"Invalid state code: {state}"
+            else:
+                if len(z_clean) == 5 and z_clean.isdigit():
+                    result = nomi.query_postal_code(z_clean)
+                    if result is None or (result.latitude != result.latitude):
+                        reason = f"Zip code not found: {z_clean}"
+                    else:
+                        continue
+                else:
+                    reason = f"Invalid zip: {z}"
+
+            failed.append({
+                "store_name": name,
+                "address": address,
+                "city": city,
+                "state": state,
+                "zip": z,
+                "phone": phone,
+                "email": email,
+                "source": source,
+                "reason": reason,
+            })
+
+    return failed
 
 
 def _load_customers():
@@ -428,6 +511,46 @@ def generate_c4c_report(output_path):
 
     _auto_width(ws6, len(priority_headers))
 
+    # ── Sheet 7: Failed to Geolocate ──
+    failed = _get_failed_geolocations()
+
+    ws7 = wb.create_sheet("Failed to Geolocate")
+    ws7.sheet_properties.tabColor = "94A3B8"
+
+    ws7.merge_cells("A1:I1")
+    ws7["A1"] = f"Installer Accounts — Failed to Geolocate ({len(failed)} accounts)"
+    ws7["A1"].font = TITLE_FONT
+    ws7.row_dimensions[1].height = 28
+
+    ws7.merge_cells("A2:I2")
+    ws7["A2"] = "These accounts could not be placed on the map due to invalid or missing address data."
+    ws7["A2"].font = Font(name="Calibri", italic=True, size=10, color="64748B")
+
+    row = 4
+    fail_headers = ["Store Name", "Address", "City", "State", "Zip",
+                     "Phone", "Email", "Source Sheet", "Reason"]
+    for ci, h in enumerate(fail_headers, 1):
+        ws7.cell(row=row, column=ci, value=h)
+    _apply_header_row(ws7, row, len(fail_headers))
+    row += 1
+
+    for f in sorted(failed, key=lambda x: (x["reason"], x["state"], x["store_name"])):
+        ws7.cell(row=row, column=1, value=f["store_name"])
+        ws7.cell(row=row, column=2, value=f["address"])
+        ws7.cell(row=row, column=3, value=f["city"])
+        ws7.cell(row=row, column=4, value=f["state"])
+        ws7.cell(row=row, column=5, value=f["zip"])
+        ws7.cell(row=row, column=6, value=f["phone"])
+        ws7.cell(row=row, column=7, value=f["email"])
+        ws7.cell(row=row, column=8, value=f["source"])
+        ws7.cell(row=row, column=9, value=f["reason"])
+
+        _apply_data_row(ws7, row, len(fail_headers), alt=(row % 2 == 0))
+        ws7.cell(row=row, column=4).alignment = Alignment(horizontal="center")
+        row += 1
+
+    _auto_width(ws7, len(fail_headers))
+
     wb.save(output_path)
 
     return {
@@ -436,5 +559,6 @@ def generate_c4c_report(output_path):
         "c4c_matched": len(c4c_matched),
         "distributors": len(distributors_list),
         "states": len(all_states_code),
-        "sheets": 6,
+        "failed_geo": len(failed),
+        "sheets": 7,
     }
