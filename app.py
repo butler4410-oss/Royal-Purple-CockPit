@@ -32,7 +32,7 @@ with st.sidebar:
 
     st.markdown("---")
     if os.path.exists(LOGO_NEVER_SETTLE):
-        st.image(LOGO_NEVER_SETTLE, use_container_width=True)
+        st.image(LOGO_NEVER_SETTLE, width="stretch")
     st.caption("More Cars. More Loyalty. Less Stress.")
 
 
@@ -104,7 +104,7 @@ if nav == "Distribution Map":
         plot_bgcolor="rgba(0,0,0,0)",
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True, key="dist_map")
 
     st.markdown("### ABE Legend")
     legend_cols = st.columns(min(len(DISTRIBUTOR_COLORS), 3))
@@ -179,7 +179,7 @@ elif nav == "Report Generator":
             map_cols = st.columns(min(len(map_files), 3))
             for i, mf in enumerate(map_files):
                 with map_cols[i % 3]:
-                    st.image(mf, caption=mf.name, use_container_width=True)
+                    st.image(mf, caption=mf.name, width="stretch")
 
     if uploaded_file is not None:
         with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
@@ -259,7 +259,7 @@ elif nav == "Report Generator":
                         "MC Rate": f"{mc.get('attachmentRate', 0):.0f}%",
                         "MC Lift": f"+${mc.get('ticketLift', 0):.2f}",
                     })
-                st.dataframe(ranking_data, use_container_width=True, hide_index=True)
+                st.dataframe(ranking_data, use_container_width=True, hide_index=True, key="ranking_df")
 
             with tab_mc:
                 if network_mc > 0:
@@ -280,7 +280,7 @@ elif nav == "Report Generator":
                             "Non-MC Avg": f"${mc['nonMcAvgTicket']:.2f}",
                             "Ticket Lift": f"+${mc['ticketLift']:.2f}",
                         })
-                    st.dataframe(mc_data, use_container_width=True, hide_index=True)
+                    st.dataframe(mc_data, use_container_width=True, hide_index=True, key="mc_df")
 
                     st.markdown("")
                     st.markdown("#### Key Insight")
