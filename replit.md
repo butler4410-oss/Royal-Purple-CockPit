@@ -8,7 +8,8 @@
 - **report_generator.py** — PPTX engine + adaptive Excel parser with invoice deduplication and Max-Clean attachment analysis
 - **distribution_data.py** — STATE_DISTRIBUTORS mapping (50 states + DC), DISTRIBUTOR_COLORS, ALL_DISTRIBUTORS
 - **customer_map.py** — Leaflet.js map builder: loads customers.json, parses CSV uploads, generates embedded HTML map component
-- **customers.json** — Sample customer location data (40 locations across US: installers, retailers, distributors)
+- **c4c_report_generator.py** — Excel report generator: C4C gap analysis + ABE territory data → 6-sheet .xlsx workbook
+- **customers.json** — Geocoded installer accounts (2,326 from Excel) + 6 ABE distributors
 - **assets/** — Royal Purple branding images
 
 ## Excel Parsing (Fully Adaptive)

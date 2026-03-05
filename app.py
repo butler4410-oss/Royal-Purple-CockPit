@@ -10,6 +10,7 @@ from report_generator import (
 )
 from distribution_data import STATE_DISTRIBUTORS, DISTRIBUTOR_COLORS, ALL_DISTRIBUTORS
 from customer_map import load_customers, parse_csv_customers, build_leaflet_html, get_states
+from c4c_report_generator import generate_c4c_report
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
@@ -191,6 +192,31 @@ elif nav == "Customer Map":
 
         st.markdown("")
         st.caption("Use the search bar and filters on the map to find specific locations. Click the List button to see a sidebar of all locations.")
+
+        st.markdown("---")
+        st.markdown("### Export Report")
+        st.caption("Generate a comprehensive Excel report combining C4C gap analysis with ABE distribution territory data.")
+
+        if st.button("Generate C4C & Territory Report", type="primary"):
+            with st.spinner("Building report..."):
+                report_path = os.path.join(tempfile.gettempdir(), "RP_C4C_Territory_Report.xlsx")
+                stats = generate_c4c_report(report_path)
+
+                with open(report_path, "rb") as f:
+                    report_data = f.read()
+
+                st.success(
+                    f"Report generated — {stats['not_on_c4c']} accounts not on C4C, "
+                    f"{stats['c4c_matched']} matched, across {stats['states']} states. "
+                    f"{stats['sheets']} sheets."
+                )
+
+                st.download_button(
+                    label="Download Excel Report",
+                    data=report_data,
+                    file_name="RP_C4C_Territory_Report.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
     else:
         st.info("No customer data available. Upload a CSV file to get started.")
 
