@@ -777,62 +777,50 @@ def add_slide_header(slide, title, subtitle=None):
         run2.font.name = "Calibri"
 
 
-def add_stat_card(slide, x, y, w, h, value, label, sub_label=None):
-    card = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(w), Inches(h))
-    card.fill.solid()
-    card.fill.fore_color.rgb = rgb(C["white"])
-    card.line.fill.background()
-
-    gold_bar = slide.shapes.add_shape(
-        1, Inches(x), Inches(y), Inches(w), Inches(0.06)
-    )
-    gold_bar.fill.solid()
-    gold_bar.fill.fore_color.rgb = rgb(C["gold"])
-    gold_bar.line.fill.background()
-
+def _add_metric(slide, x, y, w, value, label, sub_label=None):
     val_str = str(value)
     font_size = 20 if len(val_str) > 8 else 26
-
-    val_box = slide.shapes.add_textbox(
-        Inches(x + 0.1), Inches(y + 0.15), Inches(w - 0.2), Inches(0.45)
-    )
-    tf = val_box.text_frame
+    vb = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(0.45))
+    tf = vb.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.alignment = PP_ALIGN.CENTER
-    run = p.add_run()
-    run.text = val_str
-    run.font.size = Pt(font_size)
-    run.font.bold = True
-    run.font.color.rgb = rgb(C["purple"])
-    run.font.name = "Calibri"
+    r = p.add_run()
+    r.text = val_str
+    r.font.size = Pt(font_size)
+    r.font.bold = True
+    r.font.color.rgb = rgb(C["purple"])
+    r.font.name = "Calibri"
 
-    lbl_box = slide.shapes.add_textbox(
-        Inches(x + 0.1), Inches(y + 0.6), Inches(w - 0.2), Inches(0.25)
-    )
-    tf2 = lbl_box.text_frame
+    lb = slide.shapes.add_textbox(Inches(x), Inches(y + 0.42), Inches(w), Inches(0.22))
+    tf2 = lb.text_frame
     tf2.word_wrap = True
     p2 = tf2.paragraphs[0]
     p2.alignment = PP_ALIGN.CENTER
-    run2 = p2.add_run()
-    run2.text = label
-    run2.font.size = Pt(9)
-    run2.font.color.rgb = rgb(C["darkGray"])
-    run2.font.name = "Calibri"
+    r2 = p2.add_run()
+    r2.text = label
+    r2.font.size = Pt(9)
+    r2.font.color.rgb = rgb(C["darkGray"])
+    r2.font.name = "Calibri"
 
     if sub_label:
-        sub_box = slide.shapes.add_textbox(
-            Inches(x + 0.1), Inches(y + 0.82), Inches(w - 0.2), Inches(0.2)
-        )
-        tf3 = sub_box.text_frame
+        sb = slide.shapes.add_textbox(Inches(x), Inches(y + 0.62), Inches(w), Inches(0.18))
+        tf3 = sb.text_frame
         tf3.word_wrap = True
         p3 = tf3.paragraphs[0]
         p3.alignment = PP_ALIGN.CENTER
-        run3 = p3.add_run()
-        run3.text = sub_label
-        run3.font.size = Pt(7)
-        run3.font.color.rgb = rgb(C["midGray"])
-        run3.font.name = "Calibri"
+        r3 = p3.add_run()
+        r3.text = sub_label
+        r3.font.size = Pt(7)
+        r3.font.color.rgb = rgb(C["midGray"])
+        r3.font.name = "Calibri"
+
+
+def _add_thin_divider(slide, x, y, w, color=C["lightGray"]):
+    line = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(w), Inches(0.01))
+    line.fill.solid()
+    line.fill.fore_color.rgb = rgb(color)
+    line.line.fill.background()
 
 
 def fmt_currency(val):
@@ -999,42 +987,35 @@ def build_toc_slide(prs, total_slides):
         ("7", "Next Steps", "Recommendations"),
     ]
     for i, (num, title, desc) in enumerate(sections):
-        col = i % 4
-        row = i // 4
-        x = 0.3 + col * 2.4
-        y = 1.55 + row * 1.7
+        y = 1.5 + i * 0.5
+        _add_thin_divider(slide, 0.5, y, 9.0)
 
-        card = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(2.15), Inches(1.4))
-        card.fill.solid()
-        card.fill.fore_color.rgb = rgb(C["white"])
-        card.line.fill.background()
-
-        num_box = slide.shapes.add_textbox(Inches(x + 0.12), Inches(y + 0.1), Inches(0.5), Inches(0.5))
-        tf = num_box.text_frame
+        nb = slide.shapes.add_textbox(Inches(0.5), Inches(y + 0.06), Inches(0.5), Inches(0.35))
+        tf = nb.text_frame
         p = tf.paragraphs[0]
         r = p.add_run()
         r.text = num
-        r.font.size = Pt(24)
+        r.font.size = Pt(18)
         r.font.bold = True
         r.font.color.rgb = rgb(C["gold"])
         r.font.name = "Calibri"
 
-        t_box = slide.shapes.add_textbox(Inches(x + 0.12), Inches(y + 0.55), Inches(1.9), Inches(0.35))
-        tf2 = t_box.text_frame
+        tb = slide.shapes.add_textbox(Inches(1.1), Inches(y + 0.08), Inches(3.5), Inches(0.25))
+        tf2 = tb.text_frame
         p2 = tf2.paragraphs[0]
         r2 = p2.add_run()
         r2.text = title
-        r2.font.size = Pt(10)
+        r2.font.size = Pt(12)
         r2.font.bold = True
         r2.font.color.rgb = rgb(C["purple"])
         r2.font.name = "Calibri"
 
-        d_box = slide.shapes.add_textbox(Inches(x + 0.12), Inches(y + 0.9), Inches(1.9), Inches(0.3))
-        tf3 = d_box.text_frame
+        db = slide.shapes.add_textbox(Inches(5.0), Inches(y + 0.1), Inches(4.5), Inches(0.25))
+        tf3 = db.text_frame
         p3 = tf3.paragraphs[0]
         r3 = p3.add_run()
         r3.text = desc
-        r3.font.size = Pt(9)
+        r3.font.size = Pt(10)
         r3.font.color.rgb = rgb(C["midGray"])
         r3.font.name = "Calibri"
 
@@ -1050,39 +1031,39 @@ def build_exec_summary_kpis(prs, stores, month_year, total_slides):
     avg_rev = total_rev / total_inv if total_inv else 0
     total_veh = sum(s["vehicles"] for s in stores)
 
-    cards = [
+    metrics = [
         (fmt_currency(total_rev), "Total Revenue", f"Across {len(stores)} locations"),
         (fmt_number(total_inv), "Total Oil Changes", f"{month_year}"),
         (f"${avg_rev:.2f}", "Avg Rev / Invoice", "Network average"),
         (fmt_number(total_veh), "Unique Vehicles", f"{month_year}"),
     ]
-    card_w = 2.1
+    mw = 2.1
     gap = 0.2
-    start_x = (10 - (4 * card_w + 3 * gap)) / 2
-    for i, (val, lbl, sub) in enumerate(cards):
-        x = start_x + i * (card_w + gap)
-        add_stat_card(slide, x, 1.55, card_w, 1.1, val, lbl, sub)
+    sx = (10 - (4 * mw + 3 * gap)) / 2
+    for i, (val, lbl, sub) in enumerate(metrics):
+        _add_metric(slide, sx + i * (mw + gap), 1.55, mw, val, lbl, sub)
+
+    _add_thin_divider(slide, 0.5, 2.55, 9.0)
 
     top8 = stores[:8]
     max_rev = top8[0]["totalRevenue"] if top8 else 1
 
-    bar_y = 3.0
-    lbl_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.8), Inches(4), Inches(0.3))
+    lbl_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.7), Inches(4), Inches(0.3))
     tf = lbl_box.text_frame
     p = tf.paragraphs[0]
     r = p.add_run()
-    r.text = "Revenue Leaderboard — Top 8 Stores"
+    r.text = "Revenue Leaderboard"
     r.font.size = Pt(11)
     r.font.bold = True
     r.font.color.rgb = rgb(C["purple"])
     r.font.name = "Calibri"
 
     for i, store in enumerate(top8):
-        y = bar_y + i * 0.28
-        bar_w = max(0.3, (store["totalRevenue"] / max_rev) * 6.5)
+        y = 3.05 + i * 0.3
+        bar_w = max(0.3, (store["totalRevenue"] / max_rev) * 5.0)
 
-        name_box = slide.shapes.add_textbox(Inches(0.5), Inches(y), Inches(2.5), Inches(0.26))
-        tf_n = name_box.text_frame
+        nm = slide.shapes.add_textbox(Inches(0.5), Inches(y), Inches(2.8), Inches(0.26))
+        tf_n = nm.text_frame
         p_n = tf_n.paragraphs[0]
         p_n.alignment = PP_ALIGN.RIGHT
         r_n = p_n.add_run()
@@ -1091,14 +1072,13 @@ def build_exec_summary_kpis(prs, stores, month_year, total_slides):
         r_n.font.color.rgb = rgb(C["darkGray"])
         r_n.font.name = "Calibri"
 
-        bar_color = C["purple"] if i % 2 == 0 else C["purpleMid"]
-        bar = slide.shapes.add_shape(1, Inches(3.1), Inches(y + 0.02), Inches(bar_w), Inches(0.22))
+        bar = slide.shapes.add_shape(1, Inches(3.4), Inches(y + 0.04), Inches(bar_w), Inches(0.18))
         bar.fill.solid()
-        bar.fill.fore_color.rgb = rgb(bar_color)
+        bar.fill.fore_color.rgb = rgb(C["purple"])
         bar.line.fill.background()
 
-        val_box = slide.shapes.add_textbox(Inches(3.1 + bar_w + 0.1), Inches(y), Inches(1.2), Inches(0.26))
-        tf_v = val_box.text_frame
+        vb = slide.shapes.add_textbox(Inches(3.4 + bar_w + 0.08), Inches(y), Inches(1.5), Inches(0.26))
+        tf_v = vb.text_frame
         p_v = tf_v.paragraphs[0]
         r_v = p_v.add_run()
         r_v.text = fmt_currency(store["totalRevenue"])
@@ -1130,62 +1110,54 @@ def build_exec_observations(prs, stores, month_year, total_slides):
         (
             "Network Revenue",
             f"Total network revenue of {fmt_currency(total_rev)} across {len(stores)} locations with {fmt_number(total_inv)} oil changes at an average of ${avg_rev:.2f} per invoice.",
-            C["purple"],
         ),
         (
             "Top Performer",
             f"{top_store['name']} leads with {fmt_currency(top_store['totalRevenue'])} in revenue ({top_store['totalRevenue']/total_rev*100:.1f}% of network total) and {fmt_number(top_store['invoices'])} oil changes." if top_store else "N/A",
-            C["gold"],
         ),
         (
             "Product Mix Insight",
             f"High Mileage products account for {hm_pct:.1f}% of total revenue, indicating strong upsell penetration across the network.",
-            C["purpleMid"],
         ),
         (
             "Growth Opportunity",
             f"{bottom_store['name']} has the lowest revenue at {fmt_currency(bottom_store['totalRevenue'])} — targeted promotions could lift volume." if bottom_store else "N/A",
-            C["teal"],
         ),
     ]
 
-    for i, (title, body, accent_color) in enumerate(observations):
-        col = i % 2
-        row = i // 2
-        x = 0.5 + col * 4.6
-        y = 1.55 + row * 1.85
-        w = 4.3
-        h = 1.65
+    for i, (title, body) in enumerate(observations):
+        y = 1.55 + i * 0.92
+        _add_thin_divider(slide, 0.5, y, 9.0)
 
-        card = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(w), Inches(h))
-        card.fill.solid()
-        card.fill.fore_color.rgb = rgb(C["white"])
-        card.line.fill.background()
+        nb = slide.shapes.add_textbox(Inches(0.5), Inches(y + 0.08), Inches(0.35), Inches(0.3))
+        tf_n = nb.text_frame
+        p_n = tf_n.paragraphs[0]
+        r_n = p_n.add_run()
+        r_n.text = str(i + 1)
+        r_n.font.size = Pt(16)
+        r_n.font.bold = True
+        r_n.font.color.rgb = rgb(C["gold"])
+        r_n.font.name = "Calibri"
 
-        accent = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(0.06), Inches(h))
-        accent.fill.solid()
-        accent.fill.fore_color.rgb = rgb(accent_color)
-        accent.line.fill.background()
+        tb = slide.shapes.add_textbox(Inches(1.0), Inches(y + 0.08), Inches(8.5), Inches(0.25))
+        tf_t = tb.text_frame
+        p_t = tf_t.paragraphs[0]
+        r_t = p_t.add_run()
+        r_t.text = title
+        r_t.font.size = Pt(12)
+        r_t.font.bold = True
+        r_t.font.color.rgb = rgb(C["purple"])
+        r_t.font.name = "Calibri"
 
-        t_box = slide.shapes.add_textbox(Inches(x + 0.2), Inches(y + 0.12), Inches(w - 0.4), Inches(0.3))
-        tf = t_box.text_frame
-        p = tf.paragraphs[0]
-        r = p.add_run()
-        r.text = title
-        r.font.size = Pt(11)
-        r.font.bold = True
-        r.font.color.rgb = rgb(accent_color)
-        r.font.name = "Calibri"
-
-        b_box = slide.shapes.add_textbox(Inches(x + 0.2), Inches(y + 0.45), Inches(w - 0.4), Inches(h - 0.55))
-        tf2 = b_box.text_frame
-        tf2.word_wrap = True
-        p2 = tf2.paragraphs[0]
-        r2 = p2.add_run()
-        r2.text = body
-        r2.font.size = Pt(9)
-        r2.font.color.rgb = rgb(C["darkGray"])
-        r2.font.name = "Calibri"
+        bb = slide.shapes.add_textbox(Inches(1.0), Inches(y + 0.36), Inches(8.5), Inches(0.5))
+        tf_b = bb.text_frame
+        tf_b.word_wrap = True
+        p_b = tf_b.paragraphs[0]
+        r_b = p_b.add_run()
+        r_b.text = body
+        r_b.font.size = Pt(9)
+        r_b.font.color.rgb = rgb(C["darkGray"])
+        r_b.font.name = "Calibri"
 
 
 def build_revenue_overview(prs, stores, month_year, total_slides):
@@ -1195,105 +1167,53 @@ def build_revenue_overview(prs, stores, month_year, total_slides):
     add_footer(slide, 5, total_slides)
 
     total_rev = sum(s["totalRevenue"] for s in stores)
-
-    hero = slide.shapes.add_shape(1, Inches(0.5), Inches(1.55), Inches(3.8), Inches(3.5))
-    hero.fill.solid()
-    hero.fill.fore_color.rgb = rgb(C["purple"])
-    hero.line.fill.background()
-
-    h_lbl = slide.shapes.add_textbox(Inches(0.8), Inches(1.8), Inches(3.2), Inches(0.3))
-    tf = h_lbl.text_frame
-    p = tf.paragraphs[0]
-    r = p.add_run()
-    r.text = "TOTAL NETWORK REVENUE"
-    r.font.size = Pt(9)
-    r.font.bold = True
-    r.font.color.rgb = rgb(C["goldLight"])
-    r.font.name = "Calibri"
-
-    h_val = slide.shapes.add_textbox(Inches(0.8), Inches(2.1), Inches(3.2), Inches(0.6))
-    tf2 = h_val.text_frame
-    p2 = tf2.paragraphs[0]
-    r2 = p2.add_run()
-    r2.text = fmt_currency(total_rev)
-    r2.font.size = Pt(32)
-    r2.font.bold = True
-    r2.font.color.rgb = rgb(C["white"])
-    r2.font.name = "Calibri"
-
-    h_sub = slide.shapes.add_textbox(Inches(0.8), Inches(2.7), Inches(3.2), Inches(0.3))
-    tf3 = h_sub.text_frame
-    p3 = tf3.paragraphs[0]
-    r3 = p3.add_run()
-    r3.text = f"{len(stores)} Locations | {month_year}"
-    r3.font.size = Pt(10)
-    r3.font.color.rgb = rgb(C["purpleLight"])
-    r3.font.name = "Calibri"
-
     total_inv = sum(s["invoices"] for s in stores)
     avg_rev = total_rev / total_inv if total_inv else 0
-    stats = [
-        (fmt_number(total_inv), "Total Oil Changes"),
-        (f"${avg_rev:.2f}", "Avg Rev/Invoice"),
-        (fmt_number(sum(s["vehicles"] for s in stores)), "Unique Vehicles"),
-    ]
-    for i, (val, lbl) in enumerate(stats):
-        sy = 3.3 + i * 0.55
-        vb = slide.shapes.add_textbox(Inches(0.8), Inches(sy), Inches(1.8), Inches(0.25))
-        tf_v = vb.text_frame
-        p_v = tf_v.paragraphs[0]
-        r_v = p_v.add_run()
-        r_v.text = val
-        r_v.font.size = Pt(14)
-        r_v.font.bold = True
-        r_v.font.color.rgb = rgb(C["white"])
-        r_v.font.name = "Calibri"
 
-        lb = slide.shapes.add_textbox(Inches(2.6), Inches(sy), Inches(1.5), Inches(0.25))
-        tf_l = lb.text_frame
-        p_l = tf_l.paragraphs[0]
-        r_l = p_l.add_run()
-        r_l.text = lbl
-        r_l.font.size = Pt(8)
-        r_l.font.color.rgb = rgb(C["purpleLight"])
-        r_l.font.name = "Calibri"
+    _add_metric(slide, 0.5, 1.55, 2.8, fmt_currency(total_rev), "Total Network Revenue", f"{len(stores)} Locations | {month_year}")
+    _add_metric(slide, 3.5, 1.55, 2.0, fmt_number(total_inv), "Oil Changes", "")
+    _add_metric(slide, 5.7, 1.55, 2.0, f"${avg_rev:.2f}", "Avg Rev/Invoice", "")
+    _add_metric(slide, 7.8, 1.55, 1.8, fmt_number(sum(s["vehicles"] for s in stores)), "Vehicles", "")
 
-    list_x = 4.6
-    list_y = 1.55
-    hdr = slide.shapes.add_textbox(Inches(list_x), Inches(list_y), Inches(5), Inches(0.3))
+    _add_thin_divider(slide, 0.5, 2.55, 9.0)
+
+    hdr = slide.shapes.add_textbox(Inches(0.5), Inches(2.7), Inches(5), Inches(0.3))
     tf_h = hdr.text_frame
     p_h = tf_h.paragraphs[0]
     r_h = p_h.add_run()
-    r_h.text = "Share of Total Revenue by Store"
-    r_h.font.size = Pt(10)
+    r_h.text = "Revenue by Store"
+    r_h.font.size = Pt(11)
     r_h.font.bold = True
     r_h.font.color.rgb = rgb(C["purple"])
     r_h.font.name = "Calibri"
 
-    for i, store in enumerate(stores):
-        sy = list_y + 0.35 + i * 0.28
+    max_rows = int((5.33 - 3.05) / 0.28)
+    visible_stores = stores[:max_rows]
+    for i, store in enumerate(visible_stores):
+        sy = 3.05 + i * 0.28
         pct = store["totalRevenue"] / total_rev * 100 if total_rev else 0
 
-        nm = slide.shapes.add_textbox(Inches(list_x), Inches(sy), Inches(2.5), Inches(0.25))
+        nm = slide.shapes.add_textbox(Inches(0.5), Inches(sy), Inches(2.8), Inches(0.25))
         tf_n = nm.text_frame
         p_n = tf_n.paragraphs[0]
+        p_n.alignment = PP_ALIGN.RIGHT
         r_n = p_n.add_run()
         r_n.text = store["name"]
         r_n.font.size = Pt(8)
         r_n.font.color.rgb = rgb(C["darkGray"])
         r_n.font.name = "Calibri"
 
-        bar_w = max(0.15, pct / 100 * 2.5)
-        bar = slide.shapes.add_shape(1, Inches(list_x + 2.6), Inches(sy + 0.03), Inches(bar_w), Inches(0.18))
+        bar_w = max(0.15, pct / 100 * 4.0)
+        bar = slide.shapes.add_shape(1, Inches(3.4), Inches(sy + 0.03), Inches(bar_w), Inches(0.18))
         bar.fill.solid()
-        bar.fill.fore_color.rgb = rgb(C["purple"] if i % 2 == 0 else C["purpleMid"])
+        bar.fill.fore_color.rgb = rgb(C["purple"])
         bar.line.fill.background()
 
-        pv = slide.shapes.add_textbox(Inches(list_x + 2.6 + bar_w + 0.05), Inches(sy), Inches(0.8), Inches(0.25))
+        pv = slide.shapes.add_textbox(Inches(3.4 + bar_w + 0.05), Inches(sy), Inches(1.5), Inches(0.25))
         tf_p = pv.text_frame
         p_p = tf_p.paragraphs[0]
         r_p = p_p.add_run()
-        r_p.text = f"{pct:.1f}%"
+        r_p.text = f"{fmt_currency(store['totalRevenue'])}  ({pct:.1f}%)"
         r_p.font.size = Pt(7)
         r_p.font.bold = True
         r_p.font.color.rgb = rgb(C["purple"])
@@ -1303,13 +1223,15 @@ def build_revenue_overview(prs, stores, month_year, total_slides):
 def build_ranking_table(prs, stores, month_year, total_slides, start_page):
     TABLE_TOP = 1.55
     FOOTER_Y = 5.33
-    ROW_H = 0.285
-    ROWS_PER_PAGE = int(math.floor((FOOTER_Y - TABLE_TOP) / ROW_H)) - 1
+    ROW_H = 0.28
+    ROWS_PER_PAGE = int(math.floor((FOOTER_Y - TABLE_TOP - 0.3) / ROW_H))
 
     total_rev = sum(s["totalRevenue"] for s in stores)
     chunks = [stores[i:i+ROWS_PER_PAGE] for i in range(0, len(stores), ROWS_PER_PAGE)]
     total_pages = len(chunks)
     pages_built = 0
+
+    headers = ["Rank", "Store Name", "Revenue", "Oil Changes", "Avg Rev/Inv", "Share %"]
 
     for page_idx, chunk in enumerate(chunks):
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -1320,33 +1242,27 @@ def build_ranking_table(prs, stores, month_year, total_slides, start_page):
         add_slide_header(slide, "Store Performance Ranking", subtitle)
         add_footer(slide, start_page + page_idx, total_slides)
 
-        headers = ["Rank", "Store Name", "Revenue", "Oil Changes", "Avg Rev/Inv", "Share %"]
-        col_widths = [0.5, 2.8, 1.3, 1.1, 1.1, 0.9]
-        col_x = [0.5]
-        for w in col_widths[:-1]:
-            col_x.append(col_x[-1] + w)
+        rows = len(chunk) + 1
+        cols = len(headers)
+        tbl = slide.shapes.add_table(rows, cols, Inches(0.5), Inches(TABLE_TOP), Inches(9.0), Inches(rows * ROW_H)).table
+        col_widths = [Inches(0.6), Inches(3.0), Inches(1.4), Inches(1.2), Inches(1.4), Inches(1.0)]
+        for ci, cw in enumerate(col_widths):
+            tbl.columns[ci].width = cw
 
-        hy = TABLE_TOP
-        for ci, (htext, cw) in enumerate(zip(headers, col_widths)):
-            hdr_bg = slide.shapes.add_shape(1, Inches(col_x[ci]), Inches(hy), Inches(cw), Inches(ROW_H))
-            hdr_bg.fill.solid()
-            hdr_bg.fill.fore_color.rgb = rgb(C["purple"])
-            hdr_bg.line.fill.background()
-
-            hdr_tb = slide.shapes.add_textbox(Inches(col_x[ci] + 0.05), Inches(hy + 0.02), Inches(cw - 0.1), Inches(ROW_H - 0.04))
-            tf = hdr_tb.text_frame
-            tf.word_wrap = False
-            p = tf.paragraphs[0]
-            p.alignment = PP_ALIGN.LEFT if ci < 2 else PP_ALIGN.RIGHT
-            r = p.add_run()
-            r.text = htext
-            r.font.size = Pt(8)
-            r.font.bold = True
-            r.font.color.rgb = rgb(C["white"])
-            r.font.name = "Calibri"
+        for ci, ht in enumerate(headers):
+            cell = tbl.cell(0, ci)
+            cell.text = ht
+            for paragraph in cell.text_frame.paragraphs:
+                paragraph.font.size = Pt(9)
+                paragraph.font.bold = True
+                paragraph.font.color.rgb = rgb(C["white"])
+                paragraph.font.name = "Calibri"
+                paragraph.alignment = PP_ALIGN.LEFT if ci < 2 else PP_ALIGN.RIGHT
+            cell.fill.solid()
+            cell.fill.fore_color.rgb = rgb(C["purple"])
+            cell.vertical_anchor = MSO_ANCHOR.MIDDLE
 
         for ri, store in enumerate(chunk):
-            ry = TABLE_TOP + ROW_H * (ri + 1)
             pct = store["totalRevenue"] / total_rev * 100 if total_rev else 0
             row_data = [
                 f"#{store['rank']}",
@@ -1356,27 +1272,22 @@ def build_ranking_table(prs, stores, month_year, total_slides, start_page):
                 f"${store['avgRevPerInvoice']:.2f}",
                 f"{pct:.1f}%",
             ]
-
-            bg_color = C["white"] if ri % 2 == 0 else C["lightGray"]
-            for ci, (val, cw) in enumerate(zip(row_data, col_widths)):
-                cell_bg = slide.shapes.add_shape(1, Inches(col_x[ci]), Inches(ry), Inches(cw), Inches(ROW_H))
-                cell_bg.fill.solid()
-                cell_bg.fill.fore_color.rgb = rgb(bg_color)
-                cell_bg.line.fill.background()
-
-                cell_tb = slide.shapes.add_textbox(Inches(col_x[ci] + 0.05), Inches(ry + 0.02), Inches(cw - 0.1), Inches(ROW_H - 0.04))
-                tf = cell_tb.text_frame
-                tf.word_wrap = False
-                p = tf.paragraphs[0]
-                p.alignment = PP_ALIGN.LEFT if ci < 2 else PP_ALIGN.RIGHT
-                r = p.add_run()
-                r.text = val
-                r.font.size = Pt(8)
-                r.font.color.rgb = rgb(C["darkGray"])
-                r.font.name = "Calibri"
-                if ci == 0:
-                    r.font.bold = True
-                    r.font.color.rgb = rgb(C["gold"])
+            bg = C["white"] if ri % 2 == 0 else C["offWhite"]
+            for ci, val in enumerate(row_data):
+                cell = tbl.cell(ri + 1, ci)
+                cell.text = val
+                for paragraph in cell.text_frame.paragraphs:
+                    paragraph.font.size = Pt(8)
+                    paragraph.font.name = "Calibri"
+                    paragraph.alignment = PP_ALIGN.LEFT if ci < 2 else PP_ALIGN.RIGHT
+                    if ci == 0:
+                        paragraph.font.bold = True
+                        paragraph.font.color.rgb = rgb(C["gold"])
+                    else:
+                        paragraph.font.color.rgb = rgb(C["darkGray"])
+                cell.fill.solid()
+                cell.fill.fore_color.rgb = rgb(bg)
+                cell.vertical_anchor = MSO_ANCHOR.MIDDLE
 
         pages_built += 1
 
@@ -1384,18 +1295,16 @@ def build_ranking_table(prs, stores, month_year, total_slides, start_page):
 
 
 def build_performance_matrix(prs, stores, month_year, total_slides, start_page):
-    ROW_Y0 = 1.83
-    LEGEND_H = 0.30
-    ROW_H = 0.258
-    ROWS_PER_PAGE = int(math.floor((5.33 - ROW_Y0 - LEGEND_H) / ROW_H))
-
-    total_inv = sum(s["invoices"] for s in stores)
-    max_inv = max(s["invoices"] for s in stores) if stores else 1
-    max_avg = max(s["avgRevPerInvoice"] for s in stores) if stores else 1
+    TABLE_TOP = 1.55
+    FOOTER_Y = 5.33
+    ROW_H = 0.28
+    ROWS_PER_PAGE = int(math.floor((FOOTER_Y - TABLE_TOP - 0.3) / ROW_H))
 
     chunks = [stores[i:i+ROWS_PER_PAGE] for i in range(0, len(stores), ROWS_PER_PAGE)]
     total_pages = len(chunks)
     pages_built = 0
+
+    headers = ["Store", "Invoices", "Avg Rev/Inv", "Revenue", "Vehicles"]
 
     for page_idx, chunk in enumerate(chunks):
         slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -1406,74 +1315,46 @@ def build_performance_matrix(prs, stores, month_year, total_slides, start_page):
         add_slide_header(slide, "Store Performance Matrix", subtitle)
         add_footer(slide, start_page + page_idx, total_slides)
 
-        legend_y = ROW_Y0
-        leg1 = slide.shapes.add_shape(1, Inches(5.5), Inches(legend_y), Inches(0.3), Inches(0.15))
-        leg1.fill.solid()
-        leg1.fill.fore_color.rgb = rgb(C["purple"])
-        leg1.line.fill.background()
-        l1 = slide.shapes.add_textbox(Inches(5.85), Inches(legend_y - 0.02), Inches(1.2), Inches(0.2))
-        tf1 = l1.text_frame
-        p1 = tf1.paragraphs[0]
-        r1 = p1.add_run()
-        r1.text = "Volume (invoices)"
-        r1.font.size = Pt(7)
-        r1.font.color.rgb = rgb(C["darkGray"])
-        r1.font.name = "Calibri"
+        rows = len(chunk) + 1
+        cols = len(headers)
+        tbl = slide.shapes.add_table(rows, cols, Inches(0.5), Inches(TABLE_TOP), Inches(9.0), Inches(rows * ROW_H)).table
+        col_widths = [Inches(3.0), Inches(1.5), Inches(1.5), Inches(1.5), Inches(1.5)]
+        for ci, cw in enumerate(col_widths):
+            tbl.columns[ci].width = cw
 
-        leg2 = slide.shapes.add_shape(1, Inches(7.2), Inches(legend_y), Inches(0.3), Inches(0.15))
-        leg2.fill.solid()
-        leg2.fill.fore_color.rgb = rgb(C["gold"])
-        leg2.line.fill.background()
-        l2 = slide.shapes.add_textbox(Inches(7.55), Inches(legend_y - 0.02), Inches(1.5), Inches(0.2))
-        tf2 = l2.text_frame
-        p2 = tf2.paragraphs[0]
-        r2 = p2.add_run()
-        r2.text = "Avg Rev/Invoice ($)"
-        r2.font.size = Pt(7)
-        r2.font.color.rgb = rgb(C["darkGray"])
-        r2.font.name = "Calibri"
+        for ci, ht in enumerate(headers):
+            cell = tbl.cell(0, ci)
+            cell.text = ht
+            for paragraph in cell.text_frame.paragraphs:
+                paragraph.font.size = Pt(9)
+                paragraph.font.bold = True
+                paragraph.font.color.rgb = rgb(C["white"])
+                paragraph.font.name = "Calibri"
+                paragraph.alignment = PP_ALIGN.LEFT if ci == 0 else PP_ALIGN.RIGHT
+            cell.fill.solid()
+            cell.fill.fore_color.rgb = rgb(C["purple"])
+            cell.vertical_anchor = MSO_ANCHOR.MIDDLE
 
         for ri, store in enumerate(chunk):
-            ry = ROW_Y0 + LEGEND_H + ri * ROW_H
-
-            nm = slide.shapes.add_textbox(Inches(0.5), Inches(ry), Inches(2.2), Inches(ROW_H))
-            tf_n = nm.text_frame
-            p_n = tf_n.paragraphs[0]
-            r_n = p_n.add_run()
-            r_n.text = store["name"]
-            r_n.font.size = Pt(8)
-            r_n.font.color.rgb = rgb(C["darkGray"])
-            r_n.font.name = "Calibri"
-
-            vol_w = max(0.2, (store["invoices"] / max_inv) * 3.5)
-            vol_bar = slide.shapes.add_shape(1, Inches(2.8), Inches(ry + 0.02), Inches(vol_w), Inches(ROW_H * 0.4))
-            vol_bar.fill.solid()
-            vol_bar.fill.fore_color.rgb = rgb(C["purple"])
-            vol_bar.line.fill.background()
-
-            vol_lbl = slide.shapes.add_textbox(Inches(2.8 + vol_w + 0.05), Inches(ry - 0.02), Inches(0.8), Inches(ROW_H * 0.5))
-            tf_vl = vol_lbl.text_frame
-            p_vl = tf_vl.paragraphs[0]
-            r_vl = p_vl.add_run()
-            r_vl.text = fmt_number(store["invoices"])
-            r_vl.font.size = Pt(6)
-            r_vl.font.color.rgb = rgb(C["purple"])
-            r_vl.font.name = "Calibri"
-
-            avg_w = max(0.2, (store["avgRevPerInvoice"] / max_avg) * 3.5)
-            avg_bar = slide.shapes.add_shape(1, Inches(2.8), Inches(ry + ROW_H * 0.5), Inches(avg_w), Inches(ROW_H * 0.4))
-            avg_bar.fill.solid()
-            avg_bar.fill.fore_color.rgb = rgb(C["gold"])
-            avg_bar.line.fill.background()
-
-            avg_lbl = slide.shapes.add_textbox(Inches(2.8 + avg_w + 0.05), Inches(ry + ROW_H * 0.4), Inches(0.8), Inches(ROW_H * 0.5))
-            tf_al = avg_lbl.text_frame
-            p_al = tf_al.paragraphs[0]
-            r_al = p_al.add_run()
-            r_al.text = f"${store['avgRevPerInvoice']:.0f}"
-            r_al.font.size = Pt(6)
-            r_al.font.color.rgb = rgb(C["gold"])
-            r_al.font.name = "Calibri"
+            row_data = [
+                store["name"],
+                fmt_number(store["invoices"]),
+                f"${store['avgRevPerInvoice']:.2f}",
+                fmt_currency(store["totalRevenue"]),
+                fmt_number(store["vehicles"]),
+            ]
+            bg = C["white"] if ri % 2 == 0 else C["offWhite"]
+            for ci, val in enumerate(row_data):
+                cell = tbl.cell(ri + 1, ci)
+                cell.text = val
+                for paragraph in cell.text_frame.paragraphs:
+                    paragraph.font.size = Pt(8)
+                    paragraph.font.name = "Calibri"
+                    paragraph.alignment = PP_ALIGN.LEFT if ci == 0 else PP_ALIGN.RIGHT
+                    paragraph.font.color.rgb = rgb(C["darkGray"])
+                cell.fill.solid()
+                cell.fill.fore_color.rgb = rgb(bg)
+                cell.vertical_anchor = MSO_ANCHOR.MIDDLE
 
         pages_built += 1
 
@@ -1502,52 +1383,12 @@ def build_product_mix(prs, stores, month_year, total_slides, page_num):
         ("Other / Specialty", max(other_rev, 0)),
     ]
 
-    colors = [C["purple"], C["gold"], C["purpleMid"]]
     for i, (cat, rev) in enumerate(top3):
         x = 0.5 + i * 3.1
         pct = rev / total_rev * 100 if total_rev else 0
+        _add_metric(slide, x, 1.55, 2.8, f"{pct:.1f}%", cat, fmt_currency(rev))
 
-        card = slide.shapes.add_shape(1, Inches(x), Inches(1.55), Inches(2.8), Inches(1.2))
-        card.fill.solid()
-        card.fill.fore_color.rgb = rgb(C["white"])
-        card.line.fill.background()
-
-        accent = slide.shapes.add_shape(1, Inches(x), Inches(1.55), Inches(2.8), Inches(0.06))
-        accent.fill.solid()
-        accent.fill.fore_color.rgb = rgb(colors[i])
-        accent.line.fill.background()
-
-        v_box = slide.shapes.add_textbox(Inches(x + 0.15), Inches(1.7), Inches(2.5), Inches(0.4))
-        tf = v_box.text_frame
-        p = tf.paragraphs[0]
-        p.alignment = PP_ALIGN.CENTER
-        r = p.add_run()
-        r.text = f"{pct:.1f}%"
-        r.font.size = Pt(24)
-        r.font.bold = True
-        r.font.color.rgb = rgb(colors[i])
-        r.font.name = "Calibri"
-
-        n_box = slide.shapes.add_textbox(Inches(x + 0.15), Inches(2.1), Inches(2.5), Inches(0.25))
-        tf2 = n_box.text_frame
-        p2 = tf2.paragraphs[0]
-        p2.alignment = PP_ALIGN.CENTER
-        r2 = p2.add_run()
-        r2.text = cat
-        r2.font.size = Pt(9)
-        r2.font.bold = True
-        r2.font.color.rgb = rgb(C["darkGray"])
-        r2.font.name = "Calibri"
-
-        rv_box = slide.shapes.add_textbox(Inches(x + 0.15), Inches(2.35), Inches(2.5), Inches(0.2))
-        tf3 = rv_box.text_frame
-        p3 = tf3.paragraphs[0]
-        p3.alignment = PP_ALIGN.CENTER
-        r3 = p3.add_run()
-        r3.text = fmt_currency(rev)
-        r3.font.size = Pt(8)
-        r3.font.color.rgb = rgb(C["midGray"])
-        r3.font.name = "Calibri"
+    _add_thin_divider(slide, 0.5, 2.55, 9.0)
 
     sku_rev = {}
     for s in stores:
@@ -1557,22 +1398,21 @@ def build_product_mix(prs, stores, month_year, total_slides, page_num):
     sorted_skus = sorted(sku_rev.items(), key=lambda x: -x[1])[:10]
     max_sku_rev = sorted_skus[0][1] if sorted_skus else 1
 
-    bar_y = 3.1
-    lbl_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.9), Inches(4), Inches(0.3))
+    lbl_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.7), Inches(4), Inches(0.3))
     tf = lbl_box.text_frame
     p = tf.paragraphs[0]
     r = p.add_run()
-    r.text = "Revenue by Product SKU (Top 10)"
-    r.font.size = Pt(10)
+    r.text = "Top 10 Product SKUs"
+    r.font.size = Pt(11)
     r.font.bold = True
     r.font.color.rgb = rgb(C["purple"])
     r.font.name = "Calibri"
 
     for i, (code, rev) in enumerate(sorted_skus):
-        y = bar_y + i * 0.22
-        bar_w = max(0.2, (rev / max_sku_rev) * 5.0)
+        y = 3.05 + i * 0.23
+        bar_w = max(0.2, (rev / max_sku_rev) * 4.5)
 
-        nm = slide.shapes.add_textbox(Inches(0.5), Inches(y), Inches(2.0), Inches(0.2))
+        nm = slide.shapes.add_textbox(Inches(0.5), Inches(y), Inches(2.8), Inches(0.2))
         tf_n = nm.text_frame
         p_n = tf_n.paragraphs[0]
         p_n.alignment = PP_ALIGN.RIGHT
@@ -1582,12 +1422,12 @@ def build_product_mix(prs, stores, month_year, total_slides, page_num):
         r_n.font.color.rgb = rgb(C["darkGray"])
         r_n.font.name = "Calibri"
 
-        bar = slide.shapes.add_shape(1, Inches(2.6), Inches(y + 0.02), Inches(bar_w), Inches(0.16))
+        bar = slide.shapes.add_shape(1, Inches(3.4), Inches(y + 0.03), Inches(bar_w), Inches(0.14))
         bar.fill.solid()
-        bar.fill.fore_color.rgb = rgb(C["purple"] if i % 2 == 0 else C["gold"])
+        bar.fill.fore_color.rgb = rgb(C["purple"])
         bar.line.fill.background()
 
-        vb = slide.shapes.add_textbox(Inches(2.6 + bar_w + 0.05), Inches(y), Inches(1.2), Inches(0.2))
+        vb = slide.shapes.add_textbox(Inches(3.4 + bar_w + 0.05), Inches(y), Inches(1.5), Inches(0.2))
         tf_v = vb.text_frame
         p_v = tf_v.paragraphs[0]
         r_v = p_v.add_run()
@@ -1650,50 +1490,49 @@ def build_product_deep_dive(prs, cat_data, stores, month_year, total_slides, pag
 
     is_mc = cat_name == "Max-Clean"
 
-    cards = [
+    metrics = [
         (fmt_currency(cat_data["totalRevenue"]), "Category Revenue", f"{cat_pct:.1f}% of network"),
-        (fmt_number(cat_data["totalLineCount"]), "Transactions", "Product line appearances"),
+        (fmt_number(cat_data["totalLineCount"]), "Transactions", "Product line items"),
         (fmt_number(cat_data["storeCount"]), "Stores Selling", f"of {len(stores)} locations"),
     ]
 
     if is_mc:
         mc_total = sum(s.get("maxClean", {}).get("total", 0) for s in stores)
         mc_rate = mc_total / total_inv * 100 if total_inv else 0
-        cards.append((f"{mc_rate:.1f}%", "Attachment Rate", f"{fmt_number(mc_total)} of {fmt_number(total_inv)} inv"))
+        metrics.append((f"{mc_rate:.1f}%", "Attachment Rate", f"{fmt_number(mc_total)} of {fmt_number(total_inv)} inv"))
     else:
         avg_per_store = cat_data["totalRevenue"] / cat_data["storeCount"] if cat_data["storeCount"] else 0
-        cards.append((fmt_currency(avg_per_store), "Avg per Store", "Revenue per location"))
+        metrics.append((fmt_currency(avg_per_store), "Avg per Store", "Revenue per location"))
 
-    card_w = 2.05
+    mw = 2.1
     gap = 0.15
-    start_x = 0.5
-    for i, (val, lbl, sub) in enumerate(cards):
-        x = start_x + i * (card_w + gap)
-        add_stat_card(slide, x, 1.55, card_w, 1.05, val, lbl, sub)
+    sx = 0.5
+    for i, (val, lbl, sub) in enumerate(metrics):
+        _add_metric(slide, sx + i * (mw + gap), 1.55, mw, val, lbl, sub)
+
+    _add_thin_divider(slide, 0.5, 2.55, 9.0)
 
     sorted_stores = sorted(cat_data["stores"].items(), key=lambda x: -x[1]["revenue"])
     top_stores = sorted_stores[:8]
 
     if top_stores:
         max_store_rev = top_stores[0][1]["revenue"]
-        chart_y = 2.85
-        bar_h = 0.24
 
-        lbl = slide.shapes.add_textbox(Inches(0.5), Inches(chart_y - 0.25), Inches(4), Inches(0.25))
+        lbl = slide.shapes.add_textbox(Inches(0.5), Inches(2.7), Inches(4), Inches(0.25))
         tf = lbl.text_frame
         p = tf.paragraphs[0]
         r = p.add_run()
-        r.text = f"{cat_name} Revenue by Store (Top {len(top_stores)})"
-        r.font.size = Pt(10)
+        r.text = f"{cat_name} Revenue by Store"
+        r.font.size = Pt(11)
         r.font.bold = True
         r.font.color.rgb = rgb(C["purple"])
         r.font.name = "Calibri"
 
         for pi, (sname, sdata) in enumerate(top_stores):
-            py = chart_y + pi * (bar_h + 0.05)
-            bar_w = max(0.2, (sdata["revenue"] / max_store_rev) * 3.5) if max_store_rev else 0.2
+            py = 3.05 + pi * 0.28
+            bar_w = max(0.2, (sdata["revenue"] / max_store_rev) * 3.0) if max_store_rev else 0.2
 
-            nm = slide.shapes.add_textbox(Inches(0.3), Inches(py), Inches(2.0), Inches(bar_h))
+            nm = slide.shapes.add_textbox(Inches(0.5), Inches(py), Inches(2.3), Inches(0.24))
             tf_n = nm.text_frame
             tf_n.word_wrap = False
             p_n = tf_n.paragraphs[0]
@@ -1705,42 +1544,21 @@ def build_product_deep_dive(prs, cat_data, stores, month_year, total_slides, pag
             r_n.font.color.rgb = rgb(C["darkGray"])
             r_n.font.name = "Calibri"
 
-            bar_color = C["purple"] if pi % 2 == 0 else C["gold"]
-            bar = slide.shapes.add_shape(1, Inches(2.4), Inches(py + 0.02), Inches(bar_w), Inches(bar_h - 0.04))
+            bar = slide.shapes.add_shape(1, Inches(2.9), Inches(py + 0.04), Inches(bar_w), Inches(0.16))
             bar.fill.solid()
-            bar.fill.fore_color.rgb = rgb(bar_color)
+            bar.fill.fore_color.rgb = rgb(C["purple"])
             bar.line.fill.background()
 
-            vb = slide.shapes.add_textbox(Inches(2.4 + bar_w + 0.05), Inches(py), Inches(1.5), Inches(bar_h))
+            store_pct = sdata["revenue"] / cat_data["totalRevenue"] * 100 if cat_data["totalRevenue"] else 0
+            vb = slide.shapes.add_textbox(Inches(2.9 + bar_w + 0.05), Inches(py), Inches(1.5), Inches(0.24))
             tf_v = vb.text_frame
             p_v = tf_v.paragraphs[0]
             r_v = p_v.add_run()
-            store_pct = sdata["revenue"] / cat_data["totalRevenue"] * 100 if cat_data["totalRevenue"] else 0
             r_v.text = f"{fmt_currency(sdata['revenue'])} ({store_pct:.0f}%)"
             r_v.font.size = Pt(7)
             r_v.font.bold = True
             r_v.font.color.rgb = rgb(C["purple"])
             r_v.font.name = "Calibri"
-
-    notes_x = 6.3
-    notes_y = 2.85
-    notes_w = 3.4
-    notes_h = 2.3
-
-    notes_bg = slide.shapes.add_shape(1, Inches(notes_x), Inches(notes_y), Inches(notes_w), Inches(notes_h))
-    notes_bg.fill.solid()
-    notes_bg.fill.fore_color.rgb = rgb(C["purple"])
-    notes_bg.line.fill.background()
-
-    n_lbl = slide.shapes.add_textbox(Inches(notes_x + 0.15), Inches(notes_y + 0.1), Inches(notes_w - 0.3), Inches(0.25))
-    tf_nl = n_lbl.text_frame
-    p_nl = tf_nl.paragraphs[0]
-    r_nl = p_nl.add_run()
-    r_nl.text = "Product Insights"
-    r_nl.font.size = Pt(10)
-    r_nl.font.bold = True
-    r_nl.font.color.rgb = rgb(C["goldLight"])
-    r_nl.font.name = "Calibri"
 
     desc = PRODUCT_DESCRIPTIONS.get(cat_name, "")
     top_store_name = sorted_stores[0][0] if sorted_stores else "N/A"
@@ -1782,14 +1600,24 @@ def build_product_deep_dive(prs, cat_data, stores, month_year, total_slides, pag
         )
         note_text += sku_lines
 
-    n_body = slide.shapes.add_textbox(Inches(notes_x + 0.15), Inches(notes_y + 0.4), Inches(notes_w - 0.3), Inches(notes_h - 0.55))
+    n_lbl = slide.shapes.add_textbox(Inches(6.5), Inches(2.7), Inches(3.2), Inches(0.25))
+    tf_nl = n_lbl.text_frame
+    p_nl = tf_nl.paragraphs[0]
+    r_nl = p_nl.add_run()
+    r_nl.text = "Insights"
+    r_nl.font.size = Pt(11)
+    r_nl.font.bold = True
+    r_nl.font.color.rgb = rgb(C["purple"])
+    r_nl.font.name = "Calibri"
+
+    n_body = slide.shapes.add_textbox(Inches(6.5), Inches(3.0), Inches(3.2), Inches(2.1))
     tf_nb = n_body.text_frame
     tf_nb.word_wrap = True
     p_nb = tf_nb.paragraphs[0]
     r_nb = p_nb.add_run()
     r_nb.text = note_text
     r_nb.font.size = Pt(8)
-    r_nb.font.color.rgb = rgb(C["white"])
+    r_nb.font.color.rgb = rgb(C["darkGray"])
     r_nb.font.name = "Calibri"
 
 
@@ -1863,41 +1691,39 @@ def build_deep_dive(prs, store, stores, month_year, total_slides, page_num):
     )
     add_footer(slide, page_num, total_slides)
 
-    cards = [
+    metrics = [
         (fmt_currency(store["totalRevenue"]), "Total Revenue", month_year),
         (fmt_number(store["invoices"]), "Oil Changes", "Invoice count"),
         (f"${store['avgRevPerInvoice']:.2f}", "Avg Rev/Invoice", "Per transaction"),
         (f"#{store['rank']}", "Network Rank", f"of {len(stores)} stores"),
     ]
-    card_w = 2.05
+    mw = 2.1
     gap = 0.15
-    start_x = 0.5
-    for i, (val, lbl, sub) in enumerate(cards):
-        x = start_x + i * (card_w + gap)
-        add_stat_card(slide, x, 1.55, card_w, 1.05, val, lbl, sub)
+    sx = 0.5
+    for i, (val, lbl, sub) in enumerate(metrics):
+        _add_metric(slide, sx + i * (mw + gap), 1.55, mw, val, lbl, sub)
+
+    _add_thin_divider(slide, 0.5, 2.55, 9.0)
 
     top_products = store["productBreakdown"][:6]
     if top_products:
         max_prod_rev = top_products[0]["revenue"]
-        chart_y = 2.85
-        chart_h_total = 2.2
-        bar_h = min(0.28, chart_h_total / max(len(top_products), 1))
 
-        lbl = slide.shapes.add_textbox(Inches(0.5), Inches(chart_y - 0.25), Inches(4), Inches(0.25))
+        lbl = slide.shapes.add_textbox(Inches(0.5), Inches(2.7), Inches(4), Inches(0.25))
         tf = lbl.text_frame
         p = tf.paragraphs[0]
         r = p.add_run()
-        r.text = "Revenue by Product SKU"
-        r.font.size = Pt(10)
+        r.text = "Revenue by Product"
+        r.font.size = Pt(11)
         r.font.bold = True
         r.font.color.rgb = rgb(C["purple"])
         r.font.name = "Calibri"
 
         for pi, prod in enumerate(top_products):
-            py = chart_y + pi * (bar_h + 0.05)
-            bar_w = max(0.2, (prod["revenue"] / max_prod_rev) * 3.8) if max_prod_rev else 0.2
+            py = 3.05 + pi * 0.28
+            bar_w = max(0.2, (prod["revenue"] / max_prod_rev) * 3.0) if max_prod_rev else 0.2
 
-            nm = slide.shapes.add_textbox(Inches(0.5), Inches(py), Inches(1.8), Inches(bar_h))
+            nm = slide.shapes.add_textbox(Inches(0.5), Inches(py), Inches(2.3), Inches(0.24))
             tf_n = nm.text_frame
             tf_n.word_wrap = False
             p_n = tf_n.paragraphs[0]
@@ -1908,13 +1734,12 @@ def build_deep_dive(prs, store, stores, month_year, total_slides, page_num):
             r_n.font.color.rgb = rgb(C["darkGray"])
             r_n.font.name = "Calibri"
 
-            bar_color = C["purple"] if pi % 2 == 0 else C["gold"]
-            bar = slide.shapes.add_shape(1, Inches(2.4), Inches(py + 0.02), Inches(bar_w), Inches(bar_h - 0.04))
+            bar = slide.shapes.add_shape(1, Inches(2.9), Inches(py + 0.04), Inches(bar_w), Inches(0.16))
             bar.fill.solid()
-            bar.fill.fore_color.rgb = rgb(bar_color)
+            bar.fill.fore_color.rgb = rgb(C["purple"])
             bar.line.fill.background()
 
-            vb = slide.shapes.add_textbox(Inches(2.4 + bar_w + 0.05), Inches(py), Inches(1.2), Inches(bar_h))
+            vb = slide.shapes.add_textbox(Inches(2.9 + bar_w + 0.05), Inches(py), Inches(1.5), Inches(0.24))
             tf_v = vb.text_frame
             p_v = tf_v.paragraphs[0]
             r_v = p_v.add_run()
@@ -1923,26 +1748,6 @@ def build_deep_dive(prs, store, stores, month_year, total_slides, page_num):
             r_v.font.bold = True
             r_v.font.color.rgb = rgb(C["purple"])
             r_v.font.name = "Calibri"
-
-    notes_x = 6.5
-    notes_y = 2.85
-    notes_w = 3.2
-    notes_h = 2.2
-
-    notes_bg = slide.shapes.add_shape(1, Inches(notes_x), Inches(notes_y), Inches(notes_w), Inches(notes_h))
-    notes_bg.fill.solid()
-    notes_bg.fill.fore_color.rgb = rgb(C["purple"])
-    notes_bg.line.fill.background()
-
-    n_lbl = slide.shapes.add_textbox(Inches(notes_x + 0.15), Inches(notes_y + 0.1), Inches(notes_w - 0.3), Inches(0.25))
-    tf_nl = n_lbl.text_frame
-    p_nl = tf_nl.paragraphs[0]
-    r_nl = p_nl.add_run()
-    r_nl.text = "Location Notes"
-    r_nl.font.size = Pt(10)
-    r_nl.font.bold = True
-    r_nl.font.color.rgb = rgb(C["goldLight"])
-    r_nl.font.name = "Calibri"
 
     total_rev = sum(s["totalRevenue"] for s in stores)
     pct = store["totalRevenue"] / total_rev * 100 if total_rev else 0
@@ -1961,28 +1766,28 @@ def build_deep_dive(prs, store, stores, month_year, total_slides, page_num):
         f"${store['avgRevPerInvoice']:.2f}, {store['name']} "
         f"{'leads' if store['rank'] == 1 else 'ranks #' + str(store['rank'])} in the network. "
         f"{top_cat} products represent {top_cat_pct:.0f}% of this location's mix."
-        f"{desc_line}"
+        f"{desc_line}\n\nTop Product: {store['topProduct']}"
     )
 
-    n_body = slide.shapes.add_textbox(Inches(notes_x + 0.15), Inches(notes_y + 0.4), Inches(notes_w - 0.3), Inches(notes_h - 0.85))
+    n_lbl = slide.shapes.add_textbox(Inches(6.5), Inches(2.7), Inches(3.2), Inches(0.25))
+    tf_nl = n_lbl.text_frame
+    p_nl = tf_nl.paragraphs[0]
+    r_nl = p_nl.add_run()
+    r_nl.text = "Location Notes"
+    r_nl.font.size = Pt(11)
+    r_nl.font.bold = True
+    r_nl.font.color.rgb = rgb(C["purple"])
+    r_nl.font.name = "Calibri"
+
+    n_body = slide.shapes.add_textbox(Inches(6.5), Inches(3.0), Inches(3.2), Inches(2.1))
     tf_nb = n_body.text_frame
     tf_nb.word_wrap = True
     p_nb = tf_nb.paragraphs[0]
     r_nb = p_nb.add_run()
     r_nb.text = note_text
     r_nb.font.size = Pt(8)
-    r_nb.font.color.rgb = rgb(C["white"])
+    r_nb.font.color.rgb = rgb(C["darkGray"])
     r_nb.font.name = "Calibri"
-
-    n_footer = slide.shapes.add_textbox(Inches(notes_x + 0.15), Inches(notes_y + notes_h - 0.35), Inches(notes_w - 0.3), Inches(0.25))
-    tf_nf = n_footer.text_frame
-    p_nf = tf_nf.paragraphs[0]
-    r_nf = p_nf.add_run()
-    r_nf.text = f"Top Product: {store['topProduct']}"
-    r_nf.font.size = Pt(8)
-    r_nf.font.bold = True
-    r_nf.font.color.rgb = rgb(C["goldLight"])
-    r_nf.font.name = "Calibri"
 
 
 def build_next_steps(prs, stores, month_year, total_slides, page_num):
@@ -1997,62 +1802,54 @@ def build_next_steps(prs, stores, month_year, total_slides, page_num):
         (
             "Boost Underperformers",
             f"Target {bottom['name']} with promotional offers to increase volume and average ticket size." if bottom else "Identify underperforming locations for targeted promotions.",
-            C["purple"],
         ),
         (
             "Expand High Mileage",
             "High Mileage products show strong margins — push upsell training to increase penetration across all locations.",
-            C["gold"],
         ),
         (
             "Replicate Top Performer",
             f"Study {top['name']}'s practices and replicate successful strategies across the network." if top else "Analyze top store practices for network-wide adoption.",
-            C["purpleMid"],
         ),
         (
             "Monthly Trend Tracking",
             "Establish month-over-month tracking to identify seasonal patterns and measure the impact of promotional campaigns.",
-            C["teal"],
         ),
     ]
 
-    for i, (title, body, accent_color) in enumerate(actions):
-        col = i % 2
-        row = i // 2
-        x = 0.5 + col * 4.6
-        y = 1.55 + row * 1.85
-        w = 4.3
-        h = 1.65
+    for i, (title, body) in enumerate(actions):
+        y = 1.55 + i * 0.92
+        _add_thin_divider(slide, 0.5, y, 9.0)
 
-        card = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(w), Inches(h))
-        card.fill.solid()
-        card.fill.fore_color.rgb = rgb(C["white"])
-        card.line.fill.background()
+        nb = slide.shapes.add_textbox(Inches(0.5), Inches(y + 0.08), Inches(0.35), Inches(0.3))
+        tf_n = nb.text_frame
+        p_n = tf_n.paragraphs[0]
+        r_n = p_n.add_run()
+        r_n.text = str(i + 1)
+        r_n.font.size = Pt(16)
+        r_n.font.bold = True
+        r_n.font.color.rgb = rgb(C["gold"])
+        r_n.font.name = "Calibri"
 
-        accent = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(0.06), Inches(h))
-        accent.fill.solid()
-        accent.fill.fore_color.rgb = rgb(accent_color)
-        accent.line.fill.background()
+        tb = slide.shapes.add_textbox(Inches(1.0), Inches(y + 0.08), Inches(8.5), Inches(0.25))
+        tf_t = tb.text_frame
+        p_t = tf_t.paragraphs[0]
+        r_t = p_t.add_run()
+        r_t.text = title
+        r_t.font.size = Pt(12)
+        r_t.font.bold = True
+        r_t.font.color.rgb = rgb(C["purple"])
+        r_t.font.name = "Calibri"
 
-        t_box = slide.shapes.add_textbox(Inches(x + 0.2), Inches(y + 0.12), Inches(w - 0.4), Inches(0.3))
-        tf = t_box.text_frame
-        p = tf.paragraphs[0]
-        r = p.add_run()
-        r.text = title
-        r.font.size = Pt(11)
-        r.font.bold = True
-        r.font.color.rgb = rgb(accent_color)
-        r.font.name = "Calibri"
-
-        b_box = slide.shapes.add_textbox(Inches(x + 0.2), Inches(y + 0.45), Inches(w - 0.4), Inches(h - 0.55))
-        tf2 = b_box.text_frame
-        tf2.word_wrap = True
-        p2 = tf2.paragraphs[0]
-        r2 = p2.add_run()
-        r2.text = body
-        r2.font.size = Pt(9)
-        r2.font.color.rgb = rgb(C["darkGray"])
-        r2.font.name = "Calibri"
+        bb = slide.shapes.add_textbox(Inches(1.0), Inches(y + 0.36), Inches(8.5), Inches(0.5))
+        tf_b = bb.text_frame
+        tf_b.word_wrap = True
+        p_b = tf_b.paragraphs[0]
+        r_b = p_b.add_run()
+        r_b.text = body
+        r_b.font.size = Pt(9)
+        r_b.font.color.rgb = rgb(C["darkGray"])
+        r_b.font.name = "Calibri"
 
 
 def build_closing_slide(prs, stores, month_year, total_slides):
@@ -2252,13 +2049,10 @@ def build_distribution_map_slide(prs, map_image_path, title, total_slides, page_
 def calculate_total_slides(num_stores, num_maps=0, num_product_cats=0):
     TABLE_TOP = 1.55
     FOOTER_Y = 5.33
-    ROW_H = 0.285
-    ROWS_PER_PAGE_RANK = int(math.floor((FOOTER_Y - TABLE_TOP) / ROW_H)) - 1
+    ROW_H = 0.28
+    ROWS_PER_PAGE_RANK = int(math.floor((FOOTER_Y - TABLE_TOP - 0.3) / ROW_H))
 
-    ROW_Y0 = 1.83
-    LEGEND_H = 0.30
-    MATRIX_ROW_H = 0.258
-    ROWS_PER_PAGE_MATRIX = int(math.floor((5.33 - ROW_Y0 - LEGEND_H) / MATRIX_ROW_H))
+    ROWS_PER_PAGE_MATRIX = ROWS_PER_PAGE_RANK
 
     rank_pages = math.ceil(num_stores / ROWS_PER_PAGE_RANK) if num_stores > 0 else 1
     matrix_pages = math.ceil(num_stores / ROWS_PER_PAGE_MATRIX) if num_stores > 0 else 1

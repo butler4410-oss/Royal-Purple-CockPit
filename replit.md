@@ -42,11 +42,20 @@
 - State detail selector with colored accent bars
 
 ## Logo Assets (assets/)
-- `Royal Purple White Logo.png` — Content slide badges and footer bars
-- `RPMO_logo_BF_Outline.png` — Full logo, Streamlit sidebar
-- `rp_synthetic_expert_white.png` — White "Synthetic Expert" for dark backgrounds
-- `RP_Synthetic_Expert_Logo_Black_Text.png` — Black text, Streamlit header
+- `Royal Purple White Logo.png` — DO NOT USE in PPTX (old blue/yellow text logo)
+- `RPMO_logo_BF_Outline.png` — Full logo with checkered flag, Streamlit sidebar only
+- `rp_synthetic_expert_white.png` — White "Synthetic Expert" for dark backgrounds, PPTX footer
+- `RP_Synthetic_Expert_Logo_Black_Text.png` — Black text, PPTX header badge
 - `25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg` — "NEVER SETTLE" background
+
+## PPTX Slide Design (Clean Minimal)
+- Content slides: off-white background, thin purple top bar, RP badge top-right, gold accent bar next to title
+- Metrics use `_add_metric()` — text-only (no card backgrounds, no gold accent bars)
+- Sections separated by `_add_thin_divider()` — hairline gray lines
+- Rankings/Matrix use native python-pptx Table objects (not individual cell shapes)
+- Observations/Next Steps use numbered text lists (no card containers)
+- Deep dives: metrics row → thin divider → bar chart left + text notes right (no colored panels)
+- Cover, section dividers, closing: dark background with NEVER SETTLE image overlay
 
 ## PPTX Slide Structure (dynamic)
 Cover → TOC → Exec Summary → Exec Observations → Revenue Overview → Rankings → Matrix → Product Mix → Product Deep Dives Section Divider → Product Deep Dives (per category) → [Distribution Maps] → Store Deep Dives Section Divider → Store Deep Dives → Next Steps → Closing
