@@ -182,38 +182,56 @@ def _find_header_row(rows, max_scan=10):
     return best_idx if best_score >= 2 else 0
 
 
+def _parse_single_date(date_val):
+    if date_val is None:
+        return None
+    if hasattr(date_val, 'strftime'):
+        return date_val
+    if isinstance(date_val, str):
+        date_val = date_val.strip()
+        if not date_val:
+            return None
+        import re
+        from datetime import datetime as dt
+        m = re.match(r'(\d{1,2})[/\-](\d{1,2})[/\-](\d{2,4})', date_val)
+        if m:
+            for fmt in ["%m/%d/%Y", "%m-%d-%Y", "%m/%d/%y", "%m-%d-%y",
+                        "%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"]:
+                try:
+                    return dt.strptime(date_val, fmt)
+                except ValueError:
+                    continue
+        parts = date_val.split()
+        if len(parts) >= 3:
+            for fmt in ["%B %d, %Y", "%B %d %Y"]:
+                try:
+                    return dt.strptime(date_val.replace(",", "").strip(), "%B %d %Y")
+                except ValueError:
+                    pass
+    return None
+
+
 def _detect_date_from_rows(data_rows, col_map):
     date_idx = col_map.get("date")
     if date_idx is None:
         return None
-    for row in data_rows[:20]:
+    all_dates = []
+    for row in data_rows:
         if date_idx >= len(row):
             continue
-        date_val = row[date_idx]
-        if date_val is None:
-            continue
-        if hasattr(date_val, 'strftime'):
-            return date_val.strftime("%B %Y")
-        elif isinstance(date_val, str):
-            date_val = date_val.strip()
-            if not date_val:
-                continue
-            parts = date_val.split()
-            if len(parts) >= 3:
-                return f"{parts[0]} {parts[2].rstrip(',')}"
-            elif len(parts) == 2:
-                return date_val
-            import re
-            m = re.match(r'(\d{1,2})[/\-](\d{1,2})[/\-](\d{2,4})', date_val)
-            if m:
-                from datetime import datetime as dt
-                for fmt in ["%m/%d/%Y", "%m-%d-%Y", "%m/%d/%y", "%m-%d-%y",
-                            "%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"]:
-                    try:
-                        return dt.strptime(date_val, fmt).strftime("%B %Y")
-                    except ValueError:
-                        continue
-    return None
+        d = _parse_single_date(row[date_idx])
+        if d:
+            all_dates.append(d)
+    if not all_dates:
+        return None
+    min_d = min(all_dates)
+    max_d = max(all_dates)
+    if min_d.year == max_d.year and min_d.month == max_d.month:
+        return min_d.strftime("%B %Y")
+    elif min_d.year == max_d.year:
+        return str(min_d.year)
+    else:
+        return f"{min_d.strftime('%B %Y')} – {max_d.strftime('%B %Y')}"
 
 
 def _detect_date_from_sheet(ws_title, rows):
@@ -702,12 +720,6 @@ def add_footer(slide, page_num, total_slides):
     bar.fill.fore_color.rgb = rgb(C["purple"])
     bar.line.fill.background()
 
-    logo_ft = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else None
-    if logo_ft:
-        slide.shapes.add_picture(
-            logo_ft, Inches(0.1), Inches(5.335), Inches(0.85), Inches(0.20)
-        )
-
     tf = bar.text_frame
     tf.word_wrap = False
     p = tf.paragraphs[0]
@@ -720,25 +732,19 @@ def add_footer(slide, page_num, total_slides):
 
 
 def add_royal_purple_badge(slide):
-    logo_badge = LOGO_EXPERT_BLACK if os.path.exists(LOGO_EXPERT_BLACK) else None
-    if logo_badge:
-        slide.shapes.add_picture(
-            logo_badge, Inches(7.6), Inches(0.05), Inches(2.1), Inches(0.45)
-        )
-    else:
-        txBox = slide.shapes.add_textbox(
-            Inches(7.8), Inches(0.12), Inches(2.0), Inches(0.3)
-        )
-        tf = txBox.text_frame
-        tf.word_wrap = False
-        p = tf.paragraphs[0]
-        p.alignment = PP_ALIGN.RIGHT
-        run = p.add_run()
-        run.text = "ROYAL PURPLE"
-        run.font.size = Pt(10)
-        run.font.bold = True
-        run.font.color.rgb = rgb(C["gold"])
-        run.font.name = "Calibri"
+    txBox = slide.shapes.add_textbox(
+        Inches(7.8), Inches(0.12), Inches(2.0), Inches(0.3)
+    )
+    tf = txBox.text_frame
+    tf.word_wrap = False
+    p = tf.paragraphs[0]
+    p.alignment = PP_ALIGN.RIGHT
+    run = p.add_run()
+    run.text = "ROYAL PURPLE"
+    run.font.size = Pt(10)
+    run.font.bold = True
+    run.font.color.rgb = rgb(C["gold"])
+    run.font.name = "Calibri"
 
 
 def add_slide_header(slide, title, subtitle=None):
@@ -856,13 +862,7 @@ def build_cover_slide(prs, stores, month_year, total_slides):
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    logo_path = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else LOGO_EXPERT_YELLOW
-    if os.path.exists(logo_path):
-        slide.shapes.add_picture(
-            logo_path, Inches(0.7), Inches(0.4), Inches(2.6), Inches(1.1)
-        )
-
-    txBox2 = slide.shapes.add_textbox(Inches(0.8), Inches(1.6), Inches(6), Inches(1.0))
+    txBox2 = slide.shapes.add_textbox(Inches(0.8), Inches(1.2), Inches(6), Inches(1.0))
     tf2 = txBox2.text_frame
     p2 = tf2.paragraphs[0]
     run2 = p2.add_run()
@@ -1635,18 +1635,12 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
         _set_shape_alpha(overlay, 70000)
         overlay.line.fill.background()
 
-    logo_div = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else LOGO_EXPERT_YELLOW
-    if os.path.exists(logo_div):
-        slide.shapes.add_picture(
-            logo_div, Inches(3.3), Inches(0.7), Inches(3.4), Inches(1.4)
-        )
-
-    bar = slide.shapes.add_shape(1, Inches(2.5), Inches(2.25), Inches(5), Inches(0.04))
+    bar = slide.shapes.add_shape(1, Inches(2.5), Inches(1.8), Inches(5), Inches(0.04))
     bar.fill.solid()
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    t_box = slide.shapes.add_textbox(Inches(1), Inches(2.5), Inches(8), Inches(0.7))
+    t_box = slide.shapes.add_textbox(Inches(1), Inches(2.0), Inches(8), Inches(0.7))
     tf = t_box.text_frame
     p = tf.paragraphs[0]
     p.alignment = PP_ALIGN.CENTER
@@ -1657,7 +1651,7 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
     r.font.color.rgb = rgb(C["white"])
     r.font.name = "Calibri"
 
-    s_box = slide.shapes.add_textbox(Inches(1), Inches(3.2), Inches(8), Inches(0.4))
+    s_box = slide.shapes.add_textbox(Inches(1), Inches(2.7), Inches(8), Inches(0.4))
     tf2 = s_box.text_frame
     p2 = tf2.paragraphs[0]
     p2.alignment = PP_ALIGN.CENTER
@@ -1667,7 +1661,7 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
     r2.font.color.rgb = rgb(C["purpleLight"])
     r2.font.name = "Calibri"
 
-    ns_box = slide.shapes.add_textbox(Inches(1), Inches(3.65), Inches(8), Inches(0.35))
+    ns_box = slide.shapes.add_textbox(Inches(1), Inches(3.15), Inches(8), Inches(0.35))
     tf_ns = ns_box.text_frame
     p_ns = tf_ns.paragraphs[0]
     p_ns.alignment = PP_ALIGN.CENTER
@@ -1871,13 +1865,7 @@ def build_closing_slide(prs, stores, month_year, total_slides):
     bar.fill.fore_color.rgb = rgb(C["gold"])
     bar.line.fill.background()
 
-    logo_path = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else LOGO_EXPERT_YELLOW
-    if os.path.exists(logo_path):
-        slide.shapes.add_picture(
-            logo_path, Inches(3.5), Inches(0.3), Inches(3.0), Inches(1.25)
-        )
-
-    s_box = slide.shapes.add_textbox(Inches(1), Inches(1.6), Inches(8), Inches(0.4))
+    s_box = slide.shapes.add_textbox(Inches(1), Inches(1.2), Inches(8), Inches(0.4))
     tf2 = s_box.text_frame
     p2 = tf2.paragraphs[0]
     p2.alignment = PP_ALIGN.CENTER
