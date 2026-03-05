@@ -702,9 +702,10 @@ def add_footer(slide, page_num, total_slides):
     bar.fill.fore_color.rgb = rgb(C["purple"])
     bar.line.fill.background()
 
-    if os.path.exists(LOGO_WHITE):
+    logo_ft = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else None
+    if logo_ft:
         slide.shapes.add_picture(
-            LOGO_WHITE, Inches(0.2), Inches(5.35), Inches(0.95), Inches(0.17)
+            logo_ft, Inches(0.1), Inches(5.335), Inches(0.85), Inches(0.20)
         )
 
     tf = bar.text_frame
@@ -719,9 +720,10 @@ def add_footer(slide, page_num, total_slides):
 
 
 def add_royal_purple_badge(slide):
-    if os.path.exists(LOGO_WHITE):
+    logo_badge = LOGO_EXPERT_BLACK if os.path.exists(LOGO_EXPERT_BLACK) else None
+    if logo_badge:
         slide.shapes.add_picture(
-            LOGO_WHITE, Inches(7.8), Inches(0.1), Inches(1.8), Inches(0.35)
+            logo_badge, Inches(7.6), Inches(0.05), Inches(2.1), Inches(0.45)
         )
     else:
         txBox = slide.shapes.add_textbox(
@@ -957,14 +959,26 @@ def build_cover_slide(prs, stores, month_year, total_slides):
         r_lb.font.color.rgb = rgb(C["purpleLight"])
         r_lb.font.name = "Calibri"
 
-    footer_txt = slide.shapes.add_textbox(Inches(0.8), Inches(4.8), Inches(8), Inches(0.3))
+    from datetime import datetime as _dt
+    prepared_date = _dt.now().strftime("%B %d, %Y")
+
+    footer_txt = slide.shapes.add_textbox(Inches(0.8), Inches(4.55), Inches(8), Inches(0.3))
     tf_f = footer_txt.text_frame
     p_f = tf_f.paragraphs[0]
     r_f = p_f.add_run()
-    r_f.text = "ThrottlePro — More Cars. More Loyalty. Less Stress."
-    r_f.font.size = Pt(8)
-    r_f.font.color.rgb = rgb(C["midGray"])
+    r_f.text = f"Prepared {prepared_date}"
+    r_f.font.size = Pt(9)
+    r_f.font.color.rgb = rgb(C["purpleLight"])
     r_f.font.name = "Calibri"
+
+    footer_txt2 = slide.shapes.add_textbox(Inches(0.8), Inches(4.85), Inches(8), Inches(0.3))
+    tf_f2 = footer_txt2.text_frame
+    p_f2 = tf_f2.paragraphs[0]
+    r_f2 = p_f2.add_run()
+    r_f2.text = "ThrottlePro — More Cars. More Loyalty. Less Stress."
+    r_f2.font.size = Pt(8)
+    r_f2.font.color.rgb = rgb(C["midGray"])
+    r_f2.font.name = "Calibri"
 
     add_footer(slide, 1, total_slides)
 
@@ -1793,7 +1807,7 @@ def build_section_divider(prs, title, subtitle, total_slides, page_num):
         _set_shape_alpha(overlay, 70000)
         overlay.line.fill.background()
 
-    logo_div = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else LOGO_WHITE
+    logo_div = LOGO_EXPERT_WHITE if os.path.exists(LOGO_EXPERT_WHITE) else LOGO_EXPERT_YELLOW
     if os.path.exists(logo_div):
         slide.shapes.add_picture(
             logo_div, Inches(3.3), Inches(0.7), Inches(3.4), Inches(1.4)
@@ -2150,15 +2164,28 @@ def build_closing_slide(prs, stores, month_year, total_slides):
     r_ns.font.color.rgb = rgb(C["goldLight"])
     r_ns.font.name = "Calibri"
 
-    contact = slide.shapes.add_textbox(Inches(1), Inches(4.7), Inches(8), Inches(0.5))
+    from datetime import datetime as _dt
+    prepared_date = _dt.now().strftime("%B %d, %Y")
+
+    contact = slide.shapes.add_textbox(Inches(1), Inches(4.65), Inches(8), Inches(0.25))
     tf_c = contact.text_frame
     p_c = tf_c.paragraphs[0]
     p_c.alignment = PP_ALIGN.CENTER
     r_c = p_c.add_run()
-    r_c.text = "ThrottlePro — More Cars. More Loyalty. Less Stress."
+    r_c.text = f"Prepared {prepared_date}"
     r_c.font.size = Pt(9)
-    r_c.font.color.rgb = rgb(C["midGray"])
+    r_c.font.color.rgb = rgb(C["purpleLight"])
     r_c.font.name = "Calibri"
+
+    contact2 = slide.shapes.add_textbox(Inches(1), Inches(4.9), Inches(8), Inches(0.25))
+    tf_c2 = contact2.text_frame
+    p_c2 = tf_c2.paragraphs[0]
+    p_c2.alignment = PP_ALIGN.CENTER
+    r_c2 = p_c2.add_run()
+    r_c2.text = "ThrottlePro — More Cars. More Loyalty. Less Stress."
+    r_c2.font.size = Pt(8)
+    r_c2.font.color.rgb = rgb(C["midGray"])
+    r_c2.font.name = "Calibri"
 
     add_footer(slide, total_slides, total_slides)
 
