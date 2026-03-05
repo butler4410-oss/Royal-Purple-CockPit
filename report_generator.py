@@ -980,41 +980,42 @@ def build_toc_slide(prs, total_slides):
         ("2", "Revenue Overview", "Total revenue breakdown"),
         ("3", "Store Rankings", "Performance table & matrix"),
         ("4", "Product Mix", "Category analysis"),
-        ("5", "Store Deep Dives", "Individual store detail"),
-        ("6", "Next Steps", "Recommendations"),
+        ("5", "Product Deep Dives", "Per-category performance"),
+        ("6", "Store Deep Dives", "Individual store detail"),
+        ("7", "Next Steps", "Recommendations"),
     ]
     for i, (num, title, desc) in enumerate(sections):
-        col = i % 3
-        row = i // 3
-        x = 0.5 + col * 3.1
+        col = i % 4
+        row = i // 4
+        x = 0.3 + col * 2.4
         y = 1.55 + row * 1.7
 
-        card = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(2.8), Inches(1.4))
+        card = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(2.15), Inches(1.4))
         card.fill.solid()
         card.fill.fore_color.rgb = rgb(C["white"])
         card.line.fill.background()
 
-        num_box = slide.shapes.add_textbox(Inches(x + 0.15), Inches(y + 0.1), Inches(0.5), Inches(0.5))
+        num_box = slide.shapes.add_textbox(Inches(x + 0.12), Inches(y + 0.1), Inches(0.5), Inches(0.5))
         tf = num_box.text_frame
         p = tf.paragraphs[0]
         r = p.add_run()
         r.text = num
-        r.font.size = Pt(28)
+        r.font.size = Pt(24)
         r.font.bold = True
         r.font.color.rgb = rgb(C["gold"])
         r.font.name = "Calibri"
 
-        t_box = slide.shapes.add_textbox(Inches(x + 0.15), Inches(y + 0.6), Inches(2.5), Inches(0.35))
+        t_box = slide.shapes.add_textbox(Inches(x + 0.12), Inches(y + 0.55), Inches(1.9), Inches(0.35))
         tf2 = t_box.text_frame
         p2 = tf2.paragraphs[0]
         r2 = p2.add_run()
         r2.text = title
-        r2.font.size = Pt(12)
+        r2.font.size = Pt(10)
         r2.font.bold = True
         r2.font.color.rgb = rgb(C["purple"])
         r2.font.name = "Calibri"
 
-        d_box = slide.shapes.add_textbox(Inches(x + 0.15), Inches(y + 0.95), Inches(2.5), Inches(0.3))
+        d_box = slide.shapes.add_textbox(Inches(x + 0.12), Inches(y + 0.9), Inches(1.9), Inches(0.3))
         tf3 = d_box.text_frame
         p3 = tf3.paragraphs[0]
         r3 = p3.add_run()
@@ -1583,6 +1584,201 @@ def build_product_mix(prs, stores, month_year, total_slides, page_num):
         r_v.font.name = "Calibri"
 
 
+def _aggregate_product_categories(stores):
+    cats = {}
+    for s in stores:
+        for pb in s["productBreakdown"]:
+            cat = pb["category"]
+            if cat not in cats:
+                cats[cat] = {
+                    "category": cat,
+                    "totalRevenue": 0,
+                    "totalLineCount": 0,
+                    "storeCount": 0,
+                    "stores": {},
+                    "skus": {},
+                }
+            cats[cat]["totalRevenue"] += pb["revenue"]
+            cats[cat]["totalLineCount"] += pb.get("lineCount", 0)
+
+            sname = s["name"]
+            if sname not in cats[cat]["stores"]:
+                cats[cat]["stores"][sname] = {"revenue": 0, "lineCount": 0}
+                cats[cat]["storeCount"] += 1
+            cats[cat]["stores"][sname]["revenue"] += pb["revenue"]
+            cats[cat]["stores"][sname]["lineCount"] += pb.get("lineCount", 0)
+
+            code = pb["code"]
+            if code not in cats[cat]["skus"]:
+                cats[cat]["skus"][code] = {"revenue": 0, "lineCount": 0}
+            cats[cat]["skus"][code]["revenue"] += pb["revenue"]
+            cats[cat]["skus"][code]["lineCount"] += pb.get("lineCount", 0)
+
+    result = sorted(cats.values(), key=lambda c: -c["totalRevenue"])
+    return result
+
+
+def build_product_deep_dive(prs, cat_data, stores, month_year, total_slides, page_num):
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    add_slide_background(slide)
+
+    cat_name = cat_data["category"]
+    total_net_rev = sum(s["totalRevenue"] for s in stores)
+    cat_pct = cat_data["totalRevenue"] / total_net_rev * 100 if total_net_rev else 0
+    total_inv = sum(s["invoices"] for s in stores)
+
+    add_slide_header(
+        slide,
+        f"Product Deep Dive: {cat_name}",
+        f"{cat_pct:.1f}% of network revenue — {month_year}",
+    )
+    add_footer(slide, page_num, total_slides)
+
+    is_mc = cat_name == "Max-Clean"
+
+    cards = [
+        (fmt_currency(cat_data["totalRevenue"]), "Category Revenue", f"{cat_pct:.1f}% of network"),
+        (fmt_number(cat_data["totalLineCount"]), "Transactions", "Product line appearances"),
+        (fmt_number(cat_data["storeCount"]), "Stores Selling", f"of {len(stores)} locations"),
+    ]
+
+    if is_mc:
+        mc_total = sum(s.get("maxClean", {}).get("total", 0) for s in stores)
+        mc_rate = mc_total / total_inv * 100 if total_inv else 0
+        cards.append((f"{mc_rate:.1f}%", "Attachment Rate", f"{fmt_number(mc_total)} of {fmt_number(total_inv)} inv"))
+    else:
+        avg_per_store = cat_data["totalRevenue"] / cat_data["storeCount"] if cat_data["storeCount"] else 0
+        cards.append((fmt_currency(avg_per_store), "Avg per Store", "Revenue per location"))
+
+    card_w = 2.05
+    gap = 0.15
+    start_x = 0.5
+    for i, (val, lbl, sub) in enumerate(cards):
+        x = start_x + i * (card_w + gap)
+        add_stat_card(slide, x, 1.55, card_w, 1.05, val, lbl, sub)
+
+    sorted_stores = sorted(cat_data["stores"].items(), key=lambda x: -x[1]["revenue"])
+    top_stores = sorted_stores[:8]
+
+    if top_stores:
+        max_store_rev = top_stores[0][1]["revenue"]
+        chart_y = 2.85
+        bar_h = 0.24
+
+        lbl = slide.shapes.add_textbox(Inches(0.5), Inches(chart_y - 0.25), Inches(4), Inches(0.25))
+        tf = lbl.text_frame
+        p = tf.paragraphs[0]
+        r = p.add_run()
+        r.text = f"{cat_name} Revenue by Store (Top {len(top_stores)})"
+        r.font.size = Pt(10)
+        r.font.bold = True
+        r.font.color.rgb = rgb(C["purple"])
+        r.font.name = "Calibri"
+
+        for pi, (sname, sdata) in enumerate(top_stores):
+            py = chart_y + pi * (bar_h + 0.05)
+            bar_w = max(0.2, (sdata["revenue"] / max_store_rev) * 3.5) if max_store_rev else 0.2
+
+            nm = slide.shapes.add_textbox(Inches(0.3), Inches(py), Inches(2.0), Inches(bar_h))
+            tf_n = nm.text_frame
+            tf_n.word_wrap = False
+            p_n = tf_n.paragraphs[0]
+            p_n.alignment = PP_ALIGN.RIGHT
+            r_n = p_n.add_run()
+            display_name = sname if len(sname) <= 22 else sname[:20] + ".."
+            r_n.text = display_name
+            r_n.font.size = Pt(7)
+            r_n.font.color.rgb = rgb(C["darkGray"])
+            r_n.font.name = "Calibri"
+
+            bar_color = C["purple"] if pi % 2 == 0 else C["gold"]
+            bar = slide.shapes.add_shape(1, Inches(2.4), Inches(py + 0.02), Inches(bar_w), Inches(bar_h - 0.04))
+            bar.fill.solid()
+            bar.fill.fore_color.rgb = rgb(bar_color)
+            bar.line.fill.background()
+
+            vb = slide.shapes.add_textbox(Inches(2.4 + bar_w + 0.05), Inches(py), Inches(1.5), Inches(bar_h))
+            tf_v = vb.text_frame
+            p_v = tf_v.paragraphs[0]
+            r_v = p_v.add_run()
+            store_pct = sdata["revenue"] / cat_data["totalRevenue"] * 100 if cat_data["totalRevenue"] else 0
+            r_v.text = f"{fmt_currency(sdata['revenue'])} ({store_pct:.0f}%)"
+            r_v.font.size = Pt(7)
+            r_v.font.bold = True
+            r_v.font.color.rgb = rgb(C["purple"])
+            r_v.font.name = "Calibri"
+
+    notes_x = 6.3
+    notes_y = 2.85
+    notes_w = 3.4
+    notes_h = 2.3
+
+    notes_bg = slide.shapes.add_shape(1, Inches(notes_x), Inches(notes_y), Inches(notes_w), Inches(notes_h))
+    notes_bg.fill.solid()
+    notes_bg.fill.fore_color.rgb = rgb(C["purple"])
+    notes_bg.line.fill.background()
+
+    n_lbl = slide.shapes.add_textbox(Inches(notes_x + 0.15), Inches(notes_y + 0.1), Inches(notes_w - 0.3), Inches(0.25))
+    tf_nl = n_lbl.text_frame
+    p_nl = tf_nl.paragraphs[0]
+    r_nl = p_nl.add_run()
+    r_nl.text = "Product Insights"
+    r_nl.font.size = Pt(10)
+    r_nl.font.bold = True
+    r_nl.font.color.rgb = rgb(C["goldLight"])
+    r_nl.font.name = "Calibri"
+
+    desc = PRODUCT_DESCRIPTIONS.get(cat_name, "")
+    top_store_name = sorted_stores[0][0] if sorted_stores else "N/A"
+    top_store_pct = (sorted_stores[0][1]["revenue"] / cat_data["totalRevenue"] * 100) if sorted_stores and cat_data["totalRevenue"] else 0
+
+    if is_mc:
+        mc_with_rp = sum(s.get("maxClean", {}).get("withRpOil", 0) for s in stores)
+        mc_non_rp = sum(s.get("maxClean", {}).get("withNonRpOil", 0) for s in stores)
+        mc_total_inv = sum(s.get("maxClean", {}).get("total", 0) for s in stores)
+        best_rate_store = max(stores, key=lambda s: s.get("maxClean", {}).get("attachmentRate", 0))
+        best_lift_store = max(stores, key=lambda s: s.get("maxClean", {}).get("ticketLift", 0))
+        br_mc = best_rate_store.get("maxClean", {})
+        bl_mc = best_lift_store.get("maxClean", {})
+
+        rp_pct = mc_with_rp / mc_total_inv * 100 if mc_total_inv else 0
+        note_text = (
+            f"{desc}\n\n"
+            f"Of {fmt_number(mc_total_inv)} Max-Clean transactions, "
+            f"{fmt_number(mc_with_rp)} ({rp_pct:.0f}%) were paired with RP oil "
+            f"and {fmt_number(mc_non_rp)} ({100 - rp_pct:.0f}%) with non-RP oil (upsell opportunity). "
+            f"{best_rate_store['name']} leads attachment at {br_mc.get('attachmentRate', 0):.1f}%. "
+            f"{best_lift_store['name']} delivers the highest ticket lift at +${bl_mc.get('ticketLift', 0):.2f}."
+        )
+    else:
+        low_stores = [sn for sn, sd in sorted_stores if sd["revenue"] < cat_data["totalRevenue"] / max(len(sorted_stores), 1) * 0.5]
+        opp_note = f" {len(low_stores)} store(s) sell below average — potential growth targets." if low_stores else ""
+        note_text = (
+            f"{desc}\n\n"
+            f"{top_store_name} leads with {top_store_pct:.0f}% of {cat_name} revenue across the network. "
+            f"This product is sold at {cat_data['storeCount']} of {len(stores)} locations."
+            f"{opp_note}"
+        )
+
+    sorted_skus = sorted(cat_data["skus"].items(), key=lambda x: -x[1]["revenue"])[:5]
+    if sorted_skus and len(sorted_skus) > 1:
+        sku_lines = "\n\nTop SKUs: " + ", ".join(
+            f"{get_product_display_name(code)} ({fmt_currency(sd['revenue'])})"
+            for code, sd in sorted_skus
+        )
+        note_text += sku_lines
+
+    n_body = slide.shapes.add_textbox(Inches(notes_x + 0.15), Inches(notes_y + 0.4), Inches(notes_w - 0.3), Inches(notes_h - 0.55))
+    tf_nb = n_body.text_frame
+    tf_nb.word_wrap = True
+    p_nb = tf_nb.paragraphs[0]
+    r_nb = p_nb.add_run()
+    r_nb.text = note_text
+    r_nb.font.size = Pt(8)
+    r_nb.font.color.rgb = rgb(C["white"])
+    r_nb.font.name = "Calibri"
+
+
 def build_section_divider(prs, title, subtitle, total_slides, page_num):
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     add_slide_background(slide, C["dark"])
@@ -2026,7 +2222,7 @@ def build_distribution_map_slide(prs, map_image_path, title, total_slides, page_
     add_footer(slide, page_num, total_slides)
 
 
-def calculate_total_slides(num_stores, num_maps=0):
+def calculate_total_slides(num_stores, num_maps=0, num_product_cats=0):
     TABLE_TOP = 1.55
     FOOTER_Y = 5.33
     ROW_H = 0.285
@@ -2040,6 +2236,8 @@ def calculate_total_slides(num_stores, num_maps=0):
     rank_pages = math.ceil(num_stores / ROWS_PER_PAGE_RANK) if num_stores > 0 else 1
     matrix_pages = math.ceil(num_stores / ROWS_PER_PAGE_MATRIX) if num_stores > 0 else 1
 
+    product_dive_slides = (1 + num_product_cats) if num_product_cats > 0 else 0
+
     total = (
         1 +  # cover
         1 +  # toc
@@ -2049,9 +2247,10 @@ def calculate_total_slides(num_stores, num_maps=0):
         rank_pages +  # ranking table
         matrix_pages +  # performance matrix
         1 +  # product mix
+        product_dive_slides +  # product deep dives (divider + per-category)
         num_maps +  # distribution maps
-        1 +  # section divider
-        num_stores +  # deep dives
+        1 +  # section divider (store deep dives)
+        num_stores +  # store deep dives
         1 +  # next steps
         1    # closing
     )
@@ -2062,12 +2261,14 @@ def generate_report(file_path, output_path=None, map_images=None):
     stores, month_year = parse_excel(file_path)
     maps = map_images or []
 
+    product_cats = _aggregate_product_categories(stores)
+
     if not output_path:
         month_abbr = month_year.split()[0][:3] if month_year else "Jan"
         year = month_year.split()[-1] if month_year else "2025"
         output_path = f"Royal_Purple_Partnership_Report_{month_abbr}{year}.pptx"
 
-    total_slides = calculate_total_slides(len(stores), len(maps))
+    total_slides = calculate_total_slides(len(stores), len(maps), len(product_cats))
 
     prs = Presentation()
     prs.slide_width = Inches(10)
@@ -2088,6 +2289,14 @@ def generate_report(file_path, output_path=None, map_images=None):
 
     build_product_mix(prs, stores, month_year, total_slides, page)
     page += 1
+
+    if product_cats:
+        build_section_divider(prs, "Product Deep Dives", f"Category-level performance analysis — {month_year}", total_slides, page)
+        page += 1
+
+        for cat_data in product_cats:
+            build_product_deep_dive(prs, cat_data, stores, month_year, total_slides, page)
+            page += 1
 
     for i, map_info in enumerate(maps):
         map_path = map_info.get("path", map_info) if isinstance(map_info, dict) else map_info

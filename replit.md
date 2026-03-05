@@ -49,7 +49,7 @@
 - `25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg` — "NEVER SETTLE" background
 
 ## PPTX Slide Structure (dynamic)
-Cover → TOC → Exec Summary → Exec Observations → Revenue Overview → Rankings → Matrix → Product Mix → [Distribution Maps] → Section Divider → Store Deep Dives → Next Steps → Closing
+Cover → TOC → Exec Summary → Exec Observations → Revenue Overview → Rankings → Matrix → Product Mix → Product Deep Dives Section Divider → Product Deep Dives (per category) → [Distribution Maps] → Store Deep Dives Section Divider → Store Deep Dives → Next Steps → Closing
 
 ## Dependencies
 - Python 3.11
