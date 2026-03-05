@@ -19,8 +19,6 @@ st.set_page_config(
 )
 
 with st.sidebar:
-    if os.path.exists(LOGO_SIDEBAR_PATH):
-        st.image(LOGO_SIDEBAR_PATH, use_container_width=True)
     st.markdown("")
     st.markdown("**The Royal Purple Partnership Hub**")
     st.caption("by ThrottlePro")
@@ -39,18 +37,11 @@ with st.sidebar:
 
 
 def page_header(title, subtitle):
-    if os.path.exists(LOGO_PATH):
-        col_logo, col_title = st.columns([1, 5])
-        with col_logo:
-            st.image(LOGO_PATH, width=180)
-        with col_title:
-            st.markdown(
-                f"<h1 style='color:#4B2D8A; margin: 0; padding-top: 20px;'>{title}</h1>"
-                f"<p style='color:#94A3B8; margin: 4px 0 0 0;'>{subtitle}</p>",
-                unsafe_allow_html=True,
-            )
-    else:
-        st.markdown(f"<h1 style='color:#4B2D8A;'>{title}</h1>", unsafe_allow_html=True)
+    st.markdown(
+        f"<h1 style='color:#4B2D8A; margin: 0;'>{title}</h1>"
+        f"<p style='color:#94A3B8; margin: 4px 0 0 0;'>{subtitle}</p>",
+        unsafe_allow_html=True,
+    )
 
 
 if nav == "Distribution Map":
