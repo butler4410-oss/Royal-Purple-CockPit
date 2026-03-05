@@ -182,8 +182,8 @@ elif nav == "Customer Map":
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Total Locations", len(customers))
         col2.metric("States", len(all_states))
-        col3.metric("Installers", type_counts.get("Installer", 0))
-        col4.metric("Retailers", type_counts.get("Retail", 0))
+        col3.metric("Not on C4C", type_counts.get("Installer (Not on C4C)", 0))
+        col4.metric("C4C Matched", type_counts.get("Installer (C4C Matched)", 0))
         st.markdown("")
 
         map_html = build_leaflet_html(customers, height=650)

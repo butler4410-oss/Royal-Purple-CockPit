@@ -162,7 +162,8 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 }}
 
 .type-installer {{ background: #F0FDF4; color: #166534; }}
-.type-retail {{ background: #F5F3FF; color: #4B2D8A; }}
+.type-installer-not-c4c {{ background: #FEF3C7; color: #92400E; }}
+.type-installer-c4c {{ background: #F0FDF4; color: #166534; }}
 .type-distributor {{ background: #EFF6FF; color: #1E40AF; }}
 
 #sidebar {{
@@ -239,8 +240,8 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
         </select>
         <select id="type-filter">
             <option value="">All Types</option>
-            <option value="Retail">Retail</option>
-            <option value="Installer">Installer</option>
+            <option value="Installer (Not on C4C)">Not on C4C</option>
+            <option value="Installer (C4C Matched)">C4C Matched</option>
             <option value="Distributor">Distributor</option>
         </select>
     </div>
@@ -249,8 +250,8 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 
     <div id="legend">
         <h4>Location Types</h4>
-        <div class="legend-item"><div class="legend-dot" style="background:#7C3AED;"></div> Retail</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div> Installer</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#D97706;"></div> Installer (Not on C4C)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div> Installer (C4C Matched)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#2563EB;"></div> Distributor</div>
     </div>
 
@@ -269,8 +270,8 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 const customers = {customers_json};
 
 const TYPE_COLORS = {{
-    'Retail': '#7C3AED',
-    'Installer': '#16A34A',
+    'Installer (Not on C4C)': '#D97706',
+    'Installer (C4C Matched)': '#16A34A',
     'Distributor': '#2563EB'
 }};
 
@@ -322,18 +323,21 @@ let allMarkers = [];
 customers.forEach(function(c) {{
     if (!c.latitude || !c.longitude) return;
 
-    const typeClass = c.type ? c.type.toLowerCase() : 'retail';
+    let typeClass = 'installer';
+    if (c.type === 'Installer (Not on C4C)') typeClass = 'installer-not-c4c';
+    else if (c.type === 'Installer (C4C Matched)') typeClass = 'installer-c4c';
+    else if (c.type === 'Distributor') typeClass = 'distributor';
     const popupHtml = `
         <div class="popup-content">
             <h3>${{c.store_name}}</h3>
             <p>${{c.address || ''}}</p>
             <p>${{c.city}}, ${{c.state}} ${{c.zip || ''}}</p>
-            <span class="popup-type type-${{typeClass}}">${{c.type || 'Retail'}}</span>
+            <span class="popup-type type-${{typeClass}}">${{c.type || 'Installer'}}</span>
         </div>
     `;
 
     const marker = L.marker([c.latitude, c.longitude], {{
-        icon: createIcon(c.type || 'Retail')
+        icon: createIcon(c.type || 'Installer (Not on C4C)')
     }}).bindPopup(popupHtml);
 
     marker._customerData = c;
