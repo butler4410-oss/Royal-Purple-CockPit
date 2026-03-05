@@ -573,6 +573,20 @@ wheels = [
 ]
 
 [[package]]
+name = "pgeocode"
+version = "0.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/91/27/0de1f3890a4b8c1a7ca0bd913251c1f414bf49d8d5d85482a8b95ba6c738/pgeocode-0.5.0.tar.gz", hash = "sha256:37d6caf74e9f2b1e69762811953df5b43fe7f1806833c83bf85a60dd784dff9e", size = 10473, upload-time = "2024-04-13T06:46:07.06Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/26/62/ff5ac22710794b01a6021fb681189f43e8bff224e100cb590ced4c545f7b/pgeocode-0.5.0-py3-none-any.whl", hash = "sha256:de24a5997524ef557a29a1b22443cc1bf5d02c098e0c7a8dd9ea9caf01a6a72a", size = 9772, upload-time = "2024-04-13T06:46:05.157Z" },
+]
+
+[[package]]
 name = "pillow"
 version = "12.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -806,6 +820,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "openpyxl" },
+    { name = "pgeocode" },
     { name = "plotly" },
     { name = "python-pptx" },
     { name = "streamlit" },
@@ -814,6 +829,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "openpyxl", specifier = ">=3.1.5" },
+    { name = "pgeocode", specifier = ">=0.5.0" },
     { name = "plotly", specifier = ">=6.6.0" },
     { name = "python-pptx", specifier = ">=1.0.2" },
     { name = "streamlit", specifier = ">=1.55.0" },

@@ -5,6 +5,7 @@ description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
     "openpyxl>=3.1.5",
+    "pgeocode>=0.5.0",
     "plotly>=6.6.0",
     "python-pptx>=1.0.2",
     "streamlit>=1.55.0",
