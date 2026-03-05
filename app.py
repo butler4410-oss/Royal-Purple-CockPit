@@ -1,12 +1,15 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import tempfile
 import os
+import json
 import plotly.graph_objects as go
 from report_generator import (
     generate_report, parse_excel, fmt_currency, fmt_number,
     PRODUCT_DESCRIPTIONS, get_product_display_name,
 )
 from distribution_data import STATE_DISTRIBUTORS, DISTRIBUTOR_COLORS, ALL_DISTRIBUTORS
+from customer_map import load_customers, parse_csv_customers, build_leaflet_html, get_states
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
@@ -26,7 +29,7 @@ with st.sidebar:
 
     nav = st.radio(
         "Navigation",
-        ["Report Generator", "Distribution Map", "Product Reference"],
+        ["Report Generator", "Distribution Map", "Customer Map", "Product Reference"],
         label_visibility="collapsed",
     )
 
@@ -144,6 +147,52 @@ if nav == "Distribution Map":
                     )
             else:
                 st.info("No distributor assigned to this state.")
+
+elif nav == "Customer Map":
+    page_header("Customer Map", "Interactive map of Royal Purple customer locations across the United States.")
+    st.markdown("")
+
+    csv_upload = st.file_uploader(
+        "Upload Customer CSV (optional)",
+        type=["csv"],
+        help="CSV with columns: store_name, address, city, state, zip, latitude, longitude, type",
+    )
+
+    customers = load_customers()
+
+    if csv_upload is not None:
+        try:
+            csv_text = csv_upload.getvalue().decode("utf-8")
+            uploaded_customers = parse_csv_customers(csv_text)
+            if uploaded_customers:
+                customers = uploaded_customers
+                st.success(f"Loaded {len(uploaded_customers)} locations from CSV.")
+            else:
+                st.warning("No valid customer records found in CSV.")
+        except Exception as e:
+            st.error(f"Error reading CSV: {e}")
+
+    if customers:
+        all_states = get_states(customers)
+        type_counts = {}
+        for c in customers:
+            t = c.get("type", "Retail")
+            type_counts[t] = type_counts.get(t, 0) + 1
+
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Total Locations", len(customers))
+        col2.metric("States", len(all_states))
+        col3.metric("Installers", type_counts.get("Installer", 0))
+        col4.metric("Retailers", type_counts.get("Retail", 0))
+        st.markdown("")
+
+        map_html = build_leaflet_html(customers, height=650)
+        components.html(map_html, height=660, scrolling=False)
+
+        st.markdown("")
+        st.caption("Use the search bar and filters on the map to find specific locations. Click the List button to see a sidebar of all locations.")
+    else:
+        st.info("No customer data available. Upload a CSV file to get started.")
 
 elif nav == "Product Reference":
     page_header("Product Reference", "Royal Purple product categories and descriptions")

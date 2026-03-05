@@ -1,0 +1,178 @@
+STRICT RULES - DO NOT VIOLATE
+
+You are building a production-ready interactive web map for visualizing Royal Purple customer locations across the United States.
+
+The map must behave similarly to tools like MapChart but with the ability to display customer locations as markers on the map.
+
+The project must run entirely as a simple web app using static files (HTML + JS + CSS).
+
+No frameworks unless absolutely necessary. Prefer lightweight libraries.
+
+Use Leaflet.js for mapping.
+
+PREREQUISITES
+
+The project must support:
+
+- Displaying an interactive US map
+- Plotting Royal Purple customers as markers
+- Loading customer data from a CSV or JSON file
+- Clicking markers to show store information
+- Zooming and panning
+- Filtering by state
+- Searching by store name
+
+Customer fields must support:
+
+store_name
+address
+city
+state
+zip
+latitude
+longitude
+type (retail, installer, distributor)
+
+FILES TO CREATE
+
+index.html
+style.css
+app.js
+customers.json
+
+--------------------------------------------------
+
+index.html
+
+Include:
+
+Leaflet.js CDN
+Leaflet CSS
+
+Layout:
+
+Header:
+"Royal Purple Customer Map"
+
+Toolbar:
+Search input
+State filter dropdown
+
+Map container:
+<div id="map"></div>
+
+Sidebar (optional):
+Customer list that syncs with markers
+
+--------------------------------------------------
+
+style.css
+
+Styles must include:
+
+Full-screen map layout
+Clean white UI
+Sticky toolbar
+Responsive layout for mobile
+Map container height = 100vh
+
+--------------------------------------------------
+
+customers.json
+
+Structure example:
+
+[
+  {
+    "store_name": "AutoZone #1234",
+    "address": "123 Main St",
+    "city": "Atlanta",
+    "state": "GA",
+    "zip": "30301",
+    "latitude": 33.7490,
+    "longitude": -84.3880,
+    "type": "Retail"
+  }
+]
+
+--------------------------------------------------
+
+app.js
+
+Initialize Leaflet map:
+
+Center: United States
+Zoom: 4
+
+Load customer data from customers.json
+
+For each customer:
+
+Create a Leaflet marker
+
+Marker popup should show:
+
+Store Name
+City, State
+Type
+
+Example popup:
+
+AutoZone #1234
+Atlanta, GA
+Retail Location
+
+--------------------------------------------------
+
+Marker Icons
+
+Use different icons for:
+
+Retail = purple marker
+Installer = green marker
+Distributor = blue marker
+
+--------------------------------------------------
+
+Filtering
+
+State dropdown:
+
+When selected, only show markers in that state.
+
+Search bar:
+
+Filter markers by store_name.
+
+--------------------------------------------------
+
+Optional Enhancements
+
+Cluster markers when zoomed out
+Add heatmap layer
+Add county boundaries
+Allow CSV upload
+
+--------------------------------------------------
+
+COMPLETION CRITERIA
+
+The application must:
+
+Load a US map
+Plot customer markers
+Display popups on click
+Filter by state
+Search by name
+Work on desktop and mobile
+
+--------------------------------------------------
+
+VALIDATION CHECKLIST
+
+Map loads successfully
+Customer markers appear
+Clicking marker opens store info
+Filtering works
+Search works
+No console errors

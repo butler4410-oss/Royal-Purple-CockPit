@@ -1,13 +1,15 @@
 # Royal Purple Partnership Hub
 
 ## Overview
-"The Royal Purple Partnership Hub by ThrottlePro" — a Streamlit web app for Royal Purple installer partners with three sections: Report Generator (Excel→PPTX), interactive Distribution Map (Plotly choropleth), and Product Reference.
+"The Royal Purple Partnership Hub by ThrottlePro" — a Streamlit web app for Royal Purple installer partners with four sections: Report Generator (Excel→PPTX), interactive Distribution Map (Plotly choropleth), Customer Map (Leaflet.js interactive marker map), and Product Reference.
 
 ## Architecture
-- **app.py** — Streamlit frontend with 3-page sidebar nav, interactive US map, report generation with Max-Clean analytics display
+- **app.py** — Streamlit frontend with 4-page sidebar nav, interactive US map, customer map, report generation with Max-Clean analytics display
 - **report_generator.py** — PPTX engine + adaptive Excel parser with invoice deduplication and Max-Clean attachment analysis
 - **distribution_data.py** — STATE_DISTRIBUTORS mapping (50 states + DC), DISTRIBUTOR_COLORS, ALL_DISTRIBUTORS
-- **assets/** — Royal Purple logos and branding images
+- **customer_map.py** — Leaflet.js map builder: loads customers.json, parses CSV uploads, generates embedded HTML map component
+- **customers.json** — Sample customer location data (40 locations across US: installers, retailers, distributors)
+- **assets/** — Royal Purple branding images
 
 ## Excel Parsing (Fully Adaptive)
 - Scans first 10 rows for best header match (keyword scoring, min 2 keywords)
@@ -40,6 +42,17 @@
 - Filterable by distributor via multiselect
 - ABE Legend with state counts
 - State detail selector with colored accent bars
+
+## Customer Map (Leaflet.js)
+- Embedded via st.components.v1.html() — full Leaflet map with marker clusters
+- Customer types: Retail (purple), Installer (green), Distributor (blue) with custom SVG pin icons
+- Built-in search bar, state filter dropdown, type filter dropdown (all in-map, no Streamlit reruns)
+- Marker clustering via leaflet.markercluster for zoomed-out views
+- Clickable markers with popup showing store name, address, city/state, type badge
+- Collapsible sidebar list synced with visible markers; click to fly to location
+- Stats bar showing "X of Y locations shown"
+- Optional CSV upload to replace default customers.json data
+- CARTO light basemap tiles
 
 ## Logo Assets (assets/)
 - `Royal Purple White Logo.png` — DO NOT USE in PPTX (old blue/yellow text logo)
