@@ -1,0 +1,19 @@
+That confirms the hypothesis exactly. Invoice 32207 is one of the "solo" Max-Clean invoices in the data — Castrol Edge is the base oil, so it doesn't appear in the RP export at all. Only the 11722 line at $19.99 shows up in our dataset, but the full invoice is $124.02.
+This means the attachment rate analysis was correct — now let me also recalculate what the true Max-Clean unit price is (since the revenue we've been attributing to 11722 in the RP export actually includes the full invoice sub-total, not just the $19.99 additive price).Restate Max-Clean revenue correctly accounting for non-RP oil invoicesRestate Max-Clean revenue correctly accounting for non-RP oil invoicesThe TYPE A median is coming back wrong — $169 for the Max-Clean line on a dual-product invoice doesn't make sense (that's the full invoice total, not just the additive). The RP export is bundling the total invoice revenue against whichever RP product was on the ticket. Let me verify:Look at actual line-level revenue on TYPE A invoices to understand how revenue is attributedLook at actual line-level revenue on TYPE A invoices to understand how revenue is attributedNow the structure is completely clear. The RP export splits the total invoice sub-total evenly across every RP line item on that invoice. Invoice 33140 is a $206.65 oil change — the POS splits that equally between 11722 and RP5W20, so both show $206.65 and the total doubles to $413.30. That's double-counting in the revenue figures.
+This is a fundamental data structure issue that affects every number in the original report.Full corrected revenue analysis - deduplicate invoices and properly handle the split-revenue structureFull corrected revenue analysis - deduplicate invoices and properly handle the split-revenue structureNow we have the real numbers. Here's what actually changed and what it means:
+
+The data structure problem — confirmed:
+The RP POS export splits the invoice sub-total equally across every RP product on that ticket. Invoice 33140 is a $206.65 oil change — the system duplicates that amount onto both the 11722 line and the RP5W20 line, so the raw export shows $413.30. Every multi-product invoice was double (or triple) counted.
+Corrected network numbers:
+Raw ExportCorrectedTotal invoices16,18913,970Total revenue$2,435,165$2,060,036Avg ticket$150.42$147.46
+The inflated figures were the result of ~2,200 multi-product invoices being counted twice.
+
+Max-Clean attachment — the real story:
+
+4,198 invoices carry Max-Clean — that's 30.1% of all oil changes in the network
+99.7% of those are on oil change invoices — only 14 are standalone
+66.9% are attached to non-RP oil (Castrol, conventional, etc.) — these stores are selling the RP additive even when they can't close the full synthetic upgrade
+Max-Clean invoices average $163.59 vs. $140.53 without — that's a $23.05 lift per invoice (+16.4%)
+
+The standout story per store:
+StoreMC Ticket LiftWhat it meansLube Master+$49.86Highest lift — MC is being sold on premium full-service ticketsAurora+$43.74Strong HMX + MC combination driving premium combosOrland Park+$23.82Volume leader AND meaningful liftDuke Cal City+$6.50Lowest lift — MC being added to low-ticket conventional jobsDuke Plymouth+$2.23Barely registering — attachment may be inconsistent

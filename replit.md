@@ -4,8 +4,8 @@
 "The Royal Purple Partnership Hub by ThrottlePro" — a Streamlit web app for Royal Purple installer partners with three sections: Report Generator (Excel→PPTX), interactive Distribution Map (Plotly choropleth), and Product Reference.
 
 ## Architecture
-- **app.py** — Streamlit frontend with 3-page sidebar nav, interactive US map, report generation
-- **report_generator.py** — PPTX engine + adaptive Excel parser (header auto-detection, consolidated sheet support, currency stripping, revenue heuristics)
+- **app.py** — Streamlit frontend with 3-page sidebar nav, interactive US map, report generation with Max-Clean analytics display
+- **report_generator.py** — PPTX engine + adaptive Excel parser with invoice deduplication and Max-Clean attachment analysis
 - **distribution_data.py** — STATE_DISTRIBUTORS mapping (50 states + DC), DISTRIBUTOR_COLORS, ALL_DISTRIBUTORS
 - **assets/** — Royal Purple logos and branding images
 
@@ -19,6 +19,20 @@
 - Currency stripping: handles $, commas in values
 - Date parsing: datetime objects, string formats ("Month Day, Year", "MM/DD/YYYY"), and sheet title scanning
 - Case-insensitive product prefix matching (longest-prefix-first)
+
+## Invoice Deduplication
+- RP POS exports duplicate invoice totals across every RP product line on the same ticket
+- `_group_invoices()` groups data rows by Invoice # column (if present) or (date, revenue, vehicle) proxy key
+- Revenue per invoice = shared invoice total (counted once, not summed across product lines)
+- Applied consistently in both `_parse_single_store_sheet` and `_parse_consolidated_sheet`
+
+## Max-Clean Analytics
+- MC_CODE = "11722"; RP_OIL_PREFIXES = ("RP", "RS", "HMX", "RMS", "RSD"); 18000 (Max-Atomizer) excluded
+- Per-store metrics: total MC invoices, withRpOil, withNonRpOil, soloInData, attachmentRate, avgTicket, nonMcAvgTicket, ticketLift
+- "Solo" Max-Clean invoices = non-RP oil changes where MC was added as upsell (not standalone retail)
+- Network-level aggregation shown in app with MC Attachment Analysis section
+- Store Rankings table includes MC Rate and MC Lift columns
+- Dedicated "Max-Clean by Store" tab with detailed breakdown
 
 ## Interactive Distribution Map
 - Plotly go.Choropleth with USA scope

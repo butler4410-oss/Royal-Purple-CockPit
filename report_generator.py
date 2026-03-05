@@ -122,6 +122,8 @@ HEADER_PATTERNS = {
     "vehicles": ["# of vehicles", "vehicles", "vehicle count", "num vehicles", "cars",
                  "unique vehicles", "car count", "unique cars", "vin count"],
     "store": ["store", "location", "shop", "site", "branch", "facility", "installer", "account"],
+    "invoice_num": ["invoice #", "invoice num", "invoice number", "inv #", "inv num",
+                    "ticket #", "ticket num", "ro #", "ro num", "work order #", "wo #"],
 }
 
 SKIP_SHEETS = ["report summary", "summary", "totals", "notes", "instructions", "template", "info",
@@ -275,12 +277,68 @@ def _detect_revenue_column(header, data_rows):
     return None
 
 
+MC_CODE = "11722"
+RP_OIL_PREFIXES = ("RP", "RS", "HMX", "RMS", "RSD")
+
+
+def _extract_product_code(row, product_idx):
+    if product_idx is None:
+        return ""
+    raw = _get_val(row, product_idx)
+    if not raw:
+        return ""
+    op_desc = str(raw).strip()
+    return op_desc.split(" - ")[0].strip() if " - " in op_desc else op_desc.strip()
+
+
+def _is_rp_oil_code(code):
+    c = code.upper()
+    return any(c.startswith(p.upper()) for p in RP_OIL_PREFIXES) and c != MC_CODE and c != "18000"
+
+
+def _group_invoices(data_rows, col_map):
+    from collections import defaultdict
+    inv_num_idx = col_map.get("invoice_num")
+    product_idx = col_map.get("product")
+    revenue_idx = col_map.get("revenue")
+    date_idx = col_map.get("date")
+    vehicle_idx = col_map.get("vehicles")
+
+    groups = defaultdict(lambda: {"rows": [], "codes": [], "revenue": 0, "vehicles": 0})
+
+    for row in data_rows:
+        if inv_num_idx is not None:
+            inv_key = _get_val(row, inv_num_idx)
+            if inv_key is None or str(inv_key).strip() == "":
+                date_val = str(_get_val(row, date_idx, "")) if date_idx is not None else ""
+                rev_val = _safe_float(_get_val(row, revenue_idx))
+                veh_val = str(_get_val(row, vehicle_idx, "")) if vehicle_idx is not None else ""
+                inv_key = ("_fallback_", date_val, rev_val, veh_val)
+        else:
+            date_val = str(_get_val(row, date_idx, "")) if date_idx is not None else ""
+            rev_val = _safe_float(_get_val(row, revenue_idx))
+            veh_val = str(_get_val(row, vehicle_idx, "")) if vehicle_idx is not None else ""
+            inv_key = (date_val, rev_val, veh_val)
+
+        code = _extract_product_code(row, product_idx)
+        rev = _safe_float(_get_val(row, revenue_idx))
+        veh = _safe_int(_get_val(row, vehicle_idx))
+
+        groups[inv_key]["rows"].append(row)
+        if code:
+            groups[inv_key]["codes"].append(code)
+        groups[inv_key]["revenue"] = rev
+        groups[inv_key]["vehicles"] = max(groups[inv_key]["vehicles"], veh)
+
+    return dict(groups)
+
+
 def _parse_single_store_sheet(sheet_name, rows):
     header_row_idx = _find_header_row(rows)
     header = rows[header_row_idx]
 
     col_map = {}
-    for field in ["date", "product", "invoices", "revenue", "avg_rev", "vehicles"]:
+    for field in ["date", "product", "invoices", "revenue", "avg_rev", "vehicles", "invoice_num"]:
         idx = _find_column_index(header, field)
         if idx is not None:
             col_map[field] = idx
@@ -322,72 +380,93 @@ def _parse_single_store_sheet(sheet_name, rows):
             if last_row in data_rows:
                 data_rows.remove(last_row)
 
+    invoice_groups = _group_invoices(data_rows, col_map)
+
     product_idx = col_map.get("product")
-    revenue_idx = col_map.get("revenue")
-
-    product_revenue = {}
-    total_rev_calc = 0
-    total_inv_calc = 0
-    total_veh_calc = 0
-    for row in data_rows:
-        if product_idx is not None:
-            raw = _get_val(row, product_idx)
-            op_desc = str(raw).strip() if raw else ""
-            code = op_desc.split(" - ")[0].strip() if " - " in op_desc else op_desc.strip()
-        else:
-            code = ""
-
-        rev = _safe_float(_get_val(row, revenue_idx))
-        total_rev_calc += rev
-        total_inv_calc += _safe_int(_get_val(row, col_map.get("invoices")))
-        total_veh_calc += _safe_int(_get_val(row, col_map.get("vehicles")))
-
-        if code:
-            product_revenue[code] = product_revenue.get(code, 0) + rev
-
-    if totals_row:
-        total_invoices = _safe_int(_get_val(totals_row, col_map.get("invoices"))) or total_inv_calc
-        total_revenue = _safe_float(_get_val(totals_row, col_map.get("revenue"))) or total_rev_calc
-        avg_rev_inv = _safe_float(_get_val(totals_row, col_map.get("avg_rev")))
-        total_vehicles = _safe_int(_get_val(totals_row, col_map.get("vehicles"))) or total_veh_calc
-    else:
-        total_invoices = total_inv_calc
-        total_revenue = total_rev_calc
-        avg_rev_inv = 0
-        total_vehicles = total_veh_calc
-
-    if total_invoices == 0 and len(data_rows) > 0:
-        total_invoices = len(data_rows)
-
-    if total_invoices and total_revenue:
-        calculated_avg = total_revenue / total_invoices
-        if not avg_rev_inv or avg_rev_inv < 1 or abs(avg_rev_inv - calculated_avg) > calculated_avg * 5:
-            avg_rev_inv = calculated_avg
-
     sorted_prefixes = sorted(PRODUCT_MAP.keys(), key=len, reverse=True)
+
+    product_line_count = {}
+    dedup_revenue = 0
+    dedup_invoices = len(invoice_groups)
+    dedup_vehicles = 0
+
+    mc_total = 0
+    mc_with_rp_oil = 0
+    mc_solo_in_data = 0
+    mc_revenue_total = 0
+    non_mc_revenue_total = 0
+    mc_invoice_revenue = 0
+    non_mc_invoice_revenue = 0
+
+    for inv_key, inv_data in invoice_groups.items():
+        inv_rev = inv_data["revenue"]
+        dedup_revenue += inv_rev
+        dedup_vehicles += inv_data["vehicles"]
+
+        codes = inv_data["codes"]
+        for code in set(codes):
+            product_line_count[code] = product_line_count.get(code, 0) + 1
+
+        has_mc = MC_CODE in codes
+        has_rp_oil = any(_is_rp_oil_code(c) for c in codes)
+
+        if has_mc:
+            mc_total += 1
+            mc_invoice_revenue += inv_rev
+            if has_rp_oil:
+                mc_with_rp_oil += 1
+            elif len(codes) <= 1:
+                mc_solo_in_data += 1
+        else:
+            non_mc_invoice_revenue += inv_rev
+
+    mc_non_rp = mc_total - mc_with_rp_oil
+    mc_avg_ticket = mc_invoice_revenue / mc_total if mc_total else 0
+    non_mc_count = dedup_invoices - mc_total
+    non_mc_avg_ticket = non_mc_invoice_revenue / non_mc_count if non_mc_count else 0
+    mc_ticket_lift = mc_avg_ticket - non_mc_avg_ticket
+
     product_breakdown = []
-    for code, rev in sorted(product_revenue.items(), key=lambda x: -x[1]):
+    for code in sorted(product_line_count.keys(), key=lambda c: -product_line_count.get(c, 0)):
         cat = "Other"
         for prefix in sorted_prefixes:
             if code.upper().startswith(prefix.upper()):
                 cat = PRODUCT_MAP[prefix]
                 break
+        raw_rev = sum(_safe_float(_get_val(r, col_map.get("revenue")))
+                      for r in data_rows if _extract_product_code(r, product_idx) == code)
         product_breakdown.append({
             "code": code,
             "category": cat,
-            "revenue": round(rev, 2),
+            "revenue": round(raw_rev, 2),
+            "lineCount": product_line_count[code],
         })
 
     top_product = product_breakdown[0]["category"] if product_breakdown else "N/A"
 
+    avg_rev_inv = dedup_revenue / dedup_invoices if dedup_invoices else 0
+
+    mc_attachment_rate = mc_total / dedup_invoices * 100 if dedup_invoices else 0
+
     return {
         "name": sheet_name,
-        "invoices": int(total_invoices),
-        "vehicles": int(total_vehicles),
-        "totalRevenue": round(float(total_revenue), 2),
+        "invoices": int(dedup_invoices),
+        "vehicles": int(dedup_vehicles),
+        "totalRevenue": round(float(dedup_revenue), 2),
         "avgRevPerInvoice": round(float(avg_rev_inv), 2),
         "topProduct": top_product,
         "productBreakdown": product_breakdown,
+        "rawLineCount": len(data_rows),
+        "maxClean": {
+            "total": mc_total,
+            "withRpOil": mc_with_rp_oil,
+            "withNonRpOil": mc_non_rp,
+            "soloInData": mc_solo_in_data,
+            "attachmentRate": round(mc_attachment_rate, 1),
+            "avgTicket": round(mc_avg_ticket, 2),
+            "nonMcAvgTicket": round(non_mc_avg_ticket, 2),
+            "ticketLift": round(mc_ticket_lift, 2),
+        },
         "_col_map": col_map,
         "_date_rows": data_rows,
     }
@@ -402,7 +481,7 @@ def _parse_consolidated_sheet(sheet_name, rows):
         return []
 
     col_map = {}
-    for field in ["date", "product", "invoices", "revenue", "avg_rev", "vehicles", "store"]:
+    for field in ["date", "product", "invoices", "revenue", "avg_rev", "vehicles", "store", "invoice_num"]:
         idx = _find_column_index(header, field)
         if idx is not None:
             col_map[field] = idx
@@ -420,63 +499,98 @@ def _parse_consolidated_sheet(sheet_name, rows):
                  if len(r) > store_idx and r[store_idx] is not None
                  and str(r[store_idx]).strip()]
 
-    store_data = {}
+    store_rows = {}
     for row in data_rows:
         store_name = str(_get_val(row, store_idx, "")).strip()
-        if not store_name:
+        if not store_name or store_name.lower() in ["total", "totals", "grand total", "sum"]:
             continue
-        if store_name.lower() in ["total", "totals", "grand total", "sum"]:
-            continue
-
-        if store_name not in store_data:
-            store_data[store_name] = {
-                "revenue": 0, "invoices": 0, "vehicles": 0,
-                "product_revenue": {},
-            }
-
-        rev = _safe_float(_get_val(row, col_map.get("revenue")))
-        inv = _safe_int(_get_val(row, col_map.get("invoices")))
-        veh = _safe_int(_get_val(row, col_map.get("vehicles")))
-
-        store_data[store_name]["revenue"] += rev
-        store_data[store_name]["invoices"] += inv if inv else 1
-        store_data[store_name]["vehicles"] += veh
-
-        product_idx = col_map.get("product")
-        if product_idx is not None:
-            raw = _get_val(row, product_idx)
-            op_desc = str(raw).strip() if raw else ""
-            code = op_desc.split(" - ")[0].strip() if " - " in op_desc else op_desc.strip()
-            if code:
-                store_data[store_name]["product_revenue"][code] = \
-                    store_data[store_name]["product_revenue"].get(code, 0) + rev
+        store_rows.setdefault(store_name, []).append(row)
 
     sorted_prefixes = sorted(PRODUCT_MAP.keys(), key=len, reverse=True)
+    product_idx = col_map.get("product")
     stores = []
-    for sname, sdata in store_data.items():
-        total_inv = sdata["invoices"]
-        total_rev = sdata["revenue"]
-        avg_rev = total_rev / total_inv if total_inv else 0
+
+    for sname, s_rows in store_rows.items():
+        invoice_groups = _group_invoices(s_rows, col_map)
+
+        product_line_count = {}
+        dedup_revenue = 0
+        dedup_invoices = len(invoice_groups)
+        dedup_vehicles = 0
+
+        mc_total = 0
+        mc_with_rp_oil = 0
+        mc_solo_in_data = 0
+        mc_invoice_revenue = 0
+        non_mc_invoice_revenue = 0
+
+        for inv_key, inv_data in invoice_groups.items():
+            inv_rev = inv_data["revenue"]
+            dedup_revenue += inv_rev
+            dedup_vehicles += inv_data["vehicles"]
+
+            codes = inv_data["codes"]
+            for code in set(codes):
+                product_line_count[code] = product_line_count.get(code, 0) + 1
+
+            has_mc = MC_CODE in codes
+            has_rp_oil = any(_is_rp_oil_code(c) for c in codes)
+
+            if has_mc:
+                mc_total += 1
+                mc_invoice_revenue += inv_rev
+                if has_rp_oil:
+                    mc_with_rp_oil += 1
+                elif len(codes) <= 1:
+                    mc_solo_in_data += 1
+            else:
+                non_mc_invoice_revenue += inv_rev
+
+        mc_non_rp = mc_total - mc_with_rp_oil
+        mc_avg_ticket = mc_invoice_revenue / mc_total if mc_total else 0
+        non_mc_count = dedup_invoices - mc_total
+        non_mc_avg_ticket = non_mc_invoice_revenue / non_mc_count if non_mc_count else 0
+        mc_ticket_lift = mc_avg_ticket - non_mc_avg_ticket
+        mc_attachment_rate = mc_total / dedup_invoices * 100 if dedup_invoices else 0
 
         product_breakdown = []
-        for code, rev in sorted(sdata["product_revenue"].items(), key=lambda x: -x[1]):
+        for code in sorted(product_line_count.keys(), key=lambda c: -product_line_count.get(c, 0)):
             cat = "Other"
             for prefix in sorted_prefixes:
                 if code.upper().startswith(prefix.upper()):
                     cat = PRODUCT_MAP[prefix]
                     break
-            product_breakdown.append({"code": code, "category": cat, "revenue": round(rev, 2)})
+            raw_rev = sum(_safe_float(_get_val(r, col_map.get("revenue")))
+                          for r in s_rows if _extract_product_code(r, product_idx) == code)
+            product_breakdown.append({
+                "code": code,
+                "category": cat,
+                "revenue": round(raw_rev, 2),
+                "lineCount": product_line_count[code],
+            })
 
         top_product = product_breakdown[0]["category"] if product_breakdown else "N/A"
+        avg_rev_inv = dedup_revenue / dedup_invoices if dedup_invoices else 0
 
         stores.append({
             "name": sname,
-            "invoices": int(total_inv),
-            "vehicles": int(sdata["vehicles"]),
-            "totalRevenue": round(float(total_rev), 2),
-            "avgRevPerInvoice": round(float(avg_rev), 2),
+            "invoices": int(dedup_invoices),
+            "vehicles": int(dedup_vehicles),
+            "totalRevenue": round(float(dedup_revenue), 2),
+            "avgRevPerInvoice": round(float(avg_rev_inv), 2),
             "topProduct": top_product,
             "productBreakdown": product_breakdown,
+            "rawLineCount": len(s_rows),
+            "maxClean": {
+                "total": mc_total,
+                "withRpOil": mc_with_rp_oil,
+                "withNonRpOil": mc_non_rp,
+                "soloInData": mc_solo_in_data,
+                "attachmentRate": round(mc_attachment_rate, 1),
+                "avgTicket": round(mc_avg_ticket, 2),
+                "nonMcAvgTicket": round(non_mc_avg_ticket, 2),
+                "ticketLift": round(mc_ticket_lift, 2),
+            },
         })
 
     return stores

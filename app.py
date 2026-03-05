@@ -172,7 +172,7 @@ elif nav == "Report Generator":
         uploaded_file = st.file_uploader(
             "Upload Royal Purple Excel Report (.xlsx)",
             type=["xlsx"],
-            help="Each worksheet should represent one installer location with data columns for products, revenue, invoices, etc. The app auto-detects column layouts.",
+            help="The app auto-detects columns, deduplicates multi-product invoices, and computes corrected revenue.",
         )
     with col_upload2:
         map_files = st.file_uploader(
@@ -198,50 +198,141 @@ elif nav == "Report Generator":
         try:
             stores, month_year = parse_excel(tmp_path)
 
-            st.success(f"Parsed **{len(stores)}** locations for **{month_year}**")
-
             total_rev = sum(s["totalRevenue"] for s in stores)
             total_inv = sum(s["invoices"] for s in stores)
             avg_rev = total_rev / total_inv if total_inv else 0
             total_veh = sum(s["vehicles"] for s in stores)
+            total_raw = sum(s.get("rawLineCount", 0) for s in stores)
+
+            dedup_note = f" (deduplicated from {fmt_number(total_raw)} raw lines)" if total_raw > total_inv else ""
+            st.success(f"Parsed **{len(stores)}** locations for **{month_year}**{dedup_note}")
 
             col1, col2, col3, col4 = st.columns(4)
             col1.metric("Total Revenue", fmt_currency(total_rev))
-            col2.metric("Oil Changes", fmt_number(total_inv))
+            col2.metric("Unique Invoices", fmt_number(total_inv))
             col3.metric("Avg Rev/Invoice", f"${avg_rev:.2f}")
             col4.metric("Unique Vehicles", fmt_number(total_veh))
 
             st.markdown("")
 
-            tab_rankings, tab_details = st.tabs(["Store Rankings", "Store Details"])
+            network_mc = sum(s.get("maxClean", {}).get("total", 0) for s in stores)
+            if network_mc > 0:
+                mc_pct = network_mc / total_inv * 100 if total_inv else 0
+                mc_rev = sum(
+                    s.get("maxClean", {}).get("avgTicket", 0) * s.get("maxClean", {}).get("total", 0)
+                    for s in stores
+                )
+                mc_avg = mc_rev / network_mc if network_mc else 0
+                non_mc_count = total_inv - network_mc
+                non_mc_rev = total_rev - mc_rev
+                non_mc_avg = non_mc_rev / non_mc_count if non_mc_count else 0
+                network_lift = mc_avg - non_mc_avg
+
+                st.markdown("### Max-Clean Attachment Analysis")
+                st.caption(
+                    "The RP export only shows Royal Purple products. 'Solo' Max-Clean lines represent "
+                    "non-RP oil changes (Castrol, conventional, etc.) where Max-Clean was added as an upsell."
+                )
+
+                mc1, mc2, mc3, mc4 = st.columns(4)
+                mc1.metric("MC Invoices", fmt_number(network_mc), f"{mc_pct:.1f}% attachment rate")
+                mc2.metric("MC Avg Ticket", f"${mc_avg:.2f}")
+                mc3.metric("Non-MC Avg Ticket", f"${non_mc_avg:.2f}")
+                mc4.metric("MC Ticket Lift", f"+${network_lift:.2f}", f"+{network_lift/non_mc_avg*100:.1f}%" if non_mc_avg else "")
+
+                mc_with_rp = sum(s.get("maxClean", {}).get("withRpOil", 0) for s in stores)
+                mc_non_rp = sum(s.get("maxClean", {}).get("withNonRpOil", 0) for s in stores)
+                st.markdown("")
+                mc_solo = sum(s.get("maxClean", {}).get("soloInData", 0) for s in stores)
+                bk1, bk2, bk3 = st.columns(3)
+                bk1.metric("MC + RP Oil", fmt_number(mc_with_rp), f"{mc_with_rp/network_mc*100:.1f}%" if network_mc else "")
+                bk2.metric("MC + Non-RP Oil", fmt_number(mc_non_rp), f"{mc_non_rp/network_mc*100:.1f}%" if network_mc else "")
+                bk3.metric("MC Solo (Non-RP OC)", fmt_number(mc_solo), f"{mc_solo/network_mc*100:.1f}%" if network_mc else "")
+
+            st.markdown("")
+
+            tab_rankings, tab_mc, tab_details = st.tabs(["Store Rankings", "Max-Clean by Store", "Store Details"])
 
             with tab_rankings:
                 ranking_data = []
                 for s in stores:
                     pct = s["totalRevenue"] / total_rev * 100 if total_rev else 0
+                    mc = s.get("maxClean", {})
                     ranking_data.append({
                         "Rank": s["rank"],
                         "Store": s["name"],
                         "Revenue": fmt_currency(s["totalRevenue"]),
-                        "Oil Changes": fmt_number(s["invoices"]),
+                        "Invoices": fmt_number(s["invoices"]),
                         "Avg Rev/Inv": f"${s['avgRevPerInvoice']:.2f}",
                         "Share": f"{pct:.1f}%",
-                        "Top Product": s["topProduct"],
+                        "MC Rate": f"{mc.get('attachmentRate', 0):.0f}%",
+                        "MC Lift": f"+${mc.get('ticketLift', 0):.2f}",
                     })
                 st.dataframe(ranking_data, use_container_width=True, hide_index=True)
+
+            with tab_mc:
+                if network_mc > 0:
+                    mc_data = []
+                    for s in stores:
+                        mc = s.get("maxClean", {})
+                        if mc.get("total", 0) == 0:
+                            continue
+                        rp_pct = mc["withRpOil"] / mc["total"] * 100 if mc["total"] else 0
+                        non_rp_pct = mc["withNonRpOil"] / mc["total"] * 100 if mc["total"] else 0
+                        mc_data.append({
+                            "Store": s["name"],
+                            "MC Invoices": mc["total"],
+                            "Attach Rate": f"{mc['attachmentRate']:.1f}%",
+                            "With RP Oil": f"{mc['withRpOil']} ({rp_pct:.0f}%)",
+                            "Non-RP Oil": f"{mc['withNonRpOil']} ({non_rp_pct:.0f}%)",
+                            "MC Avg Ticket": f"${mc['avgTicket']:.2f}",
+                            "Non-MC Avg": f"${mc['nonMcAvgTicket']:.2f}",
+                            "Ticket Lift": f"+${mc['ticketLift']:.2f}",
+                        })
+                    st.dataframe(mc_data, use_container_width=True, hide_index=True)
+
+                    st.markdown("")
+                    st.markdown("#### Key Insight")
+                    best_lift = max(stores, key=lambda s: s.get("maxClean", {}).get("ticketLift", 0))
+                    best_rate = max(stores, key=lambda s: s.get("maxClean", {}).get("attachmentRate", 0))
+                    bl_mc = best_lift.get("maxClean", {})
+                    br_mc = best_rate.get("maxClean", {})
+                    st.info(
+                        f"**{best_lift['name']}** has the highest ticket lift at "
+                        f"+${bl_mc.get('ticketLift', 0):.2f} per Max-Clean invoice. "
+                        f"**{best_rate['name']}** leads in attachment rate at "
+                        f"{br_mc.get('attachmentRate', 0):.1f}%. "
+                        f"Stores with high non-RP oil + Max-Clean rates are successfully "
+                        f"selling the RP additive upsell even on conventional oil changes."
+                    )
+                else:
+                    st.info("No Max-Clean data detected in this report.")
 
             with tab_details:
                 for s in stores:
                     with st.expander(f"#{s['rank']} — {s['name']}"):
-                        dc1, dc2, dc3 = st.columns(3)
+                        dc1, dc2, dc3, dc4 = st.columns(4)
                         dc1.metric("Revenue", fmt_currency(s["totalRevenue"]))
-                        dc2.metric("Oil Changes", fmt_number(s["invoices"]))
+                        dc2.metric("Invoices", fmt_number(s["invoices"]))
                         dc3.metric("Avg Rev/Inv", f"${s['avgRevPerInvoice']:.2f}")
+                        mc = s.get("maxClean", {})
+                        dc4.metric("MC Attach Rate", f"{mc.get('attachmentRate', 0):.1f}%")
+
+                        if mc.get("total", 0) > 0:
+                            st.caption(
+                                f"Max-Clean: {mc['total']} invoices | "
+                                f"With RP oil: {mc['withRpOil']} | "
+                                f"Non-RP oil: {mc['withNonRpOil']} | "
+                                f"Ticket lift: +${mc['ticketLift']:.2f}"
+                            )
+
                         if s["productBreakdown"]:
                             st.caption("Top Products:")
                             for pb in s["productBreakdown"][:5]:
                                 display_name = get_product_display_name(pb["code"])
-                                st.text(f"  {display_name} ({pb['category']}) — {fmt_currency(pb['revenue'])}")
+                                line_ct = pb.get("lineCount", "")
+                                ct_str = f" ({line_ct} lines)" if line_ct else ""
+                                st.text(f"  {display_name} ({pb['category']}){ct_str}")
 
             st.markdown("")
             if st.button("Generate PowerPoint Report", type="primary"):
@@ -294,4 +385,4 @@ elif nav == "Report Generator":
             except OSError:
                 pass
     else:
-        st.info("Upload an Excel file to get started. The app auto-detects column layouts, so reports from any Royal Purple region or distributor should work.")
+        st.info("Upload an Excel file to get started. The app auto-detects column layouts, deduplicates multi-product invoices, and computes corrected revenue figures.")
