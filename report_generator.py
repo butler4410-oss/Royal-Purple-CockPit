@@ -108,34 +108,33 @@ def rgb(hex_str):
     return RGBColor.from_string(hex_str)
 
 HEADER_PATTERNS = {
-    "date": ["invoice date", "date", "service date", "trans date", "transaction date"],
-    "product": ["operation code", "op code", "product", "description", "item", "service", "operation"],
-    "invoices": ["# of invoices", "invoices", "invoice count", "num invoices", "transactions", "oil changes", "ticket count"],
-    "revenue": ["total rev", "revenue", "total sales", "sales amount", "net sales", "gross rev", "gross sales"],
-    "avg_rev": ["rev/inv", "avg rev", "average rev", "avg sale", "per invoice", "avg amount", "average sale", "rev per"],
-    "vehicles": ["# of vehicles", "vehicles", "vehicle count", "num vehicles", "cars", "unique vehicles"],
-    "qty": ["qty", "quantity", "count", "units"],
-    "amount": ["amount", "sales", "total"],
+    "date": ["invoice date", "date", "service date", "trans date", "transaction date", "period", "month"],
+    "product": ["operation code", "op code", "product", "description", "item", "service", "operation", "sku", "part"],
+    "invoices": ["# of invoices", "invoices", "invoice count", "num invoices", "transactions", "oil changes",
+                 "ticket count", "tickets", "work orders", "ro count", "repair orders", "# invoices",
+                 "number of invoices", "inv count", "total invoices"],
+    "revenue": ["total rev", "revenue", "total sales", "net sales", "gross rev", "gross sales",
+                "sales rev", "total amount", "net amount", "total $", "gross amount", "sales total",
+                "earnings", "income", "proceeds"],
+    "avg_rev": ["rev/inv", "avg rev", "average rev", "avg sale", "per invoice", "avg amount",
+                "average sale", "rev per", "avg ticket", "average ticket", "per ticket",
+                "avg ro", "average order"],
+    "vehicles": ["# of vehicles", "vehicles", "vehicle count", "num vehicles", "cars",
+                 "unique vehicles", "car count", "unique cars", "vin count"],
+    "store": ["store", "location", "shop", "site", "branch", "facility", "installer", "account"],
 }
 
-SKIP_SHEETS = ["report summary", "summary", "totals", "notes", "instructions", "template", "info"]
-
-
-def _find_column_index(header, field):
-    patterns = HEADER_PATTERNS.get(field, [])
-    header_lower = [str(h).lower().strip() if h else "" for h in header]
-    for pattern in patterns:
-        for i, h in enumerate(header_lower):
-            if pattern in h:
-                return i
-    return None
+SKIP_SHEETS = ["report summary", "summary", "totals", "notes", "instructions", "template", "info",
+               "cover", "pivot", "chart", "dashboard", "index",
+               "legend", "reference", "lookup", "config", "settings"]
 
 
 def _safe_float(val, default=0):
     if val is None:
         return default
     try:
-        return float(val)
+        v = str(val).replace("$", "").replace(",", "").strip()
+        return float(v)
     except (ValueError, TypeError):
         return default
 
@@ -144,16 +143,48 @@ def _safe_int(val, default=0):
     if val is None:
         return default
     try:
-        return int(float(val))
+        v = str(val).replace(",", "").strip()
+        return int(float(v))
     except (ValueError, TypeError):
         return default
 
 
-def _detect_date(data_rows, col_map):
+def _find_column_index(header, field):
+    patterns = HEADER_PATTERNS.get(field, [])
+    header_lower = [str(h).lower().strip() if h else "" for h in header]
+    for pattern in patterns:
+        for i, h in enumerate(header_lower):
+            if pattern == h:
+                return i
+    for pattern in patterns:
+        for i, h in enumerate(header_lower):
+            if pattern in h:
+                return i
+    return None
+
+
+def _find_header_row(rows, max_scan=10):
+    keywords = ["invoice", "date", "revenue", "product", "operation", "sales",
+                "amount", "total", "store", "location", "description", "qty",
+                "vehicles", "transactions", "tickets", "sku", "service"]
+    best_idx = 0
+    best_score = 0
+    for i, row in enumerate(rows[:max_scan]):
+        if not row:
+            continue
+        row_strs = [str(c).lower().strip() if c else "" for c in row]
+        score = sum(1 for s in row_strs if any(kw in s for kw in keywords))
+        if score > best_score:
+            best_score = score
+            best_idx = i
+    return best_idx if best_score >= 2 else 0
+
+
+def _detect_date_from_rows(data_rows, col_map):
     date_idx = col_map.get("date")
     if date_idx is None:
         return None
-    for row in data_rows:
+    for row in data_rows[:20]:
         if date_idx >= len(row):
             continue
         date_val = row[date_idx]
@@ -163,11 +194,37 @@ def _detect_date(data_rows, col_map):
             return date_val.strftime("%B %Y")
         elif isinstance(date_val, str):
             date_val = date_val.strip()
+            if not date_val:
+                continue
             parts = date_val.split()
             if len(parts) >= 3:
                 return f"{parts[0]} {parts[2].rstrip(',')}"
             elif len(parts) == 2:
                 return date_val
+            import re
+            m = re.match(r'(\d{1,2})[/\-](\d{1,2})[/\-](\d{2,4})', date_val)
+            if m:
+                from datetime import datetime as dt
+                for fmt in ["%m/%d/%Y", "%m-%d-%Y", "%m/%d/%y", "%m-%d-%y",
+                            "%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"]:
+                    try:
+                        return dt.strptime(date_val, fmt).strftime("%B %Y")
+                    except ValueError:
+                        continue
+    return None
+
+
+def _detect_date_from_sheet(ws_title, rows):
+    import re
+    for text in [ws_title] + [str(c) for r in rows[:5] if r for c in r if c]:
+        months = ["january", "february", "march", "april", "may", "june",
+                  "july", "august", "september", "october", "november", "december"]
+        text_lower = text.lower()
+        for month in months:
+            if month in text_lower:
+                m = re.search(r'(\d{4})', text)
+                if m:
+                    return f"{month.capitalize()} {m.group(1)}"
     return None
 
 
@@ -177,129 +234,317 @@ def _get_val(row, idx, default=None):
     return row[idx]
 
 
-def parse_excel(file_path):
-    wb = openpyxl.load_workbook(file_path)
-    stores = []
-    month_year = None
-
-    for sheet_name in wb.sheetnames:
-        if sheet_name.lower().strip() in SKIP_SHEETS:
+def _is_numeric_column(rows, col_idx, sample_size=10):
+    count = 0
+    numeric = 0
+    for row in rows[:sample_size]:
+        if col_idx >= len(row):
             continue
-        ws = wb[sheet_name]
-        rows = list(ws.iter_rows(values_only=True))
-        if len(rows) < 2:
+        val = row[col_idx]
+        if val is None:
             continue
+        count += 1
+        try:
+            float(str(val).replace("$", "").replace(",", ""))
+            numeric += 1
+        except (ValueError, TypeError):
+            pass
+    return numeric > 0 and numeric / max(count, 1) >= 0.5
 
-        header_row_idx = 0
-        header = rows[0]
-        for i, row in enumerate(rows[:5]):
-            row_strs = [str(c).lower() if c else "" for c in row]
-            if any(p in s for s in row_strs for p in ["invoice", "date", "revenue", "product", "operation", "sales"]):
-                header = row
-                header_row_idx = i
-                break
 
-        col_map = {}
-        for field in ["date", "product", "invoices", "revenue", "avg_rev", "vehicles"]:
-            idx = _find_column_index(header, field)
-            if idx is not None:
-                col_map[field] = idx
-
-        if "revenue" not in col_map:
-            for fallback_field in ["amount"]:
-                idx = _find_column_index(header, fallback_field)
-                if idx is not None:
-                    col_map["revenue"] = idx
-                    break
-
-        if "invoices" not in col_map:
-            for fallback_field in ["qty"]:
-                idx = _find_column_index(header, fallback_field)
-                if idx is not None:
-                    col_map["invoices"] = idx
-                    break
-
-        if "revenue" not in col_map and "invoices" not in col_map:
+def _detect_revenue_column(header, data_rows):
+    header_lower = [str(h).lower().strip() if h else "" for h in header]
+    candidates = []
+    for i, h in enumerate(header_lower):
+        if not h:
             continue
+        if any(kw in h for kw in ["rev", "sales", "amount", "total", "earnings", "income", "gross", "net"]):
+            if any(skip in h for skip in ["date", "name", "desc", "code", "model", "make", "year", "vin"]):
+                continue
+            if _is_numeric_column(data_rows, i):
+                total = sum(_safe_float(_get_val(r, i)) for r in data_rows[:50])
+                candidates.append((i, total, h))
+    if candidates:
+        candidates.sort(key=lambda x: -x[1])
+        return candidates[0][0]
+    for i in range(len(header)):
+        if _is_numeric_column(data_rows, i):
+            total = sum(_safe_float(_get_val(r, i)) for r in data_rows[:50])
+            if total > 100:
+                return i
+    return None
 
-        all_data_rows = rows[header_row_idx + 1:]
-        first_col = col_map.get("date", col_map.get("product", 0))
-        data_rows = [r for r in all_data_rows if len(r) > first_col and r[first_col] is not None]
 
-        last_row = all_data_rows[-1] if all_data_rows else None
-        totals_row = None
-        if last_row and len(last_row) > first_col and last_row[first_col] is None:
+def _parse_single_store_sheet(sheet_name, rows):
+    header_row_idx = _find_header_row(rows)
+    header = rows[header_row_idx]
+
+    col_map = {}
+    for field in ["date", "product", "invoices", "revenue", "avg_rev", "vehicles"]:
+        idx = _find_column_index(header, field)
+        if idx is not None:
+            col_map[field] = idx
+
+    if "revenue" not in col_map:
+        rev_idx = _detect_revenue_column(header, rows[header_row_idx + 1:])
+        if rev_idx is not None:
+            col_map["revenue"] = rev_idx
+
+    if "revenue" not in col_map and "invoices" not in col_map:
+        return None
+
+    all_data_rows = rows[header_row_idx + 1:]
+    first_col = col_map.get("date", col_map.get("product", 0))
+
+    data_rows = []
+    for r in all_data_rows:
+        if len(r) <= first_col:
+            continue
+        if r[first_col] is not None:
+            data_rows.append(r)
+
+    if not data_rows:
+        non_empty = [r for r in all_data_rows if any(c is not None for c in r)]
+        if non_empty:
+            data_rows = non_empty
+
+    if not data_rows:
+        return None
+
+    last_row = all_data_rows[-1] if all_data_rows else None
+    totals_row = None
+    if last_row:
+        first_empty = (len(last_row) <= first_col or last_row[first_col] is None)
+        has_numbers = any(_safe_float(_get_val(last_row, col_map.get(f))) > 0
+                         for f in ["revenue", "invoices"] if f in col_map)
+        if first_empty and has_numbers:
             totals_row = last_row
+            if last_row in data_rows:
+                data_rows.remove(last_row)
 
-        if not month_year:
-            month_year = _detect_date(data_rows, col_map)
+    product_idx = col_map.get("product")
+    revenue_idx = col_map.get("revenue")
+
+    product_revenue = {}
+    total_rev_calc = 0
+    total_inv_calc = 0
+    total_veh_calc = 0
+    for row in data_rows:
+        if product_idx is not None:
+            raw = _get_val(row, product_idx)
+            op_desc = str(raw).strip() if raw else ""
+            code = op_desc.split(" - ")[0].strip() if " - " in op_desc else op_desc.strip()
+        else:
+            code = ""
+
+        rev = _safe_float(_get_val(row, revenue_idx))
+        total_rev_calc += rev
+        total_inv_calc += _safe_int(_get_val(row, col_map.get("invoices")))
+        total_veh_calc += _safe_int(_get_val(row, col_map.get("vehicles")))
+
+        if code:
+            product_revenue[code] = product_revenue.get(code, 0) + rev
+
+    if totals_row:
+        total_invoices = _safe_int(_get_val(totals_row, col_map.get("invoices"))) or total_inv_calc
+        total_revenue = _safe_float(_get_val(totals_row, col_map.get("revenue"))) or total_rev_calc
+        avg_rev_inv = _safe_float(_get_val(totals_row, col_map.get("avg_rev")))
+        total_vehicles = _safe_int(_get_val(totals_row, col_map.get("vehicles"))) or total_veh_calc
+    else:
+        total_invoices = total_inv_calc
+        total_revenue = total_rev_calc
+        avg_rev_inv = 0
+        total_vehicles = total_veh_calc
+
+    if total_invoices == 0 and len(data_rows) > 0:
+        total_invoices = len(data_rows)
+
+    if total_invoices and total_revenue:
+        calculated_avg = total_revenue / total_invoices
+        if not avg_rev_inv or avg_rev_inv < 1 or abs(avg_rev_inv - calculated_avg) > calculated_avg * 5:
+            avg_rev_inv = calculated_avg
+
+    sorted_prefixes = sorted(PRODUCT_MAP.keys(), key=len, reverse=True)
+    product_breakdown = []
+    for code, rev in sorted(product_revenue.items(), key=lambda x: -x[1]):
+        cat = "Other"
+        for prefix in sorted_prefixes:
+            if code.upper().startswith(prefix.upper()):
+                cat = PRODUCT_MAP[prefix]
+                break
+        product_breakdown.append({
+            "code": code,
+            "category": cat,
+            "revenue": round(rev, 2),
+        })
+
+    top_product = product_breakdown[0]["category"] if product_breakdown else "N/A"
+
+    return {
+        "name": sheet_name,
+        "invoices": int(total_invoices),
+        "vehicles": int(total_vehicles),
+        "totalRevenue": round(float(total_revenue), 2),
+        "avgRevPerInvoice": round(float(avg_rev_inv), 2),
+        "topProduct": top_product,
+        "productBreakdown": product_breakdown,
+        "_col_map": col_map,
+        "_date_rows": data_rows,
+    }
+
+
+def _parse_consolidated_sheet(sheet_name, rows):
+    header_row_idx = _find_header_row(rows)
+    header = rows[header_row_idx]
+
+    store_idx = _find_column_index(header, "store")
+    if store_idx is None:
+        return []
+
+    col_map = {}
+    for field in ["date", "product", "invoices", "revenue", "avg_rev", "vehicles", "store"]:
+        idx = _find_column_index(header, field)
+        if idx is not None:
+            col_map[field] = idx
+
+    if "revenue" not in col_map:
+        rev_idx = _detect_revenue_column(header, rows[header_row_idx + 1:])
+        if rev_idx is not None:
+            col_map["revenue"] = rev_idx
+
+    if "revenue" not in col_map:
+        return []
+
+    all_data_rows = rows[header_row_idx + 1:]
+    data_rows = [r for r in all_data_rows
+                 if len(r) > store_idx and r[store_idx] is not None
+                 and str(r[store_idx]).strip()]
+
+    store_data = {}
+    for row in data_rows:
+        store_name = str(_get_val(row, store_idx, "")).strip()
+        if not store_name:
+            continue
+        if store_name.lower() in ["total", "totals", "grand total", "sum"]:
+            continue
+
+        if store_name not in store_data:
+            store_data[store_name] = {
+                "revenue": 0, "invoices": 0, "vehicles": 0,
+                "product_revenue": {},
+            }
+
+        rev = _safe_float(_get_val(row, col_map.get("revenue")))
+        inv = _safe_int(_get_val(row, col_map.get("invoices")))
+        veh = _safe_int(_get_val(row, col_map.get("vehicles")))
+
+        store_data[store_name]["revenue"] += rev
+        store_data[store_name]["invoices"] += inv if inv else 1
+        store_data[store_name]["vehicles"] += veh
 
         product_idx = col_map.get("product")
-        revenue_idx = col_map.get("revenue")
-
-        product_revenue = {}
-        total_rev_calc = 0
-        total_inv_calc = 0
-        total_veh_calc = 0
-        for row in data_rows:
-            if product_idx is not None:
-                op_desc = str(_get_val(row, product_idx, "")) if _get_val(row, product_idx) else ""
-                code = op_desc.split(" - ")[0].strip() if " - " in op_desc else op_desc.strip()
-            else:
-                code = ""
-
-            rev = _safe_float(_get_val(row, revenue_idx))
-            total_rev_calc += rev
-            total_inv_calc += _safe_int(_get_val(row, col_map.get("invoices")))
-            total_veh_calc += _safe_int(_get_val(row, col_map.get("vehicles")))
-
+        if product_idx is not None:
+            raw = _get_val(row, product_idx)
+            op_desc = str(raw).strip() if raw else ""
+            code = op_desc.split(" - ")[0].strip() if " - " in op_desc else op_desc.strip()
             if code:
-                product_revenue[code] = product_revenue.get(code, 0) + rev
+                store_data[store_name]["product_revenue"][code] = \
+                    store_data[store_name]["product_revenue"].get(code, 0) + rev
 
-        if totals_row:
-            total_invoices = _safe_int(_get_val(totals_row, col_map.get("invoices"))) or total_inv_calc
-            total_revenue = _safe_float(_get_val(totals_row, col_map.get("revenue"))) or total_rev_calc
-            avg_rev_inv = _safe_float(_get_val(totals_row, col_map.get("avg_rev")))
-            total_vehicles = _safe_int(_get_val(totals_row, col_map.get("vehicles"))) or total_veh_calc
-        else:
-            total_invoices = total_inv_calc
-            total_revenue = total_rev_calc
-            avg_rev_inv = 0
-            total_vehicles = total_veh_calc
+    sorted_prefixes = sorted(PRODUCT_MAP.keys(), key=len, reverse=True)
+    stores = []
+    for sname, sdata in store_data.items():
+        total_inv = sdata["invoices"]
+        total_rev = sdata["revenue"]
+        avg_rev = total_rev / total_inv if total_inv else 0
 
-        if (not avg_rev_inv or avg_rev_inv < 1) and total_invoices and total_revenue:
-            avg_rev_inv = total_revenue / total_invoices
-
-        if "invoices" not in col_map and total_invoices == 0 and len(data_rows) > 0:
-            total_invoices = len(data_rows)
-            if total_revenue:
-                avg_rev_inv = total_revenue / total_invoices
-
-        sorted_prefixes = sorted(PRODUCT_MAP.keys(), key=len, reverse=True)
         product_breakdown = []
-        for code, rev in sorted(product_revenue.items(), key=lambda x: -x[1]):
+        for code, rev in sorted(sdata["product_revenue"].items(), key=lambda x: -x[1]):
             cat = "Other"
             for prefix in sorted_prefixes:
-                if code.startswith(prefix):
+                if code.upper().startswith(prefix.upper()):
                     cat = PRODUCT_MAP[prefix]
                     break
-            product_breakdown.append({
-                "code": code,
-                "category": cat,
-                "revenue": round(rev, 2),
-            })
+            product_breakdown.append({"code": code, "category": cat, "revenue": round(rev, 2)})
 
         top_product = product_breakdown[0]["category"] if product_breakdown else "N/A"
 
         stores.append({
-            "name": sheet_name,
-            "invoices": int(total_invoices),
-            "vehicles": int(total_vehicles),
-            "totalRevenue": round(float(total_revenue), 2),
-            "avgRevPerInvoice": round(float(avg_rev_inv), 2),
+            "name": sname,
+            "invoices": int(total_inv),
+            "vehicles": int(sdata["vehicles"]),
+            "totalRevenue": round(float(total_rev), 2),
+            "avgRevPerInvoice": round(float(avg_rev), 2),
             "topProduct": top_product,
             "productBreakdown": product_breakdown,
         })
+
+    return stores
+
+
+def parse_excel(file_path):
+    wb = openpyxl.load_workbook(file_path, data_only=True)
+    stores = []
+    month_year = None
+
+    skip_lower = set(SKIP_SHEETS)
+    data_sheets = [s for s in wb.sheetnames if s.lower().strip() not in skip_lower]
+
+    if len(data_sheets) == 1:
+        ws = wb[data_sheets[0]]
+        rows = list(ws.iter_rows(values_only=True))
+        if len(rows) >= 2:
+            header_idx = _find_header_row(rows)
+            header = rows[header_idx]
+            store_idx = _find_column_index(header, "store")
+
+            if store_idx is not None:
+                consolidated = _parse_consolidated_sheet(data_sheets[0], rows)
+                if consolidated:
+                    stores.extend(consolidated)
+                    month_year = _detect_date_from_rows(rows[header_idx + 1:],
+                                                        {"date": _find_column_index(header, "date")})
+                    if not month_year:
+                        month_year = _detect_date_from_sheet(data_sheets[0], rows)
+            else:
+                result = _parse_single_store_sheet(data_sheets[0], rows)
+                if result:
+                    month_year = _detect_date_from_rows(
+                        result.pop("_date_rows", []),
+                        result.pop("_col_map", {}))
+                    stores.append(result)
+    else:
+        for sheet_name in data_sheets:
+            ws = wb[sheet_name]
+            rows = list(ws.iter_rows(values_only=True))
+            if len(rows) < 2:
+                continue
+
+            header_idx = _find_header_row(rows)
+            header = rows[header_idx]
+            store_idx = _find_column_index(header, "store")
+
+            if store_idx is not None:
+                consolidated = _parse_consolidated_sheet(sheet_name, rows)
+                if consolidated:
+                    stores.extend(consolidated)
+                    if not month_year:
+                        date_idx = _find_column_index(header, "date")
+                        month_year = _detect_date_from_rows(rows[header_idx + 1:],
+                                                            {"date": date_idx})
+                    continue
+
+            result = _parse_single_store_sheet(sheet_name, rows)
+            if result:
+                if not month_year:
+                    month_year = _detect_date_from_rows(
+                        result.get("_date_rows", []),
+                        result.get("_col_map", {}))
+                    if not month_year:
+                        month_year = _detect_date_from_sheet(sheet_name, rows)
+                result.pop("_date_rows", None)
+                result.pop("_col_map", None)
+                stores.append(result)
 
     stores.sort(key=lambda s: -s["totalRevenue"])
     for i, s in enumerate(stores):
@@ -310,7 +555,11 @@ def parse_excel(file_path):
         month_year = datetime.now().strftime("%B %Y")
 
     if not stores:
-        raise ValueError("No store data found in the Excel file. Ensure the workbook has at least one data sheet with recognizable column headers (e.g., Revenue, Invoices, Product).")
+        raise ValueError(
+            "No store data found in the Excel file. The app looks for columns like "
+            "'Revenue', 'Total Rev', 'Sales', 'Invoices', 'Product', etc. "
+            "Make sure your report has recognizable column headers."
+        )
 
     return stores, month_year
 
