@@ -1998,7 +1998,7 @@ def build_distribution_map_slide(prs, map_image_path, title, total_slides, page_
     tf2 = s_box.text_frame
     p2 = tf2.paragraphs[0]
     r2 = p2.add_run()
-    r2.text = "ABE Consumer Distribution Territory Map"
+    r2.text = "Territory Map"
     r2.font.size = Pt(11)
     r2.font.color.rgb = rgb(C["goldLight"])
     r2.font.name = "Calibri"
@@ -2057,7 +2057,7 @@ def calculate_total_slides(num_stores, num_maps=0, num_product_cats=0):
         matrix_pages +  # performance matrix
         1 +  # product mix
         product_dive_slides +  # product deep dives (divider + per-category)
-        num_maps +  # distribution maps
+        num_maps +  # map image slides
         1 +  # section divider (store deep dives)
         num_stores +  # store deep dives
         1 +  # next steps
@@ -2109,7 +2109,7 @@ def generate_report(file_path, output_path=None, map_images=None):
 
     for i, map_info in enumerate(maps):
         map_path = map_info.get("path", map_info) if isinstance(map_info, dict) else map_info
-        map_title = map_info.get("title", f"Distribution Map {i + 1}") if isinstance(map_info, dict) else f"Distribution Map {i + 1}"
+        map_title = map_info.get("title", f"Map {i + 1}") if isinstance(map_info, dict) else f"Map {i + 1}"
         build_distribution_map_slide(prs, map_path, map_title, total_slides, page)
         page += 1
 

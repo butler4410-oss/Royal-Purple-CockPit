@@ -3,12 +3,11 @@ import streamlit.components.v1 as components
 import tempfile
 import os
 import json
-import plotly.graph_objects as go
+import io
 from report_generator import (
     generate_report, parse_excel, fmt_currency, fmt_number,
     PRODUCT_DESCRIPTIONS, get_product_display_name,
 )
-from distribution_data import STATE_DISTRIBUTORS, DISTRIBUTOR_COLORS, ALL_DISTRIBUTORS
 from customer_map import load_customers, parse_csv_customers, build_leaflet_html, get_states
 from c4c_report_generator import generate_c4c_report
 
@@ -30,7 +29,7 @@ with st.sidebar:
 
     nav = st.radio(
         "Navigation",
-        ["Report Generator", "Distribution Map", "Customer Map", "Product Reference"],
+        ["Report Generator", "Customer Map", "Product Reference"],
         label_visibility="collapsed",
     )
 
@@ -48,108 +47,7 @@ def page_header(title, subtitle):
     )
 
 
-if nav == "Distribution Map":
-    page_header("Distribution Map", "ABE Consumer Distribution Territory Coverage")
-    st.markdown("")
-
-    dist_filter = st.multiselect(
-        "Filter by Distributor",
-        options=ALL_DISTRIBUTORS,
-        default=[],
-        help="Select distributors to highlight on the map. Leave empty to show all.",
-    )
-
-    codes = []
-    states_list = []
-    colors = []
-    hover_texts = []
-    for code, info in STATE_DISTRIBUTORS.items():
-        dists = info["distributors"]
-        if not dists:
-            continue
-        if dist_filter:
-            matching = [d for d in dists if d in dist_filter]
-            if not matching:
-                continue
-            primary = matching[0]
-        else:
-            primary = dists[0]
-
-        codes.append(code)
-        states_list.append(info["state"])
-        colors.append(DISTRIBUTOR_COLORS.get(primary, "#808080"))
-
-        dist_list = "<br>".join(f"• {d}" for d in dists)
-        hover_texts.append(f"<b>{info['state']}</b><br>{dist_list}")
-
-    fig = go.Figure(data=go.Choropleth(
-        locations=codes,
-        z=[list(DISTRIBUTOR_COLORS.values()).index(c) if c in DISTRIBUTOR_COLORS.values() else 0 for c in colors],
-        locationmode="USA-states",
-        colorscale=[[i / max(len(DISTRIBUTOR_COLORS) - 1, 1), c] for i, c in enumerate(DISTRIBUTOR_COLORS.values())],
-        showscale=False,
-        text=hover_texts,
-        hoverinfo="text",
-        marker_line_color="white",
-        marker_line_width=1.5,
-    ))
-
-    fig.update_layout(
-        geo=dict(
-            scope="usa",
-            bgcolor="rgba(0,0,0,0)",
-            lakecolor="#F8F5FF",
-            landcolor="#E8E0F0",
-            showlakes=True,
-        ),
-        margin=dict(l=0, r=0, t=0, b=0),
-        height=500,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-    )
-
-    st.plotly_chart(fig, use_container_width=True, key="dist_map")
-
-    st.markdown("### ABE Legend")
-    legend_cols = st.columns(min(len(DISTRIBUTOR_COLORS), 3))
-    for i, (dist_name, color) in enumerate(DISTRIBUTOR_COLORS.items()):
-        with legend_cols[i % 3]:
-            state_count = sum(1 for s in STATE_DISTRIBUTORS.values() if dist_name in s["distributors"])
-            st.markdown(
-                f"<div style='display:flex;align-items:center;gap:8px;margin-bottom:8px;'>"
-                f"<div style='width:20px;height:20px;background:{color};border-radius:3px;flex-shrink:0;'></div>"
-                f"<span><b>{dist_name}</b> ({state_count} states)</span>"
-                f"</div>",
-                unsafe_allow_html=True,
-            )
-
-    st.markdown("---")
-    st.markdown("### State Details")
-
-    selected_state = st.selectbox(
-        "Select a state for details",
-        options=[""] + [f"{info['state']} ({code})" for code, info in sorted(STATE_DISTRIBUTORS.items(), key=lambda x: x[1]["state"])],
-        format_func=lambda x: "Choose a state..." if x == "" else x,
-    )
-
-    if selected_state and selected_state != "":
-        state_code = selected_state.split("(")[-1].rstrip(")")
-        info = STATE_DISTRIBUTORS.get(state_code, {})
-        if info:
-            st.markdown(f"#### {info['state']}")
-            if info["distributors"]:
-                for dist in info["distributors"]:
-                    color = DISTRIBUTOR_COLORS.get(dist, "#808080")
-                    st.markdown(
-                        f"<div style='display:flex;align-items:center;gap:8px;padding:8px 12px;margin-bottom:4px;"
-                        f"background:linear-gradient(90deg, {color}22, transparent);border-left:4px solid {color};border-radius:4px;'>"
-                        f"<b>{dist}</b></div>",
-                        unsafe_allow_html=True,
-                    )
-            else:
-                st.info("No distributor assigned to this state.")
-
-elif nav == "Customer Map":
+if nav == "Customer Map":
     page_header("Customer Map", "Interactive map of Royal Purple customer locations across the United States.")
     st.markdown("")
 
@@ -180,18 +78,15 @@ elif nav == "Customer Map":
             t = c.get("type", "Retail")
             type_counts[t] = type_counts.get(t, 0) + 1
 
-        all_countries = sorted(set(c.get("country", "US") for c in customers))
-        country_names = {"US": "United States", "CR": "Costa Rica", "PR": "Puerto Rico", "CA": "Canada", "GU": "Guam", "DO": "Dominican Republic"}
-        country_label = ", ".join(country_names.get(co, co) for co in all_countries if co != "US")
+        unique_counties = len(set(c.get("county", "") for c in customers if c.get("county")))
 
-        col1, col2, col3, col4, col5 = st.columns(5)
+        col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.metric("Total Accounts", len(customers))
-        col2.metric("Countries", len(all_countries))
-        col3.metric("Promo Only", type_counts.get("Promo Only (Not on C4C)", 0))
-        col4.metric("On Both Lists", type_counts.get("On Both Lists", 0))
-        col5.metric("C4C Only", type_counts.get("C4C Only", 0))
-        if country_label:
-            st.caption(f"International: {country_label}")
+        col2.metric("States", len(all_states))
+        col3.metric("Counties", unique_counties)
+        col4.metric("Promo Only", type_counts.get("Promo Only (Not on C4C)", 0))
+        col5.metric("On Both Lists", type_counts.get("On Both Lists", 0))
+        col6.metric("C4C Only", type_counts.get("C4C Only", 0))
         st.markdown("")
 
         map_html = build_leaflet_html(customers, height=650)
@@ -201,31 +96,56 @@ elif nav == "Customer Map":
         st.caption("Use the search bar and filters on the map to find specific locations. Click the List button to see a sidebar of all locations.")
 
         st.markdown("---")
-        st.markdown("### Export Report")
-        st.caption("Generate a comprehensive Excel report combining C4C gap analysis with ABE distribution territory data.")
+        exp_col1, exp_col2 = st.columns(2)
 
-        if st.button("Generate C4C & Territory Report", type="primary"):
-            with st.spinner("Building report..."):
-                report_path = os.path.join(tempfile.gettempdir(), "RP_C4C_Territory_Report.xlsx")
-                stats = generate_c4c_report(report_path)
+        with exp_col1:
+            st.markdown("### Export Map Data")
+            st.caption("Download the full account dataset as a CSV file to share with the Royal Purple team.")
 
-                with open(report_path, "rb") as f:
-                    report_data = f.read()
+            csv_buf = io.StringIO()
+            import csv as csv_mod
+            writer = csv_mod.writer(csv_buf)
+            writer.writerow(["Store Name", "Address", "City", "State", "County", "Zip", "Country", "Latitude", "Longitude", "Account Type"])
+            for c in sorted(customers, key=lambda x: (x.get("state", ""), x.get("county", ""), x.get("store_name", ""))):
+                writer.writerow([
+                    c.get("store_name", ""), c.get("address", ""), c.get("city", ""),
+                    c.get("state", ""), c.get("county", ""), c.get("zip", ""),
+                    c.get("country", "US"), c.get("latitude", ""), c.get("longitude", ""),
+                    c.get("type", "")
+                ])
 
-                st.success(
-                    f"Report generated — {stats['sheets']} sheets including: "
-                    f"{stats['not_on_c4c']} not on C4C, {stats['c4c_matched']} matched, "
-                    f"{stats['states']} states, {stats.get('c4c_dupes', 0)} C4C duplicates, "
-                    f"{stats.get('promo_dupes', 0)} promo duplicates, "
-                    f"{stats.get('failed_geo', 0)} failed geolocations."
-                )
+            st.download_button(
+                label="Download Map Data (CSV)",
+                data=csv_buf.getvalue(),
+                file_name="RP_Customer_Map_Data.csv",
+                mime="text/csv",
+                type="primary",
+            )
 
-                st.download_button(
-                    label="Download Excel Report",
-                    data=report_data,
-                    file_name="RP_C4C_Territory_Report.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                )
+        with exp_col2:
+            st.markdown("### Export C4C Report")
+            st.caption("Generate a comprehensive Excel report with C4C gap analysis.")
+
+            if st.button("Generate C4C Report", type="primary"):
+                with st.spinner("Building report..."):
+                    report_path = os.path.join(tempfile.gettempdir(), "RP_C4C_Report.xlsx")
+                    stats = generate_c4c_report(report_path)
+
+                    with open(report_path, "rb") as f:
+                        report_data = f.read()
+
+                    st.success(
+                        f"Report generated — {stats['sheets']} sheets: "
+                        f"{stats['not_on_c4c']} not on C4C, {stats['c4c_matched']} matched, "
+                        f"{stats['states']} states/regions."
+                    )
+
+                    st.download_button(
+                        label="Download Excel Report",
+                        data=report_data,
+                        file_name="RP_C4C_Report.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    )
     else:
         st.info("No customer data available. Upload a CSV file to get started.")
 
@@ -251,10 +171,10 @@ elif nav == "Report Generator":
         )
     with col_upload2:
         map_files = st.file_uploader(
-            "Upload Distribution Maps (optional)",
+            "Upload Map Images (optional)",
             type=["png", "jpg", "jpeg"],
             accept_multiple_files=True,
-            help="Upload ABE distribution territory maps to include as slides in the report.",
+            help="Upload map images to include as slides in the report.",
         )
 
     if map_files:
@@ -431,7 +351,7 @@ elif nav == "Report Generator":
                         with open(output_path, "rb") as f:
                             pptx_data = f.read()
 
-                        map_note = f" + {len(map_temp_paths)} distribution map(s)" if map_temp_paths else ""
+                        map_note = f" + {len(map_temp_paths)} map image(s)" if map_temp_paths else ""
                         st.success(f"Report generated — {len(stores)} store deep dives{map_note} included.")
 
                         st.download_button(
