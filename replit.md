@@ -8,9 +8,36 @@
 - **report_generator.py** — PPTX engine + adaptive Excel parser with invoice deduplication and Max-Clean attachment analysis
 - **distribution_data.py** — STATE_DISTRIBUTORS mapping (50 states + DC), DISTRIBUTOR_COLORS, ALL_DISTRIBUTORS
 - **customer_map.py** — Leaflet.js map builder: loads customers.json, parses CSV uploads, generates embedded HTML map component
-- **c4c_report_generator.py** — Excel report generator: C4C gap analysis + ABE territory data → 6-sheet .xlsx workbook
-- **customers.json** — Geocoded installer accounts (2,326 from Excel) + 6 ABE distributors
+- **c4c_report_generator.py** — Excel report generator: C4C gap analysis → 10-sheet .xlsx workbook
+- **customers.json** — Geocoded installer accounts (3,516 total: 2,093 Promo Only, 233 On Both Lists, 1,190 C4C Only)
 - **assets/** — Royal Purple branding images
+
+## Customer Map (Leaflet.js)
+- Embedded via st.components.v1.html() — full Leaflet map with marker clusters
+- 3 account categories with distinct colors:
+  - **Promo Only (Not on C4C)** — Red (#DC2626) — 2,093 accounts from promo participation list not found in C4C
+  - **On Both Lists** — Green (#16A34A) — 233 accounts matched on both promo and C4C lists
+  - **C4C Only** — Blue (#2563EB) — 1,190 accounts on C4C but not on promo participation list
+- Built-in search bar, state filter dropdown, type filter dropdown (all in-map, no Streamlit reruns)
+- Marker clustering via leaflet.markercluster for zoomed-out views
+- Clickable markers with popup showing store name, address, city/state, type badge
+- Stats bar with inline per-category counts
+- Collapsible sidebar list synced with visible markers; click to fly to location
+- Optional CSV upload to replace default customers.json data
+- CARTO light basemap tiles
+- Distributor info removed — do NOT re-add until user provides real data
+
+## C4C Report (10 Sheets)
+1. Executive Summary — totals, gap %, key findings
+2. State Breakdown — per-state counts (Not on C4C vs C4C Matched)
+3. Not on C4C Full List — 2,093 promo-only accounts
+4. C4C Matched Full List — 1,423 accounts (On Both Lists + C4C Only)
+5. Top Priority States — ranked by gap
+6. Reconciliation — cross-reference summary
+7. C4C Duplicates — 52 duplicate entries in C4C list
+8. Promo Duplicates — 123 duplicate entries in promo list
+9. On C4C Only — 1,170 accounts on C4C but not matched to promo
+10. Failed to Geolocate — 62 accounts with invalid zip codes
 
 ## Excel Parsing (Fully Adaptive)
 - Scans first 10 rows for best header match (keyword scoring, min 2 keywords)
@@ -44,23 +71,11 @@
 - ABE Legend with state counts
 - State detail selector with colored accent bars
 
-## Customer Map (Leaflet.js)
-- Embedded via st.components.v1.html() — full Leaflet map with marker clusters
-- Customer types: Retail (purple), Installer (green), Distributor (blue) with custom SVG pin icons
-- Built-in search bar, state filter dropdown, type filter dropdown (all in-map, no Streamlit reruns)
-- Marker clustering via leaflet.markercluster for zoomed-out views
-- Clickable markers with popup showing store name, address, city/state, type badge
-- Collapsible sidebar list synced with visible markers; click to fly to location
-- Stats bar showing "X of Y locations shown"
-- Optional CSV upload to replace default customers.json data
-- CARTO light basemap tiles
-
-## Logo Assets (assets/)
-- `Royal Purple White Logo.png` — DO NOT USE in PPTX (old blue/yellow text logo)
-- `RPMO_logo_BF_Outline.png` — Full logo with checkered flag, Streamlit sidebar only
-- `rp_synthetic_expert_white.png` — White "Synthetic Expert" for dark backgrounds, PPTX footer
-- `RP_Synthetic_Expert_Logo_Black_Text.png` — Black text, PPTX header badge
-- `25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg` — "NEVER SETTLE" background
+## Logo/Branding Rules
+- NO logo images in PPTX slides — gold text "ROYAL PURPLE" badge only
+- Sidebar is text-only (no logo)
+- NEVER SETTLE background image stays on cover/dividers/closing slides only
+- assets/25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg — background image
 
 ## PPTX Slide Design (Clean Minimal)
 - Content slides: off-white background, thin purple top bar, RP badge top-right, gold accent bar next to title
@@ -76,7 +91,7 @@ Cover → TOC → Exec Summary → Exec Observations → Revenue Overview → Ra
 
 ## Dependencies
 - Python 3.11
-- streamlit, python-pptx, openpyxl, Pillow, plotly
+- streamlit, python-pptx, openpyxl, Pillow, plotly, pgeocode
 
 ## Running
 ```

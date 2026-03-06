@@ -265,8 +265,8 @@ def _auto_width(ws, num_cols, max_width=40):
 def generate_c4c_report(output_path):
     customers = _load_customers()
 
-    not_c4c = [c for c in customers if c["type"] == "Installer (Not on C4C)"]
-    c4c_matched = [c for c in customers if c["type"] == "Installer (C4C Matched)"]
+    not_c4c = [c for c in customers if c["type"] == "Promo Only (Not on C4C)"]
+    c4c_matched = [c for c in customers if c["type"] in ("On Both Lists", "C4C Only")]
 
     all_states_code = sorted(set(c["state"] for c in customers if c.get("state")))
 

@@ -161,10 +161,9 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
     margin-top: 4px;
 }}
 
-.type-installer {{ background: #F0FDF4; color: #166534; }}
-.type-installer-not-c4c {{ background: #FEF3C7; color: #92400E; }}
-.type-installer-c4c {{ background: #F0FDF4; color: #166534; }}
-.type-distributor {{ background: #EFF6FF; color: #1E40AF; }}
+.type-promo-only {{ background: #FEE2E2; color: #991B1B; }}
+.type-both-lists {{ background: #D1FAE5; color: #065F46; }}
+.type-c4c-only {{ background: #DBEAFE; color: #1E40AF; }}
 
 #sidebar {{
     position: absolute;
@@ -239,18 +238,20 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
             <option value="">All States</option>
         </select>
         <select id="type-filter">
-            <option value="">All Types</option>
-            <option value="Installer (Not on C4C)">Not on C4C</option>
-            <option value="Installer (C4C Matched)">C4C Matched</option>
+            <option value="">All Account Types</option>
+            <option value="Promo Only (Not on C4C)">Promo Only (Not on C4C)</option>
+            <option value="On Both Lists">On Both Lists (Matched)</option>
+            <option value="C4C Only">C4C Only</option>
         </select>
     </div>
 
     <div id="stats-bar">Loading...</div>
 
     <div id="legend">
-        <h4>Location Types</h4>
-        <div class="legend-item"><div class="legend-dot" style="background:#D97706;"></div> Installer (Not on C4C)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div> Installer (C4C Matched)</div>
+        <h4>Account Status</h4>
+        <div class="legend-item"><div class="legend-dot" style="background:#DC2626;"></div> Promo Only (Not on C4C)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div> On Both Lists</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2563EB;"></div> C4C Only</div>
     </div>
 
     <button id="toggle-sidebar" onclick="toggleSidebar()">&#9776; List</button>
@@ -268,8 +269,9 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 const customers = {customers_json};
 
 const TYPE_COLORS = {{
-    'Installer (Not on C4C)': '#D97706',
-    'Installer (C4C Matched)': '#16A34A'
+    'Promo Only (Not on C4C)': '#DC2626',
+    'On Both Lists': '#16A34A',
+    'C4C Only': '#2563EB'
 }};
 
 const map = L.map('map', {{
@@ -320,21 +322,21 @@ let allMarkers = [];
 customers.forEach(function(c) {{
     if (!c.latitude || !c.longitude) return;
 
-    let typeClass = 'installer';
-    if (c.type === 'Installer (Not on C4C)') typeClass = 'installer-not-c4c';
-    else if (c.type === 'Installer (C4C Matched)') typeClass = 'installer-c4c';
-    else if (c.type === 'Distributor') typeClass = 'distributor';
+    let typeClass = 'promo-only';
+    if (c.type === 'Promo Only (Not on C4C)') typeClass = 'promo-only';
+    else if (c.type === 'On Both Lists') typeClass = 'both-lists';
+    else if (c.type === 'C4C Only') typeClass = 'c4c-only';
     const popupHtml = `
         <div class="popup-content">
             <h3>${{c.store_name}}</h3>
             <p>${{c.address || ''}}</p>
             <p>${{c.city}}, ${{c.state}} ${{c.zip || ''}}</p>
-            <span class="popup-type type-${{typeClass}}">${{c.type || 'Installer'}}</span>
+            <span class="popup-type type-${{typeClass}}">${{c.type || 'Unknown'}}</span>
         </div>
     `;
 
     const marker = L.marker([c.latitude, c.longitude], {{
-        icon: createIcon(c.type || 'Installer (Not on C4C)')
+        icon: createIcon(c.type || 'Unknown')
     }}).bindPopup(popupHtml);
 
     marker._customerData = c;
@@ -375,8 +377,19 @@ function filterMarkers() {{
         }}
     }});
 
-    document.getElementById('stats-bar').textContent =
-        visibleCount + ' of ' + allMarkers.length + ' locations shown';
+    let promoCount = 0, bothCount = 0, c4cCount = 0;
+    markerClusterGroup.eachLayer(function(m) {{
+        const t = m._customerData.type;
+        if (t === 'Promo Only (Not on C4C)') promoCount++;
+        else if (t === 'On Both Lists') bothCount++;
+        else if (t === 'C4C Only') c4cCount++;
+    }});
+
+    document.getElementById('stats-bar').innerHTML =
+        '<strong>' + visibleCount + '</strong> of ' + allMarkers.length + ' accounts shown — ' +
+        '<span style="color:#DC2626">&#9679; Promo Only: ' + promoCount + '</span> | ' +
+        '<span style="color:#16A34A">&#9679; Both Lists: ' + bothCount + '</span> | ' +
+        '<span style="color:#2563EB">&#9679; C4C Only: ' + c4cCount + '</span>';
 
     updateSidebar();
 
@@ -390,8 +403,7 @@ document.getElementById('search-input').addEventListener('input', filterMarkers)
 document.getElementById('state-filter').addEventListener('change', filterMarkers);
 document.getElementById('type-filter').addEventListener('change', filterMarkers);
 
-document.getElementById('stats-bar').textContent =
-    allMarkers.length + ' of ' + allMarkers.length + ' locations shown';
+filterMarkers();
 
 function updateSidebar() {{
     const list = document.getElementById('sidebar-list');
@@ -410,8 +422,9 @@ function updateSidebar() {{
         const c = marker._customerData;
         const div = document.createElement('div');
         div.className = 'sidebar-item';
+        const dotColor = TYPE_COLORS[c.type] || '#999';
         div.innerHTML = '<div class="si-name">' + c.store_name + '</div>' +
-            '<div class="si-loc">' + c.city + ', ' + c.state + ' &middot; ' + (c.type || 'Retail') + '</div>';
+            '<div class="si-loc"><span style="color:' + dotColor + '">&#9679;</span> ' + c.city + ', ' + c.state + ' &middot; ' + (c.type || 'Unknown') + '</div>';
         div.onclick = function() {{
             map.setView([c.latitude, c.longitude], 15);
             marker.openPopup();
