@@ -14,17 +14,19 @@
 
 ## Customer Map (Leaflet.js)
 - Embedded via st.components.v1.html() — full Leaflet map with marker clusters
+- **Global coverage**: US (3,498), Costa Rica (38), Canada (2), Puerto Rico (1) = 3,539 total
 - 3 account categories with distinct colors:
-  - **Promo Only (Not on C4C)** — Red (#DC2626) — 2,093 accounts from promo participation list not found in C4C
-  - **On Both Lists** — Green (#16A34A) — 233 accounts matched on both promo and C4C lists
-  - **C4C Only** — Blue (#2563EB) — 1,190 accounts on C4C but not on promo participation list
-- Built-in search bar, state filter dropdown, type filter dropdown (all in-map, no Streamlit reruns)
+  - **Promo Only (Not on C4C)** — Red (#DC2626) — 2,097 accounts from promo list not found in C4C
+  - **On Both Lists** — Green (#16A34A) — 234 accounts matched on both promo and C4C lists
+  - **C4C Only** — Blue (#2563EB) — 1,208 accounts on C4C but not on promo list
+- Filters: search bar, country dropdown, region/state dropdown, account type dropdown
 - Marker clustering via leaflet.markercluster for zoomed-out views
-- Clickable markers with popup showing store name, address, city/state, type badge
+- Clickable markers with popup showing store name, address, city/state/country, type badge
 - Stats bar with inline per-category counts
 - Collapsible sidebar list synced with visible markers; click to fly to location
 - Optional CSV upload to replace default customers.json data
 - CARTO light basemap tiles
+- Geocoding: pgeocode for US, CR, CA zip codes; fallback province coordinates for Costa Rica
 - Distributor info removed — do NOT re-add until user provides real data
 
 ## C4C Report (10 Sheets)

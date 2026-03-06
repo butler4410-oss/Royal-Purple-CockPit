@@ -234,8 +234,11 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 
     <div id="toolbar">
         <input type="text" id="search-input" placeholder="Search store name..." />
+        <select id="country-filter">
+            <option value="">All Countries</option>
+        </select>
         <select id="state-filter">
-            <option value="">All States</option>
+            <option value="">All Regions</option>
         </select>
         <select id="type-filter">
             <option value="">All Account Types</option>
@@ -326,11 +329,16 @@ customers.forEach(function(c) {{
     if (c.type === 'Promo Only (Not on C4C)') typeClass = 'promo-only';
     else if (c.type === 'On Both Lists') typeClass = 'both-lists';
     else if (c.type === 'C4C Only') typeClass = 'c4c-only';
+    const COUNTRY_NAMES = {{'US': 'United States', 'CR': 'Costa Rica', 'PR': 'Puerto Rico', 'CA': 'Canada', 'GU': 'Guam', 'DO': 'Dominican Republic'}};
+    const countryLabel = COUNTRY_NAMES[c.country] || c.country || 'United States';
+    const locationLine = c.country && c.country !== 'US'
+        ? `${{c.city}}, ${{c.state}} ${{c.zip || ''}} — ${{countryLabel}}`
+        : `${{c.city}}, ${{c.state}} ${{c.zip || ''}}`;
     const popupHtml = `
         <div class="popup-content">
             <h3>${{c.store_name}}</h3>
             <p>${{c.address || ''}}</p>
-            <p>${{c.city}}, ${{c.state}} ${{c.zip || ''}}</p>
+            <p>${{locationLine}}</p>
             <span class="popup-type type-${{typeClass}}">${{c.type || 'Unknown'}}</span>
         </div>
     `;
@@ -346,6 +354,17 @@ customers.forEach(function(c) {{
 allMarkers.forEach(m => markerClusterGroup.addLayer(m));
 map.addLayer(markerClusterGroup);
 
+const COUNTRY_MAP = {{'US': 'United States', 'CR': 'Costa Rica', 'PR': 'Puerto Rico', 'CA': 'Canada', 'GU': 'Guam', 'DO': 'Dominican Republic'}};
+
+const countries = [...new Set(customers.map(c => c.country || 'US').filter(Boolean))].sort();
+const countrySelect = document.getElementById('country-filter');
+countries.forEach(function(co) {{
+    const opt = document.createElement('option');
+    opt.value = co;
+    opt.textContent = COUNTRY_MAP[co] || co;
+    countrySelect.appendChild(opt);
+}});
+
 const states = [...new Set(customers.map(c => c.state).filter(Boolean))].sort();
 const stateSelect = document.getElementById('state-filter');
 states.forEach(function(s) {{
@@ -357,6 +376,7 @@ states.forEach(function(s) {{
 
 function filterMarkers() {{
     const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const countryVal = document.getElementById('country-filter').value;
     const stateVal = document.getElementById('state-filter').value;
     const typeVal = document.getElementById('type-filter').value;
 
@@ -368,6 +388,7 @@ function filterMarkers() {{
         let show = true;
 
         if (searchTerm && !c.store_name.toLowerCase().includes(searchTerm)) show = false;
+        if (countryVal && (c.country || 'US') !== countryVal) show = false;
         if (stateVal && c.state !== stateVal) show = false;
         if (typeVal && c.type !== typeVal) show = false;
 
@@ -393,13 +414,14 @@ function filterMarkers() {{
 
     updateSidebar();
 
-    if (visibleCount > 0 && (stateVal || searchTerm)) {{
+    if (visibleCount > 0 && (countryVal || stateVal || searchTerm)) {{
         const bounds = markerClusterGroup.getBounds();
         if (bounds.isValid()) map.fitBounds(bounds, {{ padding: [50, 50] }});
     }}
 }}
 
 document.getElementById('search-input').addEventListener('input', filterMarkers);
+document.getElementById('country-filter').addEventListener('change', filterMarkers);
 document.getElementById('state-filter').addEventListener('change', filterMarkers);
 document.getElementById('type-filter').addEventListener('change', filterMarkers);
 
@@ -423,8 +445,10 @@ function updateSidebar() {{
         const div = document.createElement('div');
         div.className = 'sidebar-item';
         const dotColor = TYPE_COLORS[c.type] || '#999';
+        const cNames = {{'US': '', 'CR': ' — Costa Rica', 'PR': ' — Puerto Rico', 'CA': ' — Canada', 'GU': ' — Guam', 'DO': ' — Dominican Republic'}};
+        const cSuffix = cNames[c.country] || '';
         div.innerHTML = '<div class="si-name">' + c.store_name + '</div>' +
-            '<div class="si-loc"><span style="color:' + dotColor + '">&#9679;</span> ' + c.city + ', ' + c.state + ' &middot; ' + (c.type || 'Unknown') + '</div>';
+            '<div class="si-loc"><span style="color:' + dotColor + '">&#9679;</span> ' + c.city + ', ' + c.state + cSuffix + ' &middot; ' + (c.type || 'Unknown') + '</div>';
         div.onclick = function() {{
             map.setView([c.latitude, c.longitude], 15);
             marker.openPopup();

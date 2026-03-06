@@ -180,12 +180,18 @@ elif nav == "Customer Map":
             t = c.get("type", "Retail")
             type_counts[t] = type_counts.get(t, 0) + 1
 
+        all_countries = sorted(set(c.get("country", "US") for c in customers))
+        country_names = {"US": "United States", "CR": "Costa Rica", "PR": "Puerto Rico", "CA": "Canada", "GU": "Guam", "DO": "Dominican Republic"}
+        country_label = ", ".join(country_names.get(co, co) for co in all_countries if co != "US")
+
         col1, col2, col3, col4, col5 = st.columns(5)
         col1.metric("Total Accounts", len(customers))
-        col2.metric("States", len(all_states))
+        col2.metric("Countries", len(all_countries))
         col3.metric("Promo Only", type_counts.get("Promo Only (Not on C4C)", 0))
         col4.metric("On Both Lists", type_counts.get("On Both Lists", 0))
         col5.metric("C4C Only", type_counts.get("C4C Only", 0))
+        if country_label:
+            st.caption(f"International: {country_label}")
         st.markdown("")
 
         map_html = build_leaflet_html(customers, height=650)
