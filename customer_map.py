@@ -242,7 +242,6 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
             <option value="">All Types</option>
             <option value="Installer (Not on C4C)">Not on C4C</option>
             <option value="Installer (C4C Matched)">C4C Matched</option>
-            <option value="Distributor">Distributor</option>
         </select>
     </div>
 
@@ -252,7 +251,6 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
         <h4>Location Types</h4>
         <div class="legend-item"><div class="legend-dot" style="background:#D97706;"></div> Installer (Not on C4C)</div>
         <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div> Installer (C4C Matched)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#2563EB;"></div> Distributor</div>
     </div>
 
     <button id="toggle-sidebar" onclick="toggleSidebar()">&#9776; List</button>
@@ -271,8 +269,7 @@ const customers = {customers_json};
 
 const TYPE_COLORS = {{
     'Installer (Not on C4C)': '#D97706',
-    'Installer (C4C Matched)': '#16A34A',
-    'Distributor': '#2563EB'
+    'Installer (C4C Matched)': '#16A34A'
 }};
 
 const map = L.map('map', {{

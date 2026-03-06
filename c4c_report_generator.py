@@ -267,7 +267,6 @@ def generate_c4c_report(output_path):
 
     not_c4c = [c for c in customers if c["type"] == "Installer (Not on C4C)"]
     c4c_matched = [c for c in customers if c["type"] == "Installer (C4C Matched)"]
-    distributors_list = [c for c in customers if c["type"] == "Distributor"]
 
     all_states_code = sorted(set(c["state"] for c in customers if c.get("state")))
 
@@ -283,7 +282,7 @@ def generate_c4c_report(output_path):
     ws.sheet_properties.tabColor = "1B1464"
 
     ws.merge_cells("A1:F1")
-    ws["A1"] = "Royal Purple — C4C Gap Analysis & Distribution Territory Report"
+    ws["A1"] = "Royal Purple — C4C Gap Analysis Report"
     ws["A1"].font = TITLE_FONT
     ws["A1"].alignment = Alignment(vertical="center")
     ws.row_dimensions[1].height = 30
@@ -302,7 +301,6 @@ def generate_c4c_report(output_path):
         ("Total Installer Accounts on Map", len(not_c4c) + len(c4c_matched)),
         ("Installer Accounts NOT on C4C", len(not_c4c)),
         ("Installer Accounts Matched (on C4C)", len(c4c_matched)),
-        ("ABE Distributors", len(distributors_list)),
         ("States Covered", len(all_states_code)),
     ]
 
@@ -367,7 +365,7 @@ def generate_c4c_report(output_path):
     row = 3
     state_headers = [
         "State", "State Code", "Not on C4C", "C4C Matched",
-        "Total Installers", "Gap %", "ABE Distributor(s)"
+        "Total Installers", "Gap %"
     ]
     for ci, h in enumerate(state_headers, 1):
         ws2.cell(row=row, column=ci, value=h)
@@ -398,8 +396,6 @@ def generate_c4c_report(output_path):
         total_c4c += mc
         total_all += total
 
-        dist_info = STATE_DISTRIBUTORS.get(sc, {})
-        dists = ", ".join(dist_info.get("distributors", [])) if dist_info else ""
         sname = state_names.get(sc, sc)
 
         ws2.cell(row=row, column=1, value=sname)
@@ -408,7 +404,6 @@ def generate_c4c_report(output_path):
         ws2.cell(row=row, column=4, value=mc)
         ws2.cell(row=row, column=5, value=total)
         ws2.cell(row=row, column=6, value=f"{gap:.1f}%")
-        ws2.cell(row=row, column=7, value=dists)
 
         _apply_data_row(ws2, row, len(state_headers), alt=(row % 2 == 0))
         for col in [2, 3, 4, 5, 6]:
@@ -436,76 +431,7 @@ def generate_c4c_report(output_path):
 
     _auto_width(ws2, len(state_headers))
 
-    # ── Sheet 3: Distribution Territory Map ──
-    ws3 = wb.create_sheet("Distribution Territories")
-    ws3.sheet_properties.tabColor = "228B22"
-
-    ws3.merge_cells("A1:E1")
-    ws3["A1"] = "ABE Distributor Territory Assignments"
-    ws3["A1"].font = TITLE_FONT
-    ws3.row_dimensions[1].height = 28
-
-    row = 3
-    dist_headers = ["ABE Distributor", "States Assigned", "State Count",
-                     "Installers (Not on C4C)", "Installers (C4C Matched)"]
-    for ci, h in enumerate(dist_headers, 1):
-        ws3.cell(row=row, column=ci, value=h)
-    _apply_header_row(ws3, row, len(dist_headers))
-    row += 1
-
-    for dist_name in ALL_DISTRIBUTORS:
-        dist_states = []
-        for code, info in sorted(STATE_DISTRIBUTORS.items()):
-            if dist_name in info.get("distributors", []):
-                dist_states.append(code)
-
-        nc_count = sum(not_c4c_by_state.get(s, 0) for s in dist_states)
-        mc_count = sum(c4c_by_state.get(s, 0) for s in dist_states)
-
-        ws3.cell(row=row, column=1, value=dist_name)
-        ws3.cell(row=row, column=2, value=", ".join(dist_states))
-        ws3.cell(row=row, column=3, value=len(dist_states))
-        ws3.cell(row=row, column=4, value=nc_count)
-        ws3.cell(row=row, column=5, value=mc_count)
-
-        _apply_data_row(ws3, row, len(dist_headers), alt=(row % 2 == 0))
-        for col in [3, 4, 5]:
-            ws3.cell(row=row, column=col).alignment = Alignment(horizontal="center")
-        row += 1
-
-    row += 2
-    ws3.merge_cells(f"A{row}:E{row}")
-    ws3[f"A{row}"] = "State-Level Territory Detail"
-    ws3[f"A{row}"].font = SUBTITLE_FONT
-    row += 1
-
-    detail_headers = ["State", "State Code", "ABE Distributor(s)",
-                       "Not on C4C", "C4C Matched"]
-    for ci, h in enumerate(detail_headers, 1):
-        ws3.cell(row=row, column=ci, value=h)
-    _apply_header_row(ws3, row, len(detail_headers))
-    row += 1
-
-    for code in sorted(STATE_DISTRIBUTORS.keys()):
-        info = STATE_DISTRIBUTORS[code]
-        dists = ", ".join(info["distributors"]) if info["distributors"] else "—"
-        nc = not_c4c_by_state.get(code, 0)
-        mc = c4c_by_state.get(code, 0)
-
-        ws3.cell(row=row, column=1, value=info["state"])
-        ws3.cell(row=row, column=2, value=code)
-        ws3.cell(row=row, column=3, value=dists)
-        ws3.cell(row=row, column=4, value=nc)
-        ws3.cell(row=row, column=5, value=mc)
-
-        _apply_data_row(ws3, row, len(detail_headers), alt=(row % 2 == 0))
-        for col in [2, 4, 5]:
-            ws3.cell(row=row, column=col).alignment = Alignment(horizontal="center")
-        row += 1
-
-    _auto_width(ws3, len(dist_headers))
-
-    # ── Sheet 4: Not on C4C (Full List) ──
+    # ── Sheet 3: Not on C4C (Full List) ──
     ws4 = wb.create_sheet("Not on C4C — Full List")
     ws4.sheet_properties.tabColor = "D97706"
 
@@ -516,24 +442,20 @@ def generate_c4c_report(output_path):
 
     row = 3
     list_headers = ["Store Name", "Address", "City", "State", "Zip",
-                     "ABE Distributor", "Latitude", "Longitude"]
+                     "Latitude", "Longitude"]
     for ci, h in enumerate(list_headers, 1):
         ws4.cell(row=row, column=ci, value=h)
     _apply_header_row(ws4, row, len(list_headers))
     row += 1
 
     for c in sorted(not_c4c, key=lambda x: (x["state"], x["store_name"])):
-        dist_info = STATE_DISTRIBUTORS.get(c["state"], {})
-        dists = ", ".join(dist_info.get("distributors", [])) if dist_info else ""
-
         ws4.cell(row=row, column=1, value=c["store_name"])
         ws4.cell(row=row, column=2, value=c["address"])
         ws4.cell(row=row, column=3, value=c["city"])
         ws4.cell(row=row, column=4, value=c["state"])
         ws4.cell(row=row, column=5, value=c["zip"])
-        ws4.cell(row=row, column=6, value=dists)
-        ws4.cell(row=row, column=7, value=c["latitude"])
-        ws4.cell(row=row, column=8, value=c["longitude"])
+        ws4.cell(row=row, column=6, value=c["latitude"])
+        ws4.cell(row=row, column=7, value=c["longitude"])
 
         _apply_data_row(ws4, row, len(list_headers), alt=(row % 2 == 0))
         ws4.cell(row=row, column=4).alignment = Alignment(horizontal="center")
@@ -557,17 +479,13 @@ def generate_c4c_report(output_path):
     row += 1
 
     for c in sorted(c4c_matched, key=lambda x: (x["state"], x["store_name"])):
-        dist_info = STATE_DISTRIBUTORS.get(c["state"], {})
-        dists = ", ".join(dist_info.get("distributors", [])) if dist_info else ""
-
         ws5.cell(row=row, column=1, value=c["store_name"])
         ws5.cell(row=row, column=2, value=c["address"])
         ws5.cell(row=row, column=3, value=c["city"])
         ws5.cell(row=row, column=4, value=c["state"])
         ws5.cell(row=row, column=5, value=c["zip"])
-        ws5.cell(row=row, column=6, value=dists)
-        ws5.cell(row=row, column=7, value=c["latitude"])
-        ws5.cell(row=row, column=8, value=c["longitude"])
+        ws5.cell(row=row, column=6, value=c["latitude"])
+        ws5.cell(row=row, column=7, value=c["longitude"])
 
         _apply_data_row(ws5, row, len(list_headers), alt=(row % 2 == 0))
         ws5.cell(row=row, column=4).alignment = Alignment(horizontal="center")
@@ -586,7 +504,7 @@ def generate_c4c_report(output_path):
 
     row = 3
     priority_headers = ["Rank", "State", "Not on C4C", "C4C Matched",
-                         "Total", "Gap %", "ABE Distributor(s)"]
+                         "Total", "Gap %"]
     for ci, h in enumerate(priority_headers, 1):
         ws6.cell(row=row, column=ci, value=h)
     _apply_header_row(ws6, row, len(priority_headers))
@@ -601,20 +519,17 @@ def generate_c4c_report(output_path):
             continue
         gap = nc / total * 100
         sname = state_names.get(sc, sc)
-        dist_info = STATE_DISTRIBUTORS.get(sc, {})
-        dists = ", ".join(dist_info.get("distributors", [])) if dist_info else ""
-        state_priority.append((sname, sc, nc, mc, total, gap, dists))
+        state_priority.append((sname, sc, nc, mc, total, gap))
 
     state_priority.sort(key=lambda x: -x[2])
 
-    for rank, (sname, sc, nc, mc, total, gap, dists) in enumerate(state_priority, 1):
+    for rank, (sname, sc, nc, mc, total, gap) in enumerate(state_priority, 1):
         ws6.cell(row=row, column=1, value=rank)
         ws6.cell(row=row, column=2, value=f"{sname} ({sc})")
         ws6.cell(row=row, column=3, value=nc)
         ws6.cell(row=row, column=4, value=mc)
         ws6.cell(row=row, column=5, value=total)
         ws6.cell(row=row, column=6, value=f"{gap:.1f}%")
-        ws6.cell(row=row, column=7, value=dists)
 
         _apply_data_row(ws6, row, len(priority_headers), alt=(row % 2 == 0))
         for col in [1, 3, 4, 5, 6]:
@@ -801,11 +716,10 @@ def generate_c4c_report(output_path):
         "total_installers": total_installers,
         "not_on_c4c": len(not_c4c),
         "c4c_matched": len(c4c_matched),
-        "distributors": len(distributors_list),
         "states": len(all_states_code),
         "failed_geo": len(failed),
         "c4c_dupes": len(xref["c4c_dupes"]),
         "promo_dupes": len(xref["promo_dupes"]),
         "cross_matched": xref["matched"],
-        "sheets": 11,
+        "sheets": 10,
     }
