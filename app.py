@@ -3,13 +3,13 @@ import streamlit.components.v1 as components
 import tempfile
 import os
 import json
-import io
 from report_generator import (
     generate_report, parse_excel, fmt_currency, fmt_number,
     PRODUCT_DESCRIPTIONS, get_product_display_name,
 )
 from customer_map import load_customers, parse_csv_customers, build_leaflet_html, get_states
 from c4c_report_generator import generate_c4c_report
+from map_data_exporter import generate_map_export
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
@@ -100,39 +100,44 @@ if nav == "Customer Map":
 
         with exp_col1:
             st.markdown("### Export Map Data")
-            st.caption("Download the full account dataset as a CSV file to share with the Royal Purple team.")
+            st.caption("Download a branded Excel workbook with per-state tabs, county breakdown, and filterable columns — ready to share with the Royal Purple team.")
 
-            csv_buf = io.StringIO()
-            import csv as csv_mod
-            writer = csv_mod.writer(csv_buf)
-            writer.writerow(["Store Name", "Address", "City", "State", "County", "Zip", "Country", "Latitude", "Longitude", "Account Type"])
-            for c in sorted(customers, key=lambda x: (x.get("state", ""), x.get("county", ""), x.get("store_name", ""))):
-                writer.writerow([
-                    c.get("store_name", ""), c.get("address", ""), c.get("city", ""),
-                    c.get("state", ""), c.get("county", ""), c.get("zip", ""),
-                    c.get("country", "US"), c.get("latitude", ""), c.get("longitude", ""),
-                    c.get("type", "")
-                ])
+            if st.button("Generate Map Data Export", type="primary", key="map_export"):
+                with st.spinner("Building Excel workbook..."):
+                    with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
+                        export_path = tmp.name
+                    stats = generate_map_export(export_path, customers)
 
-            st.download_button(
-                label="Download Map Data (CSV)",
-                data=csv_buf.getvalue(),
-                file_name="RP_Customer_Map_Data.csv",
-                mime="text/csv",
-                type="primary",
-            )
+                    with open(export_path, "rb") as f:
+                        export_data = f.read()
+                    os.unlink(export_path)
+
+                    st.success(
+                        f"Export ready — {stats['sheets']} sheets: "
+                        f"Dashboard + {stats['states']} state tabs + All Accounts + County Summary | "
+                        f"{stats['total']} accounts across {stats['counties']} counties"
+                    )
+
+                    st.download_button(
+                        label="Download Excel Workbook",
+                        data=export_data,
+                        file_name="RP_Installer_Account_Data.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    )
 
         with exp_col2:
             st.markdown("### Export C4C Report")
-            st.caption("Generate a comprehensive Excel report with C4C gap analysis.")
+            st.caption("Generate a comprehensive Excel report with C4C gap analysis, duplicates, and reconciliation data.")
 
-            if st.button("Generate C4C Report", type="primary"):
+            if st.button("Generate C4C Report", type="primary", key="c4c_export"):
                 with st.spinner("Building report..."):
-                    report_path = os.path.join(tempfile.gettempdir(), "RP_C4C_Report.xlsx")
+                    with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
+                        report_path = tmp.name
                     stats = generate_c4c_report(report_path)
 
                     with open(report_path, "rb") as f:
                         report_data = f.read()
+                    os.unlink(report_path)
 
                     st.success(
                         f"Report generated — {stats['sheets']} sheets: "
@@ -141,7 +146,7 @@ if nav == "Customer Map":
                     )
 
                     st.download_button(
-                        label="Download Excel Report",
+                        label="Download C4C Report",
                         data=report_data,
                         file_name="RP_C4C_Report.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
