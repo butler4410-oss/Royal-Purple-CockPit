@@ -1,0 +1,582 @@
+[
+  {
+    "name": "MIGHTY AUTO PARTS OF ARKANSAS",
+    "address": "1301 NABHOLZ AVENUE",
+    "city": "CONWAY",
+    "state": "AR",
+    "zip": "72034",
+    "county": "Faulkner",
+    "latitude": 35.0823,
+    "longitude": -92.4683
+  },
+  {
+    "name": "Napa Auto Parts",
+    "address": "9425 N 7th Street",
+    "city": "PHOENIX",
+    "state": "AZ",
+    "zip": "85020",
+    "county": "Maricopa",
+    "latitude": 33.5623,
+    "longitude": -112.0559
+  },
+  {
+    "name": "JM OIL",
+    "address": "12330 GREENSTONE AVE.",
+    "city": "SANTA FE SPRINGS",
+    "state": "CA",
+    "zip": "90670",
+    "county": "Los Angeles",
+    "latitude": 33.9464,
+    "longitude": -118.0838
+  },
+  {
+    "name": "MIGHTY SAN DIEGO",
+    "address": "2940 NATIONAL CITY BLVD.",
+    "city": "NATIONAL CITY",
+    "state": "CA",
+    "zip": "91950",
+    "county": "San Diego",
+    "latitude": 32.6749,
+    "longitude": -117.0897
+  },
+  {
+    "name": "NAPA AUTO PARTS",
+    "address": "319 RIDGE RD",
+    "city": "CLAYMONT",
+    "state": "DE",
+    "zip": "19703",
+    "county": "New Castle",
+    "latitude": 39.8044,
+    "longitude": -75.4649
+  },
+  {
+    "name": "LEWIS MARINE",
+    "address": "220 SW 32ND STREET",
+    "city": "FORT LAUDERDALE",
+    "state": "FL",
+    "zip": "33315",
+    "county": "Broward",
+    "latitude": 26.0989,
+    "longitude": -80.1541
+  },
+  {
+    "name": "Mighty Distributing of SW Florida",
+    "address": "1228 Viscaya Pkwy, Unit A",
+    "city": "CAPE CORAL",
+    "state": "FL",
+    "zip": "33990",
+    "county": "Lee",
+    "latitude": 26.6265,
+    "longitude": -81.9677
+  },
+  {
+    "name": "Mighty of North Fort Meyers",
+    "address": "14950 N CLEVELAND AVE",
+    "city": "NORTH FORT MYERS",
+    "state": "FL",
+    "zip": "33903",
+    "county": "Lee",
+    "latitude": 26.693,
+    "longitude": -81.9125
+  },
+  {
+    "name": "MIGHTY OF PENSACOLA",
+    "address": "40 E. NINE ONE HALF MILE RD",
+    "city": "PENASCOLA",
+    "state": "FL",
+    "zip": "32534",
+    "county": "Escambia",
+    "latitude": 30.5301,
+    "longitude": -87.2793
+  },
+  {
+    "name": "SANTEX CORPORATION",
+    "address": "14780 SW 136 STEET",
+    "city": "MIAMI",
+    "state": "FL",
+    "zip": "33196",
+    "county": "Miami-Dade",
+    "latitude": 25.6615,
+    "longitude": -80.441
+  },
+  {
+    "name": "SANTEX CORPORATION AUBURNDALE",
+    "address": "1601 HOBBS RD",
+    "city": "AUBURNDALE",
+    "state": "FL",
+    "zip": "33823",
+    "county": "Polk",
+    "latitude": 28.0724,
+    "longitude": -81.8122
+  },
+  {
+    "name": "NAPA/UNITED AUTO PARTS",
+    "address": "90 E WAKEA AVE",
+    "city": "KAHULUI, MAUI",
+    "state": "HI",
+    "zip": "96732",
+    "county": "Maui",
+    "latitude": 20.8814,
+    "longitude": -156.4783
+  },
+  {
+    "name": "Parts Center Hawaii - Hilo",
+    "address": "722 KANOELEHUA AVE",
+    "city": "HILO",
+    "state": "HI",
+    "zip": "96720",
+    "county": "Hawaii",
+    "latitude": 19.7025,
+    "longitude": -155.0939
+  },
+  {
+    "name": "KELLER-HEARTT OIL",
+    "address": "4411 S TRIPP AVE",
+    "city": "CHICAGO",
+    "state": "IL",
+    "zip": "60632",
+    "county": "Cook",
+    "latitude": 41.8093,
+    "longitude": -87.7052
+  },
+  {
+    "name": "MIGHTY SOUTH SIDE CHICAGO",
+    "address": "22793 CITATION RD, UNIT C",
+    "city": "FRANKFORT",
+    "state": "IL",
+    "zip": "60423",
+    "county": "Will",
+    "latitude": 41.5094,
+    "longitude": -87.8248
+  },
+  {
+    "name": "MIGHTY AUTO PARTS",
+    "address": "1021 EAST MICHIGAN ST",
+    "city": "INDIANAPOLIS",
+    "state": "IN",
+    "zip": "46202",
+    "county": "Marion",
+    "latitude": 39.7851,
+    "longitude": -86.1595
+  },
+  {
+    "name": "MIGHTY AUTO PARTS",
+    "address": "4172 BARDSTOWN ROAD",
+    "city": "LOUISVILLE",
+    "state": "KY",
+    "zip": "40218",
+    "county": "Jefferson",
+    "latitude": 38.189,
+    "longitude": -85.654
+  },
+  {
+    "name": "GAUBERT OIL COMPANY",
+    "address": "404 N. CANAL BLVD., SUITE L",
+    "city": "THIBODAUX",
+    "state": "LA",
+    "zip": "70301",
+    "county": "Lafourche",
+    "latitude": 29.7992,
+    "longitude": -90.8096
+  },
+  {
+    "name": "STERLING PETROLEUM",
+    "address": "401 COMMERCE PT #A",
+    "city": "HARAHAN",
+    "state": "LA",
+    "zip": "70123",
+    "county": "Jefferson Parish",
+    "latitude": 29.9511,
+    "longitude": -90.206
+  },
+  {
+    "name": "MIGHTY GREAT LAKES",
+    "address": "6911 SUMMERFIELD RD",
+    "city": "PETERSBURG",
+    "state": "MI",
+    "zip": "49720",
+    "county": "Charlevoix",
+    "latitude": 45.2654,
+    "longitude": -85.2297
+  },
+  {
+    "name": "MIGHTY OF FARMINGTON HILLS",
+    "address": "28627 GRAND RIVER AVE",
+    "city": "FARMINGTON HILLS",
+    "state": "MI",
+    "zip": "48336",
+    "county": "Oakland",
+    "latitude": 42.4656,
+    "longitude": -83.3638
+  },
+  {
+    "name": "ROWLEYS WHOLESALE",
+    "address": "3604 WILDER ROAD",
+    "city": "BAY CITY",
+    "state": "MI",
+    "zip": "48706",
+    "county": "Bay",
+    "latitude": 43.6088,
+    "longitude": -83.953
+  },
+  {
+    "name": "Mighty Midwest",
+    "address": "1875 S OLD HIGHWAY 94",
+    "city": "SAINT CHARLES",
+    "state": "MO",
+    "zip": "63303",
+    "county": "Saint Charles",
+    "latitude": 38.7622,
+    "longitude": -90.5471
+  },
+  {
+    "name": "ROCKY MOUNTAIN MIGHTY",
+    "address": "3657 PIERCE PARKWAY",
+    "city": "BILLINGS",
+    "state": "MT",
+    "zip": "59106",
+    "county": "Yellowstone",
+    "latitude": 45.7753,
+    "longitude": -108.6519
+  },
+  {
+    "name": "Mighty of ND",
+    "address": "1615 E BISMARCK EXPY",
+    "city": "BISMARCK",
+    "state": "ND",
+    "zip": "58504",
+    "county": "Burleigh",
+    "latitude": 46.7231,
+    "longitude": -100.678
+  },
+  {
+    "name": "MIGHTY AUTO PARTS",
+    "address": "347  NORTH MAIN STREET",
+    "city": "FREEPORT",
+    "state": "NY",
+    "zip": "11520",
+    "county": "Nassau",
+    "latitude": 40.6536,
+    "longitude": -73.5866
+  },
+  {
+    "name": "MIGHTY AUTO PARTS",
+    "address": "200  SAW MILL RIVER ROAD",
+    "city": "HAWTHORNE",
+    "state": "NY",
+    "zip": "10532",
+    "county": "Westchester",
+    "latitude": 41.1073,
+    "longitude": -73.796
+  },
+  {
+    "name": "OK PETROLEUM DISTRIBUTION CORP",
+    "address": "45 COMMERCE DRIVE",
+    "city": "HAUPPUAGE",
+    "state": "NY",
+    "zip": "11788",
+    "county": "Suffolk",
+    "latitude": 40.8231,
+    "longitude": -73.1958
+  },
+  {
+    "name": "Mighty of Northern Ohio",
+    "address": "5505 CLOVERLEAF PKWY",
+    "city": "VALLEY VIEW",
+    "state": "OH",
+    "zip": "44125",
+    "county": "Cuyahoga",
+    "latitude": 41.4335,
+    "longitude": -81.6323
+  },
+  {
+    "name": "MIGHTY AUTO PARTS-MEDFORD,OR",
+    "address": "191 BATEMAN DR,",
+    "city": "CENTRAL POINT",
+    "state": "OR",
+    "zip": "97502",
+    "county": "Jackson",
+    "latitude": 42.3899,
+    "longitude": -122.9222
+  },
+  {
+    "name": "Mighty of South Dakota",
+    "address": "810 E 48TH ST N",
+    "city": "SIOUX FALLS",
+    "state": "SD",
+    "zip": "57104",
+    "county": "Minnehaha",
+    "latitude": 43.5514,
+    "longitude": -96.7375
+  },
+  {
+    "name": "MIGHTY, VOLUNTEER AUTO PARTS",
+    "address": "317 HIGHWAY 70 WEST",
+    "city": "LENOIR CITY",
+    "state": "TN",
+    "zip": "37771",
+    "county": "Loudon",
+    "latitude": 35.8104,
+    "longitude": -84.2665
+  },
+  {
+    "name": "4M Parts Warehouse",
+    "address": "4130 PLATINUM WAY",
+    "city": "DALLAS",
+    "state": "TX",
+    "zip": "75237",
+    "county": "Dallas",
+    "latitude": 32.659,
+    "longitude": -96.8765
+  },
+  {
+    "name": "ALLIED SALES COMPANY",
+    "address": "5005 E 7TH ST",
+    "city": "AUSTIN",
+    "state": "TX",
+    "zip": "78702",
+    "county": "Travis",
+    "latitude": 30.2638,
+    "longitude": -97.7166
+  },
+  {
+    "name": "AMERICAN LUBE SUPPLY (HJDJ)",
+    "address": "8165 WHISPER OAK",
+    "city": "SAN ANTONIO",
+    "state": "TX",
+    "zip": "78266",
+    "county": "Comal",
+    "latitude": 29.6643,
+    "longitude": -98.3118
+  },
+  {
+    "name": "ARNOLD OIL",
+    "address": "14342 NORTHWEST BLVD.",
+    "city": "CORPUS CHRISTI",
+    "state": "TX",
+    "zip": "78410",
+    "county": "Nueces",
+    "latitude": 27.8458,
+    "longitude": -97.596
+  },
+  {
+    "name": "ARNOLD OIL CO.",
+    "address": "5422 AYERS ST.",
+    "city": "CORPUS CHRISTI",
+    "state": "TX",
+    "zip": "78415",
+    "county": "Nueces",
+    "latitude": 27.7262,
+    "longitude": -97.4078
+  },
+  {
+    "name": "ARNOLD OIL COMPANY",
+    "address": "10200 MILE 2 E. 8 1/2 N",
+    "city": "MERCEDES",
+    "state": "TX",
+    "zip": "78570",
+    "county": "Hidalgo",
+    "latitude": 26.1513,
+    "longitude": -97.9185
+  },
+  {
+    "name": "AVERY OIL COMPANY",
+    "address": "11357 WEST IH 10",
+    "city": "MARION",
+    "state": "TX",
+    "zip": "78124",
+    "county": "Guadalupe",
+    "latitude": 29.5683,
+    "longitude": -98.1517
+  },
+  {
+    "name": "AVERY OIL COMPANY",
+    "address": "1000 S. MAIN ST.",
+    "city": "MANSFIELD",
+    "state": "TX",
+    "zip": "76063",
+    "county": "Tarrant",
+    "latitude": 32.5773,
+    "longitude": -97.1416
+  },
+  {
+    "name": "AVERY OIL COMPANY",
+    "address": "5850 CUNNINGHAM ROAD",
+    "city": "HOUSTON",
+    "state": "TX",
+    "zip": "77041",
+    "county": "Harris",
+    "latitude": 29.8602,
+    "longitude": -95.5817
+  },
+  {
+    "name": "COMPETITIVE EDGE DISTRIBUTING",
+    "address": "1509 E. HENDERSON",
+    "city": "CLEBURNE",
+    "state": "TX",
+    "zip": "76031",
+    "county": "Johnson",
+    "latitude": 32.3485,
+    "longitude": -97.3311
+  },
+  {
+    "name": "GOLDEN WEST CORPUS CHRISTI",
+    "address": "4780 WESTWAY DR",
+    "city": "CORPUS CHRISTI",
+    "state": "TX",
+    "zip": "78408",
+    "county": "Nueces",
+    "latitude": 27.7945,
+    "longitude": -97.4381
+  },
+  {
+    "name": "Golden West San Antonio",
+    "address": "3010 Aniol",
+    "city": "SAN ANTONIO",
+    "state": "TX",
+    "zip": "78219",
+    "county": "Bexar",
+    "latitude": 29.4492,
+    "longitude": -98.3446
+  },
+  {
+    "name": "Hollon Oil Co.",
+    "address": "1300 DAVENPORT ST",
+    "city": "WESLACO",
+    "state": "TX",
+    "zip": "78596",
+    "county": "Hidalgo",
+    "latitude": 26.1694,
+    "longitude": -97.9887
+  },
+  {
+    "name": "LPS, LLC",
+    "address": "9603 SAUNDERS LANE, UNIT K",
+    "city": "AUSTIN",
+    "state": "TX",
+    "zip": "78758",
+    "county": "Travis",
+    "latitude": 30.3764,
+    "longitude": -97.7078
+  },
+  {
+    "name": "LUBE PLUS",
+    "address": "102-C ROTHROCK",
+    "city": "LONGVIEW",
+    "state": "TX",
+    "zip": "75602",
+    "county": "Gregg",
+    "latitude": 32.4724,
+    "longitude": -94.7101
+  },
+  {
+    "name": "LUBE PLUS",
+    "address": "112 E. MAIN STREET",
+    "city": "LINDSAY",
+    "state": "TX",
+    "zip": "76250",
+    "county": "Cooke",
+    "latitude": 33.636,
+    "longitude": -97.2214
+  },
+  {
+    "name": "LUBE PLUS",
+    "address": "12741 FM 38 N",
+    "city": "HONEY GROVE",
+    "state": "TX",
+    "zip": "75470",
+    "county": "Lamar",
+    "latitude": 33.6098,
+    "longitude": -95.7891
+  },
+  {
+    "name": "MIGHTY DFW",
+    "address": "3524 LISTON LN",
+    "city": "EULESS",
+    "state": "TX",
+    "zip": "76040",
+    "county": "Tarrant",
+    "latitude": 32.8264,
+    "longitude": -97.0972
+  },
+  {
+    "name": "MIGHTY OF EL PASO",
+    "address": "7198 MERCHANT AVE STE. C2",
+    "city": "EL PASO",
+    "state": "TX",
+    "zip": "79915",
+    "county": "El Paso",
+    "latitude": 31.7432,
+    "longitude": -106.3686
+  },
+  {
+    "name": "UNITED OIL & GREASE LUBBOCK",
+    "address": "3100 CLOVIS RD",
+    "city": "LUBBOCK",
+    "state": "TX",
+    "zip": "79415",
+    "county": "Lubbock",
+    "latitude": 33.6021,
+    "longitude": -101.876
+  },
+  {
+    "name": "WEST DIRECT",
+    "address": "10925 MARCONI LANE",
+    "city": "EL PASO",
+    "state": "TX",
+    "zip": "79935",
+    "county": "El Paso",
+    "latitude": 31.7718,
+    "longitude": -106.3303
+  },
+  {
+    "name": "BUCHANAN OIL",
+    "address": "14033 RIVERSIDE DR",
+    "city": "OAKWOOD",
+    "state": "VA",
+    "zip": "24631",
+    "county": "Buchanan",
+    "latitude": 37.2138,
+    "longitude": -81.9917
+  },
+  {
+    "name": "COMPETITION SPECIALTIES INC.",
+    "address": "2402 WEST VALLEY HWY N.",
+    "city": "AUBURN",
+    "state": "WA",
+    "zip": "98001",
+    "county": "King",
+    "latitude": 47.3099,
+    "longitude": -122.2653
+  },
+  {
+    "name": "MIGHTY AUTO PARTS-SEATTLE",
+    "address": "11555 27TH AVE. NE",
+    "city": "SEATTLE",
+    "state": "WA",
+    "zip": "98125",
+    "county": "King",
+    "latitude": 47.717,
+    "longitude": -122.3015
+  },
+  {
+    "name": "Mighty Pacific",
+    "address": "1100 NE 95TH ST,",
+    "city": "VANCOUVER",
+    "state": "WA",
+    "zip": "98665",
+    "county": "Clark",
+    "latitude": 45.6892,
+    "longitude": -122.6616
+  },
+  {
+    "name": "Blain\u2019s Supply",
+    "address": "3507 E Racine St.",
+    "city": "JANESVILLE",
+    "state": "WI",
+    "zip": "53546",
+    "county": "Rock",
+    "latitude": 42.6683,
+    "longitude": -89.0025
+  }
+]

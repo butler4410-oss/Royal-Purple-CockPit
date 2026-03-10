@@ -93,6 +93,8 @@ def _add_autofilter(ws, header_row, num_cols, last_row):
     ws.auto_filter.ref = f"{start}:{end}"
 
 
+AMBER_DARK_FILL = PatternFill(start_color="FEF3C7", end_color="FEF3C7", fill_type="solid")
+
 def _type_fill(account_type):
     if "Promo Only" in account_type:
         return RED_FILL
@@ -100,6 +102,8 @@ def _type_fill(account_type):
         return GREEN_FILL
     elif "C4C Only" in account_type:
         return BLUE_FILL
+    elif "Distributor" in account_type:
+        return AMBER_DARK_FILL
     return None
 
 
@@ -115,17 +119,19 @@ def generate_map_export(output_path, customers=None):
         x.get("state", ""), x.get("county", ""), x.get("store_name", "")
     ))
 
+    installers = [c for c in customers if c.get("type") != "Distributor"]
+
     by_state = {}
-    for c in customers:
+    for c in installers:
         st = c.get("state", "Other")
         if st not in by_state:
             by_state[st] = []
         by_state[st].append(c)
 
     type_counts = Counter(c.get("type", "Unknown") for c in customers)
-    county_counts = Counter(c.get("county", "") for c in customers if c.get("county"))
+    county_counts = Counter(c.get("county", "") for c in installers if c.get("county"))
     state_counties = {}
-    for c in customers:
+    for c in installers:
         st = c.get("state", "")
         co = c.get("county", "")
         if st and co:
@@ -156,8 +162,13 @@ def generate_map_export(output_path, customers=None):
         ws_dash.cell(row=row, column=c).border = BOTTOM_BORDER
     row += 1
 
+    distributor_count = type_counts.get("Distributor", 0)
+    installer_count = len(customers) - distributor_count
+
     metrics = [
-        ("Total Accounts", len(customers)),
+        ("Total Locations", len(customers)),
+        ("Installer Accounts", installer_count),
+        ("Distributors", distributor_count),
         ("States / Regions", len(by_state)),
         ("Counties (US)", len(county_counts)),
         ("", ""),
@@ -175,7 +186,9 @@ def generate_map_export(output_path, customers=None):
         cell.font = Font(name="Calibri", bold=True, size=11, color=PURPLE)
         cell.alignment = Alignment(horizontal="right")
 
-        if "Promo Only" in label:
+        if "Distributor" in label:
+            ws_dash.cell(row=row, column=1).fill = AMBER_DARK_FILL
+        elif "Promo Only" in label:
             ws_dash.cell(row=row, column=1).fill = RED_FILL
         elif "Both" in label:
             ws_dash.cell(row=row, column=1).fill = GREEN_FILL
@@ -260,7 +273,7 @@ def generate_map_export(output_path, customers=None):
     row += 1
 
     county_details = {}
-    for c in customers:
+    for c in installers:
         co = c.get("county", "")
         st = c.get("state", "")
         if not co:
@@ -473,6 +486,66 @@ def generate_map_export(output_path, customers=None):
     county_ws.freeze_panes = "A4"
     county_ws.sheet_view.showGridLines = False
 
+    dist_list = [c for c in customers if c.get("type") == "Distributor"]
+    if dist_list:
+        ws_dist = wb.create_sheet("Distributors")
+        ws_dist.sheet_properties.tabColor = "F59E0B"
+
+        dist_headers = ["Name", "Address", "City", "State", "County", "Zip"]
+        num_dh = len(dist_headers)
+
+        ws_dist.merge_cells(f"A1:{get_column_letter(num_dh)}1")
+        ws_dist["A1"] = f"Royal Purple Distributors ({len(dist_list)})"
+        ws_dist["A1"].font = TITLE_FONT
+        ws_dist.row_dimensions[1].height = 32
+
+        ws_dist.merge_cells(f"A2:{get_column_letter(num_dh)}2")
+        ws_dist["A2"] = f"Distributor locations across {len(set(d.get('state','') for d in dist_list))} states"
+        ws_dist["A2"].font = Font(name="Calibri", size=11, color="64748B")
+
+        row = 4
+        for ci, h in enumerate(dist_headers, 1):
+            ws_dist.cell(row=row, column=ci, value=h)
+        _apply_header_row(ws_dist, row, num_dh)
+        header_row_dist = row
+        row += 1
+
+        dist_by_state = {}
+        for d in sorted(dist_list, key=lambda x: (x.get("state", ""), x.get("store_name", ""))):
+            st = d.get("state", "")
+            if st not in dist_by_state:
+                dist_by_state[st] = []
+            dist_by_state[st].append(d)
+
+        for st in sorted(dist_by_state.keys()):
+            state_name = US_STATE_NAMES.get(st, st)
+            ws_dist.merge_cells(f"A{row}:{get_column_letter(num_dh)}{row}")
+            ws_dist.cell(row=row, column=1, value=f"{state_name} ({len(dist_by_state[st])})")
+            ws_dist.cell(row=row, column=1).font = Font(name="Calibri", bold=True, size=10, color=PURPLE)
+            ws_dist.cell(row=row, column=1).fill = PatternFill(start_color="F1F5F9", end_color="F1F5F9", fill_type="solid")
+            for col in range(1, num_dh + 1):
+                ws_dist.cell(row=row, column=col).border = THIN_BORDER
+            row += 1
+
+            for d in dist_by_state[st]:
+                ws_dist.cell(row=row, column=1, value=d.get("store_name", ""))
+                ws_dist.cell(row=row, column=2, value=d.get("address", ""))
+                ws_dist.cell(row=row, column=3, value=d.get("city", ""))
+                ws_dist.cell(row=row, column=4, value=d.get("state", ""))
+                ws_dist.cell(row=row, column=5, value=d.get("county", ""))
+                ws_dist.cell(row=row, column=6, value=d.get("zip", ""))
+
+                _apply_data_row(ws_dist, row, num_dh, alt=(row % 2 == 0))
+                ws_dist.cell(row=row, column=4).alignment = Alignment(horizontal="center")
+                row += 1
+
+        _add_autofilter(ws_dist, header_row_dist, num_dh, row - 1)
+        _auto_width(ws_dist, num_dh)
+        ws_dist.column_dimensions["A"].width = 40
+        ws_dist.column_dimensions["B"].width = 35
+        ws_dist.freeze_panes = "A5"
+        ws_dist.sheet_view.showGridLines = False
+
     wb.save(output_path)
 
     return {
@@ -483,4 +556,5 @@ def generate_map_export(output_path, customers=None):
         "promo_only": type_counts.get("Promo Only (Not on C4C)", 0),
         "on_both": type_counts.get("On Both Lists", 0),
         "c4c_only": type_counts.get("C4C Only", 0),
+        "distributors": distributor_count,
     }

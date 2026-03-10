@@ -4,11 +4,31 @@ import csv
 import io
 
 CUSTOMERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "customers.json")
+DISTRIBUTORS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "distributors.json")
 
 def load_customers():
+    customers = []
     if os.path.exists(CUSTOMERS_PATH):
         with open(CUSTOMERS_PATH, "r") as f:
-            return json.load(f)
+            customers = json.load(f)
+    return customers
+
+def load_distributors():
+    if os.path.exists(DISTRIBUTORS_PATH):
+        with open(DISTRIBUTORS_PATH, "r") as f:
+            raw = json.load(f)
+        return [{
+            "store_name": d.get("name", ""),
+            "address": d.get("address", ""),
+            "city": d.get("city", ""),
+            "state": d.get("state", ""),
+            "zip": d.get("zip", ""),
+            "county": d.get("county", ""),
+            "country": "US",
+            "latitude": d.get("latitude"),
+            "longitude": d.get("longitude"),
+            "type": "Distributor",
+        } for d in raw if d.get("latitude") is not None and d.get("longitude") is not None]
     return []
 
 def parse_csv_customers(csv_content):
@@ -164,6 +184,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 .type-promo-only {{ background: #FEE2E2; color: #991B1B; }}
 .type-both-lists {{ background: #D1FAE5; color: #065F46; }}
 .type-c4c-only {{ background: #DBEAFE; color: #1E40AF; }}
+.type-distributor {{ background: #FEF3C7; color: #92400E; }}
 
 #sidebar {{
     position: absolute;
@@ -241,10 +262,11 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
             <option value="">All Counties</option>
         </select>
         <select id="type-filter">
-            <option value="">All Account Types</option>
+            <option value="">All Types</option>
             <option value="Promo Only (Not on C4C)">Promo Only (Not on C4C)</option>
             <option value="On Both Lists">On Both Lists (Matched)</option>
             <option value="C4C Only">C4C Only</option>
+            <option value="Distributor">Distributor</option>
         </select>
     </div>
 
@@ -252,9 +274,10 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 
     <div id="legend">
         <h4>Account Status</h4>
-        <div class="legend-item"><div class="legend-dot" style="background:#DC2626;"></div> Promo Only (Not on C4C)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#DC2626;"></div> Promo Only</div>
         <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div> On Both Lists</div>
         <div class="legend-item"><div class="legend-dot" style="background:#2563EB;"></div> C4C Only</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;border:2px solid #D97706;"></div> Distributor</div>
     </div>
 
     <button id="toggle-sidebar" onclick="toggleSidebar()">&#9776; List</button>
@@ -274,7 +297,8 @@ const customers = {customers_json};
 const TYPE_COLORS = {{
     'Promo Only (Not on C4C)': '#DC2626',
     'On Both Lists': '#16A34A',
-    'C4C Only': '#2563EB'
+    'C4C Only': '#2563EB',
+    'Distributor': '#F59E0B'
 }};
 
 const map = L.map('map', {{
@@ -307,7 +331,21 @@ const markerClusterGroup = L.markerClusterGroup({{
 
 function createIcon(type) {{
     const color = TYPE_COLORS[type] || '#7C3AED';
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40">
+    let svg;
+    if (type === 'Distributor') {{
+        svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="44" viewBox="0 0 32 44">
+            <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 28 16 28s16-16 16-28C32 7.16 24.84 0 16 0z" fill="${{color}}" stroke="#D97706" stroke-width="1.5"/>
+            <polygon points="16,6 18.5,12.5 25,13 20,17.5 21.5,24 16,20.5 10.5,24 12,17.5 7,13 13.5,12.5" fill="white"/>
+        </svg>`;
+        return L.divIcon({{
+            html: svg,
+            className: '',
+            iconSize: [32, 44],
+            iconAnchor: [16, 44],
+            popupAnchor: [0, -40]
+        }});
+    }}
+    svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40">
         <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.27 21.73 0 14 0z" fill="${{color}}"/>
         <circle cx="14" cy="14" r="6" fill="white"/>
     </svg>`;
@@ -329,6 +367,7 @@ customers.forEach(function(c) {{
     if (c.type === 'Promo Only (Not on C4C)') typeClass = 'promo-only';
     else if (c.type === 'On Both Lists') typeClass = 'both-lists';
     else if (c.type === 'C4C Only') typeClass = 'c4c-only';
+    else if (c.type === 'Distributor') typeClass = 'distributor';
     const countyLine = c.county ? `<p style="margin:2px 0;color:#6B7280;font-size:12px;">${{c.county}} County</p>` : '';
     const popupHtml = `
         <div class="popup-content">
@@ -408,19 +447,21 @@ function filterMarkers() {{
         }}
     }});
 
-    let promoCount = 0, bothCount = 0, c4cCount = 0;
+    let promoCount = 0, bothCount = 0, c4cCount = 0, distCount = 0;
     markerClusterGroup.eachLayer(function(m) {{
         const t = m._customerData.type;
         if (t === 'Promo Only (Not on C4C)') promoCount++;
         else if (t === 'On Both Lists') bothCount++;
         else if (t === 'C4C Only') c4cCount++;
+        else if (t === 'Distributor') distCount++;
     }});
 
     document.getElementById('stats-bar').innerHTML =
-        '<strong>' + visibleCount + '</strong> of ' + allMarkers.length + ' accounts shown — ' +
-        '<span style="color:#DC2626">&#9679; Promo Only: ' + promoCount + '</span> | ' +
-        '<span style="color:#16A34A">&#9679; Both Lists: ' + bothCount + '</span> | ' +
-        '<span style="color:#2563EB">&#9679; C4C Only: ' + c4cCount + '</span>';
+        '<strong>' + visibleCount + '</strong> of ' + allMarkers.length + ' shown — ' +
+        '<span style="color:#DC2626">&#9679; Promo: ' + promoCount + '</span> | ' +
+        '<span style="color:#16A34A">&#9679; Both: ' + bothCount + '</span> | ' +
+        '<span style="color:#2563EB">&#9679; C4C: ' + c4cCount + '</span> | ' +
+        '<span style="color:#F59E0B">&#9733; Dist: ' + distCount + '</span>';
 
     updateSidebar();
 

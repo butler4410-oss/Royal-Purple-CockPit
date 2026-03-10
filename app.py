@@ -7,7 +7,7 @@ from report_generator import (
     generate_report, parse_excel, fmt_currency, fmt_number,
     PRODUCT_DESCRIPTIONS, get_product_display_name,
 )
-from customer_map import load_customers, parse_csv_customers, build_leaflet_html, get_states
+from customer_map import load_customers, load_distributors, parse_csv_customers, build_leaflet_html, get_states
 from c4c_report_generator import generate_c4c_report
 from map_data_exporter import generate_map_export
 
@@ -58,6 +58,7 @@ if nav == "Customer Map":
     )
 
     customers = load_customers()
+    distributors = load_distributors()
 
     if csv_upload is not None:
         try:
@@ -71,25 +72,28 @@ if nav == "Customer Map":
         except Exception as e:
             st.error(f"Error reading CSV: {e}")
 
-    if customers:
-        all_states = get_states(customers)
+    all_map_data = customers + distributors
+
+    if all_map_data:
+        all_states = get_states(all_map_data)
         type_counts = {}
-        for c in customers:
+        for c in all_map_data:
             t = c.get("type", "Retail")
             type_counts[t] = type_counts.get(t, 0) + 1
 
-        unique_counties = len(set(c.get("county", "") for c in customers if c.get("county")))
+        unique_counties = len(set(c.get("county", "") for c in all_map_data if c.get("county")))
 
-        col1, col2, col3, col4, col5, col6 = st.columns(6)
-        col1.metric("Total Accounts", len(customers))
+        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
+        col1.metric("Total Locations", len(all_map_data))
         col2.metric("States", len(all_states))
         col3.metric("Counties", unique_counties)
         col4.metric("Promo Only", type_counts.get("Promo Only (Not on C4C)", 0))
         col5.metric("On Both Lists", type_counts.get("On Both Lists", 0))
         col6.metric("C4C Only", type_counts.get("C4C Only", 0))
+        col7.metric("Distributors", type_counts.get("Distributor", 0))
         st.markdown("")
 
-        map_html = build_leaflet_html(customers, height=650)
+        map_html = build_leaflet_html(all_map_data, height=650)
         components.html(map_html, height=660, scrolling=False)
 
         st.markdown("")
@@ -106,7 +110,7 @@ if nav == "Customer Map":
                 with st.spinner("Building Excel workbook..."):
                     with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
                         export_path = tmp.name
-                    stats = generate_map_export(export_path, customers)
+                    stats = generate_map_export(export_path, all_map_data)
 
                     with open(export_path, "rb") as f:
                         export_data = f.read()
@@ -114,8 +118,8 @@ if nav == "Customer Map":
 
                     st.success(
                         f"Export ready — {stats['sheets']} sheets: "
-                        f"Dashboard + {stats['states']} state tabs + All Accounts + County Summary | "
-                        f"{stats['total']} accounts across {stats['counties']} counties"
+                        f"Dashboard + {stats['states']} state tabs + All Accounts + County Summary + Distributors | "
+                        f"{stats['total']} locations across {stats['counties']} counties"
                     )
 
                     st.download_button(

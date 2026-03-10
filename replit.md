@@ -6,28 +6,31 @@
 ## Architecture
 - **app.py** — Streamlit frontend with 3-page sidebar nav: Report Generator, Customer Map, Product Reference
 - **report_generator.py** — PPTX engine + adaptive Excel parser with invoice deduplication and Max-Clean attachment analysis
-- **customer_map.py** — Leaflet.js map builder: loads customers.json, parses CSV uploads, generates embedded HTML map component
+- **customer_map.py** — Leaflet.js map builder: loads customers.json + distributors.json, generates embedded HTML map component
 - **c4c_report_generator.py** — Excel report generator: C4C gap analysis → 10-sheet .xlsx workbook
+- **map_data_exporter.py** — Excel export generator: branded workbook with Dashboard, per-state tabs, All Accounts, County Summary, Distributors
 - **customers.json** — Geocoded installer accounts (3,539 total with county data for US accounts)
-- **distribution_data.py** — Legacy file (not imported by active code). Do NOT re-add distributor references until user provides real data
+- **distributors.json** — Geocoded distributor locations (58 total across 23 states, from InstallerRack_RP Excel)
+- **distribution_data.py** — Legacy file (not imported by active code)
 - **assets/** — Royal Purple branding images
 
 ## Customer Map (Leaflet.js)
 - Embedded via st.components.v1.html() — full Leaflet map with marker clusters
-- **3,539 accounts** across US (3,498), Costa Rica (38), Canada (2), Puerto Rico (1)
+- **3,597 total locations**: 3,539 installer accounts + 58 distributors
+- **Installer accounts**: US (3,498), Costa Rica (38), Canada (2), Puerto Rico (1)
+- **Distributors**: 58 locations across 23 US states (from InstallerRack_RP Excel)
 - **708 unique US counties** mapped via pgeocode zip-to-county lookup
-- 3 account categories with distinct colors:
-  - **Promo Only (Not on C4C)** — Red (#DC2626) — 2,097 accounts
-  - **On Both Lists** — Green (#16A34A) — 234 accounts
-  - **C4C Only** — Blue (#2563EB) — 1,208 accounts
-- Filters: search bar, state dropdown, county dropdown (cascading from state), account type dropdown
+- 4 marker categories with distinct colors/icons:
+  - **Promo Only (Not on C4C)** — Red pin (#DC2626) — 2,097 accounts
+  - **On Both Lists** — Green pin (#16A34A) — 234 accounts
+  - **C4C Only** — Blue pin (#2563EB) — 1,208 accounts
+  - **Distributor** — Gold star pin (#F59E0B) — 58 locations (larger pin with star icon)
+- Filters: search bar, state dropdown, county dropdown (cascading from state), type dropdown (includes Distributor)
 - County shown in marker popups and sidebar list items
-- State filter dynamically updates county dropdown options
-- Marker clustering via leaflet.markercluster for zoomed-out views
-- Stats bar with inline per-category counts
+- Stats bar with 4-category counts including distributor count (★ symbol)
 - Collapsible sidebar list synced with visible markers
-- **Export Map Data**: CSV download with all account fields including county
-- **Export C4C Report**: Excel report generation button
+- **Export Map Data**: Branded Excel workbook (62 sheets) with per-state tabs, county breakdown, distributor tab
+- **Export C4C Report**: 10-sheet Excel gap analysis report
 - CARTO light basemap tiles
 - Geocoding: pgeocode for US/CR/CA zip codes; fallback coordinates for Costa Rica provinces
 
