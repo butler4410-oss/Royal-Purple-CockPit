@@ -83,14 +83,20 @@ if nav == "Customer Map":
 
         unique_counties = len(set(c.get("county", "") for c in all_map_data if c.get("county")))
 
-        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
+        installer_types = ["Promo Only (Not on C4C)", "On Both Lists", "C4C Only", "Rack Installer"]
+        installer_total = sum(type_counts.get(t, 0) for t in installer_types)
+
+        col1, col2, col3, col4 = st.columns(4)
         col1.metric("Total Locations", len(all_map_data))
-        col2.metric("States", len(all_states))
-        col3.metric("Counties", unique_counties)
-        col4.metric("Promo Only", type_counts.get("Promo Only (Not on C4C)", 0))
-        col5.metric("On Both Lists", type_counts.get("On Both Lists", 0))
-        col6.metric("C4C Only", type_counts.get("C4C Only", 0))
-        col7.metric("Distributors", type_counts.get("Distributor", 0))
+        col2.metric("Installer Accounts", installer_total)
+        col3.metric("Distributors", type_counts.get("Distributor", 0))
+        col4.metric("Powersports", type_counts.get("Powersports/Motorsports", 0))
+
+        col5, col6, col7, col8 = st.columns(4)
+        col5.metric("Promo Only", type_counts.get("Promo Only (Not on C4C)", 0))
+        col6.metric("On Both Lists", type_counts.get("On Both Lists", 0))
+        col7.metric("C4C Only", type_counts.get("C4C Only", 0))
+        col8.metric("Rack Installer", type_counts.get("Rack Installer", 0))
         st.markdown("")
 
         map_html = build_leaflet_html(all_map_data, height=650)

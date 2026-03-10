@@ -1,38 +1,49 @@
 # Royal Purple Partnership Hub
 
 ## Overview
-"The Royal Purple Partnership Hub by ThrottlePro" — a Streamlit web app for Royal Purple installer partners with three sections: Report Generator (Excel→PPTX), Customer Map (Leaflet.js interactive marker map with county-level data), and Product Reference.
+"The Royal Purple Partnership Hub by ThrottlePro" — a Streamlit web app for Royal Purple installer partners with three sections: Report Generator (Excel→PPTX), Customer Map (Leaflet.js interactive marker map), and Product Reference.
 
 ## Architecture
 - **app.py** — Streamlit frontend with 3-page sidebar nav: Report Generator, Customer Map, Product Reference
 - **report_generator.py** — PPTX engine + adaptive Excel parser with invoice deduplication and Max-Clean attachment analysis
-- **customer_map.py** — Leaflet.js map builder: loads customers.json + distributors.json, generates embedded HTML map component
+- **customer_map.py** — Leaflet.js map builder: loads customers.json + distributors.json, generates embedded HTML map with 8 marker categories
 - **c4c_report_generator.py** — Excel report generator: C4C gap analysis → 10-sheet .xlsx workbook
 - **map_data_exporter.py** — Excel export generator: branded workbook with Dashboard, per-state tabs, All Accounts, County Summary, Distributors
-- **customers.json** — Geocoded installer accounts (3,539 total with county data for US accounts)
-- **distributors.json** — Geocoded distributor locations (58 total across 23 states, from InstallerRack_RP Excel)
+- **customers.json** — All geocoded accounts (4,625 total: installers, powersports, international, Canada)
+- **distributors.json** — Geocoded distributor locations (58 total across 23 US states)
 - **distribution_data.py** — Legacy file (not imported by active code)
 - **assets/** — Royal Purple branding images
 
+## Data Sources
+- **InstallerRack_RP Excel** — 5-sheet workbook:
+  - Rack Installers USA (581): cross-referenced against promo/C4C lists — 331 matched existing, 240 new geocoded as "Rack Installer"
+  - Powersports/Motorsports (819): separate category, 804 geocoded
+  - International (27): manual coordinates for global locations → 28 entries (includes DISTRIBUIDORA BARJUM from Honduras)
+  - Canada (15): geocoded via pgeocode CA → 14 geocoded
+  - Distributors (58): all geocoded, stored in distributors.json
+- **Promo List** (Installer_Promotion_Participation): 2,097 promo-only accounts
+- **C4C List** (Royal_Purple_C4C_Installer_List): 1,208 C4C-only + 234 on both lists
+- **rack_installer flag**: 554 accounts across all types flagged as having RP display racks
+
 ## Customer Map (Leaflet.js)
 - Embedded via st.components.v1.html() — full Leaflet map with marker clusters
-- **3,597 total locations**: 3,539 installer accounts + 58 distributors
-- **Installer accounts**: US (3,498), Costa Rica (38), Canada (2), Puerto Rico (1)
-- **Distributors**: 58 locations across 23 US states (from InstallerRack_RP Excel)
-- **708 unique US counties** mapped via pgeocode zip-to-county lookup
-- 4 marker categories with distinct colors/icons:
-  - **Promo Only (Not on C4C)** — Red pin (#DC2626) — 2,097 accounts
-  - **On Both Lists** — Green pin (#16A34A) — 234 accounts
-  - **C4C Only** — Blue pin (#2563EB) — 1,208 accounts
-  - **Distributor** — Gold star pin (#F59E0B) — 58 locations (larger pin with star icon)
-- Filters: search bar, state dropdown, county dropdown (cascading from state), type dropdown (includes Distributor)
-- County shown in marker popups and sidebar list items
-- Stats bar with 4-category counts including distributor count (★ symbol)
-- Collapsible sidebar list synced with visible markers
+- **4,683 total locations**: 4,625 customer accounts + 58 distributors
+- 8 marker categories with distinct colors/icons:
+  - **Promo Only (Not on C4C)** — Red (#DC2626) — 2,097 accounts
+  - **On Both Lists** — Green (#16A34A) — 234 accounts
+  - **C4C Only** — Blue (#2563EB) — 1,208 accounts
+  - **Rack Installer** — Purple (#7C3AED) — 240 accounts (new from rack list, not on promo/C4C)
+  - **Distributor** — Gold star (#F59E0B) — 58 locations (larger pin with star icon)
+  - **Powersports/Motorsports** — Rose (#E11D48) — 804 accounts
+  - **International** — Indigo (#4F46E5) — 28 locations (global)
+  - **Canada** — Emerald (#059669) — 14 locations
+- Filters: search bar, state dropdown, county dropdown (cascading), type dropdown (all 8 types)
+- Compact horizontal legend with all 8 categories
+- Stats bar with per-type colored counts
+- Metrics: two-row layout (Total Locations, Installer Accounts, Distributors, Powersports / Promo Only, On Both, C4C Only, Rack Installer)
 - **Export Map Data**: Branded Excel workbook (62 sheets) with per-state tabs, county breakdown, distributor tab
 - **Export C4C Report**: 10-sheet Excel gap analysis report
 - CARTO light basemap tiles
-- Geocoding: pgeocode for US/CR/CA zip codes; fallback coordinates for Costa Rica provinces
 
 ## C4C Report (10 Sheets)
 1. Executive Summary — totals, gap %, key findings
@@ -88,11 +99,6 @@
 
 ## PPTX Slide Structure (dynamic)
 Cover → TOC → Exec Summary → Exec Observations → Revenue Overview → Rankings → Matrix → Product Mix → Product Deep Dives Section Divider → Product Deep Dives (per category) → [Map Images] → Store Deep Dives Section Divider → Store Deep Dives → Next Steps → Closing
-
-## Distributor Info
-- ALL distributor data has been removed from active code paths
-- distribution_data.py exists but is NOT imported anywhere
-- Do NOT re-add distributor references until user provides real ABE distributor data
 
 ## Dependencies
 - Python 3.11

@@ -94,6 +94,10 @@ def _add_autofilter(ws, header_row, num_cols, last_row):
 
 
 AMBER_DARK_FILL = PatternFill(start_color="FEF3C7", end_color="FEF3C7", fill_type="solid")
+PURPLE_LIGHT_FILL = PatternFill(start_color="F3E8FF", end_color="F3E8FF", fill_type="solid")
+ROSE_FILL = PatternFill(start_color="FFE4E6", end_color="FFE4E6", fill_type="solid")
+INDIGO_FILL = PatternFill(start_color="E0E7FF", end_color="E0E7FF", fill_type="solid")
+EMERALD_FILL = PatternFill(start_color="ECFDF5", end_color="ECFDF5", fill_type="solid")
 
 def _type_fill(account_type):
     if "Promo Only" in account_type:
@@ -102,8 +106,16 @@ def _type_fill(account_type):
         return GREEN_FILL
     elif "C4C Only" in account_type:
         return BLUE_FILL
+    elif "Rack Installer" in account_type:
+        return PURPLE_LIGHT_FILL
     elif "Distributor" in account_type:
         return AMBER_DARK_FILL
+    elif "Powersports" in account_type:
+        return ROSE_FILL
+    elif "International" in account_type:
+        return INDIGO_FILL
+    elif "Canada" in account_type:
+        return EMERALD_FILL
     return None
 
 
@@ -119,7 +131,8 @@ def generate_map_export(output_path, customers=None):
         x.get("state", ""), x.get("county", ""), x.get("store_name", "")
     ))
 
-    installers = [c for c in customers if c.get("type") != "Distributor"]
+    non_installer_types = {"Distributor", "Powersports/Motorsports", "International", "Canada"}
+    installers = [c for c in customers if c.get("type") not in non_installer_types]
 
     by_state = {}
     for c in installers:
@@ -163,18 +176,29 @@ def generate_map_export(output_path, customers=None):
     row += 1
 
     distributor_count = type_counts.get("Distributor", 0)
-    installer_count = len(customers) - distributor_count
+    ps_count = type_counts.get("Powersports/Motorsports", 0)
+    intl_count = type_counts.get("International", 0)
+    ca_count = type_counts.get("Canada", 0)
+    rack_count = type_counts.get("Rack Installer", 0)
+    installer_count = (type_counts.get("Promo Only (Not on C4C)", 0) +
+                       type_counts.get("On Both Lists", 0) +
+                       type_counts.get("C4C Only", 0) +
+                       rack_count)
 
     metrics = [
         ("Total Locations", len(customers)),
         ("Installer Accounts", installer_count),
         ("Distributors", distributor_count),
+        ("Powersports/Motorsports", ps_count),
+        ("International", intl_count),
+        ("Canada", ca_count),
         ("States / Regions", len(by_state)),
         ("Counties (US)", len(county_counts)),
         ("", ""),
         ("Promo Only (Not on C4C)", type_counts.get("Promo Only (Not on C4C)", 0)),
         ("On Both Lists", type_counts.get("On Both Lists", 0)),
         ("C4C Only", type_counts.get("C4C Only", 0)),
+        ("Rack Installer", rack_count),
     ]
 
     for label, val in metrics:
@@ -186,8 +210,16 @@ def generate_map_export(output_path, customers=None):
         cell.font = Font(name="Calibri", bold=True, size=11, color=PURPLE)
         cell.alignment = Alignment(horizontal="right")
 
-        if "Distributor" in label:
+        if "Rack Installer" in label:
+            ws_dash.cell(row=row, column=1).fill = PURPLE_LIGHT_FILL
+        elif "Distributor" in label:
             ws_dash.cell(row=row, column=1).fill = AMBER_DARK_FILL
+        elif "Powersports" in label:
+            ws_dash.cell(row=row, column=1).fill = ROSE_FILL
+        elif "International" in label:
+            ws_dash.cell(row=row, column=1).fill = INDIGO_FILL
+        elif "Canada" in label:
+            ws_dash.cell(row=row, column=1).fill = EMERALD_FILL
         elif "Promo Only" in label:
             ws_dash.cell(row=row, column=1).fill = RED_FILL
         elif "Both" in label:
@@ -553,8 +585,9 @@ def generate_map_export(output_path, customers=None):
         "states": len(by_state),
         "counties": len(county_details),
         "sheets": len(wb.sheetnames),
-        "promo_only": type_counts.get("Promo Only (Not on C4C)", 0),
-        "on_both": type_counts.get("On Both Lists", 0),
-        "c4c_only": type_counts.get("C4C Only", 0),
+        "installers": installer_count,
         "distributors": distributor_count,
+        "powersports": ps_count,
+        "international": intl_count,
+        "canada": ca_count,
     }

@@ -124,28 +124,34 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
     right: 10px;
     z-index: 1000;
     background: white;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    font-size: 13px;
+    font-size: 11px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    max-width: 420px;
+    align-items: center;
 }}
 
 #legend h4 {{
-    margin: 0 0 6px 0;
-    font-size: 13px;
+    margin: 0;
+    font-size: 11px;
     color: #4B2D8A;
+    width: 100%;
 }}
 
 .legend-item {{
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 3px;
+    gap: 4px;
+    white-space: nowrap;
 }}
 
 .legend-dot {{
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
 }}
@@ -185,6 +191,10 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 .type-both-lists {{ background: #D1FAE5; color: #065F46; }}
 .type-c4c-only {{ background: #DBEAFE; color: #1E40AF; }}
 .type-distributor {{ background: #FEF3C7; color: #92400E; }}
+.type-rack-installer {{ background: #F3E8FF; color: #6B21A8; }}
+.type-powersports {{ background: #FFE4E6; color: #9F1239; }}
+.type-international {{ background: #E0E7FF; color: #3730A3; }}
+.type-canada {{ background: #ECFDF5; color: #065F46; }}
 
 #sidebar {{
     position: absolute;
@@ -263,21 +273,29 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
         </select>
         <select id="type-filter">
             <option value="">All Types</option>
-            <option value="Promo Only (Not on C4C)">Promo Only (Not on C4C)</option>
-            <option value="On Both Lists">On Both Lists (Matched)</option>
+            <option value="Promo Only (Not on C4C)">Promo Only</option>
+            <option value="On Both Lists">On Both Lists</option>
             <option value="C4C Only">C4C Only</option>
+            <option value="Rack Installer">Rack Installer</option>
             <option value="Distributor">Distributor</option>
+            <option value="Powersports/Motorsports">Powersports/Motorsports</option>
+            <option value="International">International</option>
+            <option value="Canada">Canada</option>
         </select>
     </div>
 
     <div id="stats-bar">Loading...</div>
 
     <div id="legend">
-        <h4>Account Status</h4>
+        <h4>Account Types</h4>
         <div class="legend-item"><div class="legend-dot" style="background:#DC2626;"></div> Promo Only</div>
         <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div> On Both Lists</div>
         <div class="legend-item"><div class="legend-dot" style="background:#2563EB;"></div> C4C Only</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7C3AED;"></div> Rack Installer</div>
         <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;border:2px solid #D97706;"></div> Distributor</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#E11D48;"></div> Powersports</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4F46E5;"></div> International</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#059669;"></div> Canada</div>
     </div>
 
     <button id="toggle-sidebar" onclick="toggleSidebar()">&#9776; List</button>
@@ -298,7 +316,11 @@ const TYPE_COLORS = {{
     'Promo Only (Not on C4C)': '#DC2626',
     'On Both Lists': '#16A34A',
     'C4C Only': '#2563EB',
-    'Distributor': '#F59E0B'
+    'Rack Installer': '#7C3AED',
+    'Distributor': '#F59E0B',
+    'Powersports/Motorsports': '#E11D48',
+    'International': '#4F46E5',
+    'Canada': '#059669'
 }};
 
 const map = L.map('map', {{
@@ -367,7 +389,11 @@ customers.forEach(function(c) {{
     if (c.type === 'Promo Only (Not on C4C)') typeClass = 'promo-only';
     else if (c.type === 'On Both Lists') typeClass = 'both-lists';
     else if (c.type === 'C4C Only') typeClass = 'c4c-only';
+    else if (c.type === 'Rack Installer') typeClass = 'rack-installer';
     else if (c.type === 'Distributor') typeClass = 'distributor';
+    else if (c.type === 'Powersports/Motorsports') typeClass = 'powersports';
+    else if (c.type === 'International') typeClass = 'international';
+    else if (c.type === 'Canada') typeClass = 'canada';
     const countyLine = c.county ? `<p style="margin:2px 0;color:#6B7280;font-size:12px;">${{c.county}} County</p>` : '';
     const popupHtml = `
         <div class="popup-content">
@@ -447,21 +473,23 @@ function filterMarkers() {{
         }}
     }});
 
-    let promoCount = 0, bothCount = 0, c4cCount = 0, distCount = 0;
+    const typeCounts = {{}};
     markerClusterGroup.eachLayer(function(m) {{
         const t = m._customerData.type;
-        if (t === 'Promo Only (Not on C4C)') promoCount++;
-        else if (t === 'On Both Lists') bothCount++;
-        else if (t === 'C4C Only') c4cCount++;
-        else if (t === 'Distributor') distCount++;
+        typeCounts[t] = (typeCounts[t] || 0) + 1;
     }});
 
+    const tc = typeCounts;
     document.getElementById('stats-bar').innerHTML =
         '<strong>' + visibleCount + '</strong> of ' + allMarkers.length + ' shown — ' +
-        '<span style="color:#DC2626">&#9679; Promo: ' + promoCount + '</span> | ' +
-        '<span style="color:#16A34A">&#9679; Both: ' + bothCount + '</span> | ' +
-        '<span style="color:#2563EB">&#9679; C4C: ' + c4cCount + '</span> | ' +
-        '<span style="color:#F59E0B">&#9733; Dist: ' + distCount + '</span>';
+        '<span style="color:#DC2626">&#9679;' + (tc['Promo Only (Not on C4C)']||0) + '</span> ' +
+        '<span style="color:#16A34A">&#9679;' + (tc['On Both Lists']||0) + '</span> ' +
+        '<span style="color:#2563EB">&#9679;' + (tc['C4C Only']||0) + '</span> ' +
+        '<span style="color:#7C3AED">&#9679;' + (tc['Rack Installer']||0) + '</span> ' +
+        '<span style="color:#F59E0B">&#9733;' + (tc['Distributor']||0) + '</span> ' +
+        '<span style="color:#E11D48">&#9679;' + (tc['Powersports/Motorsports']||0) + '</span> ' +
+        '<span style="color:#4F46E5">&#9679;' + (tc['International']||0) + '</span> ' +
+        '<span style="color:#059669">&#9679;' + (tc['Canada']||0) + '</span>';
 
     updateSidebar();
 
