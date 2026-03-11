@@ -501,7 +501,8 @@ TYPE_CONFIG.forEach(t => TYPE_COLOR_MAP[t.key] = t.color);
 
 const map = L.map('map', {{
     zoomControl: true,
-    scrollWheelZoom: true
+    scrollWheelZoom: true,
+    attributionControl: false
 }}).setView([39.8283, -98.5795], 4);
 
 L.tileLayer('https://{{s}}.basemaps.cartocdn.com/light_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
