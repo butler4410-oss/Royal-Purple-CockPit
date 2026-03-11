@@ -280,16 +280,21 @@ def _auto_width(ws, num_cols, max_width=40):
 def generate_c4c_report(output_path):
     customers = _load_customers()
 
-    not_c4c = [c for c in customers if c["type"] == "Promo Only (Not on C4C)"]
-    c4c_matched = [c for c in customers if c["type"] in ("On Both Lists", "C4C Only")]
+    c4c_relevant_types = {"Promo Only (Not on C4C)", "On Both Lists", "C4C Only"}
+    c4c_accounts = [c for c in customers if c.get("type") in c4c_relevant_types]
 
-    all_states_code = sorted(set(c["state"] for c in customers if c.get("state")))
+    not_c4c = [c for c in c4c_accounts if c["type"] == "Promo Only (Not on C4C)"]
+    c4c_matched = [c for c in c4c_accounts if c["type"] in ("On Both Lists", "C4C Only")]
+
+    us_states_only = sorted(set(
+        c["state"] for c in c4c_accounts
+        if c.get("state") and c["state"] in US_STATE_NAMES
+    ))
 
     state_names = dict(US_STATE_NAMES)
 
     wb = Workbook()
 
-    # ── Sheet 1: Executive Summary ──
     ws = wb.active
     ws.title = "Executive Summary"
     ws.sheet_properties.tabColor = "1B1464"
@@ -305,16 +310,42 @@ def generate_c4c_report(output_path):
     ws["A2"].font = Font(name="Calibri", italic=True, size=10, color="64748B")
 
     row = 4
+    ws.merge_cells(f"A{row}:F{row}")
+    ws[f"A{row}"] = "What is C4C?"
+    ws[f"A{row}"].font = SUBTITLE_FONT
+    row += 1
+
+    c4c_explanation = [
+        "C4C (Connect for Calumet) is the official dealer/installer onboarding system used by",
+        "Royal Purple's parent company, Calumet Specialty Products. When an installer is \"on C4C,\"",
+        "they are registered in the system as an authorized Royal Purple dealer, which enables them",
+        "to receive direct pricing, promotional materials, marketing support, and product updates.",
+        "",
+        "This report identifies installer accounts that participate in Royal Purple promotions but",
+        "have NOT yet been onboarded into C4C — representing a gap in the dealer network. Closing",
+        "this gap ensures all active installers receive the full benefits of the RP partnership.",
+    ]
+
+    for line in c4c_explanation:
+        ws.merge_cells(f"A{row}:F{row}")
+        ws[f"A{row}"] = line
+        ws[f"A{row}"].font = Font(name="Calibri", size=10, color="475569")
+        ws.row_dimensions[row].height = 16
+        row += 1
+
+    row += 1
     ws.merge_cells(f"A{row}:B{row}")
     ws[f"A{row}"] = "Installer Account Summary"
     ws[f"A{row}"].font = SUBTITLE_FONT
     row += 1
 
     summary_data = [
-        ("Total Installer Accounts on Map", len(not_c4c) + len(c4c_matched)),
-        ("Installer Accounts NOT on C4C", len(not_c4c)),
-        ("Installer Accounts Matched (on C4C)", len(c4c_matched)),
-        ("States Covered", len(all_states_code)),
+        ("Total Installer Accounts (Promo + C4C)", len(not_c4c) + len(c4c_matched)),
+        ("Accounts NOT on C4C (Gap)", len(not_c4c)),
+        ("Accounts on C4C (Matched)", len(c4c_matched)),
+        ("  — On Both Lists (Promo + C4C)", sum(1 for c in c4c_matched if c["type"] == "On Both Lists")),
+        ("  — C4C Only (not on Promo list)", sum(1 for c in c4c_matched if c["type"] == "C4C Only")),
+        ("US States Covered", len(us_states_only)),
     ]
 
     headers = ["Metric", "Count"]
@@ -328,6 +359,8 @@ def generate_c4c_report(output_path):
         ws.cell(row=row, column=2, value=val)
         _apply_data_row(ws, row, 2, alt=(row % 2 == 0))
         ws.cell(row=row, column=2).alignment = Alignment(horizontal="center")
+        if label.startswith("  —"):
+            ws.cell(row=row, column=1).font = Font(name="Calibri", size=10, color="64748B")
         row += 1
 
     row += 2
@@ -387,11 +420,15 @@ def generate_c4c_report(output_path):
 
     not_c4c_by_state = {}
     for c in not_c4c:
-        not_c4c_by_state[c["state"]] = not_c4c_by_state.get(c["state"], 0) + 1
+        st = c.get("state", "")
+        if st in US_STATE_NAMES:
+            not_c4c_by_state[st] = not_c4c_by_state.get(st, 0) + 1
 
     c4c_by_state = {}
     for c in c4c_matched:
-        c4c_by_state[c["state"]] = c4c_by_state.get(c["state"], 0) + 1
+        st = c.get("state", "")
+        if st in US_STATE_NAMES:
+            c4c_by_state[st] = c4c_by_state.get(st, 0) + 1
 
     all_state_codes = sorted(set(list(not_c4c_by_state.keys()) + list(c4c_by_state.keys())))
 
@@ -729,7 +766,7 @@ def generate_c4c_report(output_path):
         "total_installers": total_installers,
         "not_on_c4c": len(not_c4c),
         "c4c_matched": len(c4c_matched),
-        "states": len(all_states_code),
+        "states": len(us_states_only),
         "failed_geo": len(failed),
         "c4c_dupes": len(xref["c4c_dupes"]),
         "promo_dupes": len(xref["promo_dupes"]),

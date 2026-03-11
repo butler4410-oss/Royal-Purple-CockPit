@@ -137,7 +137,7 @@ if nav == "Customer Map":
 
         with exp_col2:
             st.markdown("### Export C4C Report")
-            st.caption("Generate a comprehensive Excel report with C4C gap analysis, duplicates, and reconciliation data.")
+            st.caption("C4C (Connect for Calumet) gap analysis — identifies installer accounts not yet onboarded into Royal Purple's dealer system. Includes state breakdown, duplicates, and reconciliation.")
 
             if st.button("Generate C4C Report", type="primary", key="c4c_export"):
                 with st.spinner("Building report..."):
@@ -152,7 +152,7 @@ if nav == "Customer Map":
                     st.success(
                         f"Report generated — {stats['sheets']} sheets: "
                         f"{stats['not_on_c4c']} not on C4C, {stats['c4c_matched']} matched, "
-                        f"{stats['states']} states/regions."
+                        f"{stats['states']} US states."
                     )
 
                     st.download_button(
