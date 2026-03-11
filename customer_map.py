@@ -75,188 +75,373 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 #map-container {{ position: relative; width: 100%; height: {height}px; }}
 #map {{ width: 100%; height: 100%; border-radius: 8px; }}
 
+/* ── Toolbar (top-left search + dropdowns) ── */
 #toolbar {{
     position: absolute;
     top: 10px;
     left: 60px;
     z-index: 1000;
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
     flex-wrap: wrap;
+    max-width: calc(100% - 180px);
 }}
 
-#toolbar input, #toolbar select {{
-    padding: 8px 12px;
+.search-wrap {{
+    position: relative;
+    display: flex;
+    align-items: center;
+}}
+
+#search-input {{
+    padding: 8px 32px 8px 12px;
     border: 2px solid #E2E8F0;
     border-radius: 6px;
     font-size: 14px;
     background: white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     outline: none;
+    width: 220px;
     transition: border-color 0.2s;
 }}
+#search-input:focus {{ border-color: #4B2D8A; }}
 
-#toolbar input:focus, #toolbar select:focus {{
-    border-color: #4B2D8A;
-}}
-
-#toolbar input {{ width: 220px; }}
-#toolbar select {{ min-width: 140px; }}
-
-#stats-bar {{
+#search-clear {{
     position: absolute;
-    bottom: 10px;
-    left: 10px;
-    z-index: 1000;
-    background: rgba(75, 45, 138, 0.9);
-    color: white;
-    padding: 6px 14px;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94A3B8;
+    font-size: 16px;
+    line-height: 1;
+    display: none;
+    padding: 0;
+}}
+#search-clear:hover {{ color: #4B2D8A; }}
+
+#toolbar select {{
+    padding: 8px 10px;
+    border: 2px solid #E2E8F0;
     border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}}
-
-#legend {{
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    z-index: 1000;
+    font-size: 14px;
     background: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    font-size: 11px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    outline: none;
+    min-width: 130px;
+    transition: border-color 0.2s;
+    cursor: pointer;
+}}
+#toolbar select:focus {{ border-color: #4B2D8A; }}
+
+/* ── Type filter pills (below toolbar) ── */
+#type-pills {{
+    position: absolute;
+    top: 52px;
+    left: 60px;
+    z-index: 1000;
     display: flex;
+    gap: 5px;
     flex-wrap: wrap;
-    gap: 4px 12px;
-    max-width: 420px;
-    align-items: center;
+    max-width: calc(100% - 80px);
 }}
 
-#legend h4 {{
-    margin: 0;
-    font-size: 11px;
-    color: #4B2D8A;
-    width: 100%;
-}}
-
-.legend-item {{
+.type-pill {{
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    transition: all 0.15s;
+    user-select: none;
     white-space: nowrap;
 }}
 
-.legend-dot {{
+.type-pill .pill-dot {{
     width: 10px;
     height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
 }}
 
-.leaflet-popup-content-wrapper {{
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+.type-pill .pill-count {{
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.8;
 }}
 
-.popup-content {{
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    min-width: 180px;
+.type-pill:hover {{
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    transform: translateY(-1px);
+}}
+
+.type-pill.active {{
+    color: white !important;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}}
+
+.type-pill.dimmed {{
+    opacity: 0.35;
+}}
+
+/* ── Stats bar (bottom-left) ── */
+#stats-bar {{
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1000;
+    background: rgba(30, 20, 60, 0.88);
+    color: white;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    backdrop-filter: blur(4px);
+}}
+
+/* ── Legend (bottom-right) ── */
+#legend {{
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 1000;
+    background: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    font-size: 12px;
+    min-width: 200px;
+}}
+
+#legend-title {{
+    font-size: 11px;
+    font-weight: 700;
+    color: #4B2D8A;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #E2E8F0;
+}}
+
+.legend-row {{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 0;
+}}
+
+.legend-left {{
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}}
+
+.legend-swatch {{
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}}
+
+.legend-label {{
+    color: #374151;
+    font-size: 12px;
+    font-weight: 500;
+}}
+
+.legend-count {{
+    font-size: 12px;
+    font-weight: 700;
+    color: #6B7280;
+    min-width: 36px;
+    text-align: right;
+}}
+
+/* ── Popup ── */
+.leaflet-popup-content-wrapper {{
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    padding: 0;
+    overflow: hidden;
+}}
+.leaflet-popup-content {{ margin: 0; }}
+
+.popup-header {{
+    padding: 10px 14px 8px;
+    border-left: 5px solid #4B2D8A;
 }}
 
 .popup-content h3 {{
-    margin: 0 0 4px 0;
-    color: #4B2D8A;
-    font-size: 15px;
+    margin: 0 0 2px 0;
+    color: #1E293B;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
 }}
 
-.popup-content p {{
-    margin: 2px 0;
-    color: #475569;
-    font-size: 13px;
+.popup-addr {{
+    color: #64748B;
+    font-size: 12px;
+    margin: 1px 0;
 }}
 
-.popup-type {{
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 10px;
+.popup-footer {{
+    padding: 6px 14px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}}
+
+.popup-type-badge {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 12px;
     font-size: 11px;
-    font-weight: 600;
-    margin-top: 4px;
+    font-weight: 700;
+    color: white;
 }}
 
-.type-promo-only {{ background: #FEE2E2; color: #991B1B; }}
-.type-both-lists {{ background: #D1FAE5; color: #065F46; }}
-.type-c4c-only {{ background: #DBEAFE; color: #1E40AF; }}
-.type-distributor {{ background: #FEF3C7; color: #92400E; }}
-.type-rack-installer {{ background: #F3E8FF; color: #6B21A8; }}
-.type-powersports {{ background: #FFE4E6; color: #9F1239; }}
-.type-international {{ background: #E0E7FF; color: #3730A3; }}
-.type-canada {{ background: #ECFDF5; color: #065F46; }}
+.popup-county {{
+    font-size: 11px;
+    color: #94A3B8;
+}}
 
+/* ── Sidebar (results list) ── */
 #sidebar {{
     position: absolute;
     top: 10px;
     right: 10px;
     z-index: 1000;
-    width: 280px;
-    max-height: {height - 60}px;
+    width: 300px;
+    max-height: {height - 70}px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
     display: none;
+    flex-direction: column;
     overflow: hidden;
 }}
 
 #sidebar-header {{
-    padding: 10px 14px;
+    padding: 12px 14px;
     background: #4B2D8A;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    flex-shrink: 0;
+}}
+
+#sidebar-count {{
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.85;
 }}
 
 #sidebar-list {{
     overflow-y: auto;
-    max-height: {height - 110}px;
-    padding: 0;
+    flex: 1;
 }}
 
 .sidebar-item {{
-    padding: 8px 14px;
+    display: flex;
+    align-items: stretch;
     border-bottom: 1px solid #F1F5F9;
     cursor: pointer;
-    font-size: 13px;
-    transition: background 0.15s;
+    transition: background 0.12s;
 }}
 
 .sidebar-item:hover {{ background: #F8F5FF; }}
-.sidebar-item .si-name {{ font-weight: 600; color: #1E293B; }}
-.sidebar-item .si-loc {{ color: #64748B; font-size: 12px; }}
 
+.sidebar-color-bar {{
+    width: 5px;
+    flex-shrink: 0;
+}}
+
+.sidebar-item-body {{
+    padding: 9px 12px;
+    flex: 1;
+    min-width: 0;
+}}
+
+.si-name {{
+    font-weight: 600;
+    color: #1E293B;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}}
+
+.si-loc {{
+    color: #64748B;
+    font-size: 11px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}}
+
+.si-type-badge {{
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    margin-top: 3px;
+}}
+
+/* ── List toggle button ── */
 #toggle-sidebar {{
     position: absolute;
     top: 10px;
     right: 10px;
     z-index: 999;
     background: white;
-    border: none;
+    border: 2px solid #E2E8F0;
     border-radius: 6px;
-    padding: 8px 12px;
+    padding: 7px 12px;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     color: #4B2D8A;
+    transition: all 0.15s;
 }}
+#toggle-sidebar:hover {{ background: #F8F5FF; border-color: #4B2D8A; }}
 
-#toggle-sidebar:hover {{ background: #F8F5FF; }}
+/* ── Clear filters button ── */
+#clear-filters {{
+    display: none;
+    padding: 6px 11px;
+    background: #4B2D8A;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    white-space: nowrap;
+}}
+#clear-filters:hover {{ background: #3B1F7A; }}
 </style>
 </head>
 <body>
@@ -264,46 +449,34 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
     <div id="map"></div>
 
     <div id="toolbar">
-        <input type="text" id="search-input" placeholder="Search store name..." />
+        <div class="search-wrap">
+            <input type="text" id="search-input" placeholder="&#128269; Search store name..." />
+            <button id="search-clear" onclick="clearSearch()" title="Clear search">&times;</button>
+        </div>
         <select id="state-filter">
             <option value="">All States</option>
         </select>
         <select id="county-filter">
             <option value="">All Counties</option>
         </select>
-        <select id="type-filter">
-            <option value="">All Types</option>
-            <option value="Promo Only (Not on C4C)">Promo Only</option>
-            <option value="On Both Lists">On Both Lists</option>
-            <option value="C4C Only">C4C Only</option>
-            <option value="Rack Installer">Rack Installer</option>
-            <option value="Distributor">Distributor</option>
-            <option value="Powersports/Motorsports">Powersports/Motorsports</option>
-            <option value="International">International</option>
-            <option value="Canada">Canada</option>
-        </select>
+        <button id="clear-filters" onclick="clearAllFilters()">&#10005; Clear Filters</button>
     </div>
+
+    <div id="type-pills"></div>
 
     <div id="stats-bar">Loading...</div>
 
     <div id="legend">
-        <h4>Account Types</h4>
-        <div class="legend-item"><div class="legend-dot" style="background:#DC2626;"></div> Promo Only</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#16A34A;"></div> On Both Lists</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#2563EB;"></div> C4C Only</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#7C3AED;"></div> Rack Installer</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;border:2px solid #D97706;"></div> Distributor</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#E11D48;"></div> Powersports</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#4F46E5;"></div> International</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#059669;"></div> Canada</div>
+        <div id="legend-title">Account Types</div>
+        <div id="legend-rows"></div>
     </div>
 
     <button id="toggle-sidebar" onclick="toggleSidebar()">&#9776; List</button>
 
     <div id="sidebar">
         <div id="sidebar-header" onclick="toggleSidebar()">
-            <span>Locations</span>
-            <span>&times;</span>
+            <span>Locations <span id="sidebar-count"></span></span>
+            <span style="font-size:18px;">&times;</span>
         </div>
         <div id="sidebar-list"></div>
     </div>
@@ -312,16 +485,19 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 <script>
 const customers = {customers_json};
 
-const TYPE_COLORS = {{
-    'Promo Only (Not on C4C)': '#DC2626',
-    'On Both Lists': '#16A34A',
-    'C4C Only': '#2563EB',
-    'Rack Installer': '#7C3AED',
-    'Distributor': '#F59E0B',
-    'Powersports/Motorsports': '#E11D48',
-    'International': '#4F46E5',
-    'Canada': '#059669'
-}};
+const TYPE_CONFIG = [
+    {{ key: 'Promo Only (Not on C4C)', label: 'Promo Only',          color: '#DC2626' }},
+    {{ key: 'On Both Lists',            label: 'On Both Lists',       color: '#16A34A' }},
+    {{ key: 'C4C Only',                 label: 'C4C Only',            color: '#2563EB' }},
+    {{ key: 'Rack Installer',           label: 'Rack Installer',      color: '#7C3AED' }},
+    {{ key: 'Distributor',              label: 'Distributor',         color: '#F59E0B' }},
+    {{ key: 'Powersports/Motorsports',  label: 'Powersports',         color: '#E11D48' }},
+    {{ key: 'International',            label: 'International',       color: '#4F46E5' }},
+    {{ key: 'Canada',                   label: 'Canada',              color: '#059669' }},
+];
+
+const TYPE_COLOR_MAP = {{}};
+TYPE_CONFIG.forEach(t => TYPE_COLOR_MAP[t.key] = t.color);
 
 const map = L.map('map', {{
     zoomControl: true,
@@ -340,9 +516,6 @@ const markerClusterGroup = L.markerClusterGroup({{
     showCoverageOnHover: false,
     iconCreateFunction: function(cluster) {{
         const count = cluster.getChildCount();
-        let size = 'small';
-        if (count > 20) size = 'large';
-        else if (count > 5) size = 'medium';
         return L.divIcon({{
             html: '<div style="background:#4B2D8A;color:white;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">' + count + '</div>',
             className: 'custom-cluster',
@@ -352,63 +525,42 @@ const markerClusterGroup = L.markerClusterGroup({{
 }});
 
 function createIcon(type) {{
-    const color = TYPE_COLORS[type] || '#7C3AED';
+    const color = TYPE_COLOR_MAP[type] || '#7C3AED';
     let svg;
     if (type === 'Distributor') {{
         svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="44" viewBox="0 0 32 44">
             <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 28 16 28s16-16 16-28C32 7.16 24.84 0 16 0z" fill="${{color}}" stroke="#D97706" stroke-width="1.5"/>
             <polygon points="16,6 18.5,12.5 25,13 20,17.5 21.5,24 16,20.5 10.5,24 12,17.5 7,13 13.5,12.5" fill="white"/>
         </svg>`;
-        return L.divIcon({{
-            html: svg,
-            className: '',
-            iconSize: [32, 44],
-            iconAnchor: [16, 44],
-            popupAnchor: [0, -40]
-        }});
+        return L.divIcon({{ html: svg, className: '', iconSize: [32, 44], iconAnchor: [16, 44], popupAnchor: [0, -40] }});
     }}
     svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40">
         <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.27 21.73 0 14 0z" fill="${{color}}"/>
         <circle cx="14" cy="14" r="6" fill="white"/>
     </svg>`;
-    return L.divIcon({{
-        html: svg,
-        className: '',
-        iconSize: [28, 40],
-        iconAnchor: [14, 40],
-        popupAnchor: [0, -36]
-    }});
+    return L.divIcon({{ html: svg, className: '', iconSize: [28, 40], iconAnchor: [14, 40], popupAnchor: [0, -36] }});
 }}
 
 let allMarkers = [];
 
 customers.forEach(function(c) {{
     if (!c.latitude || !c.longitude) return;
-
-    let typeClass = 'promo-only';
-    if (c.type === 'Promo Only (Not on C4C)') typeClass = 'promo-only';
-    else if (c.type === 'On Both Lists') typeClass = 'both-lists';
-    else if (c.type === 'C4C Only') typeClass = 'c4c-only';
-    else if (c.type === 'Rack Installer') typeClass = 'rack-installer';
-    else if (c.type === 'Distributor') typeClass = 'distributor';
-    else if (c.type === 'Powersports/Motorsports') typeClass = 'powersports';
-    else if (c.type === 'International') typeClass = 'international';
-    else if (c.type === 'Canada') typeClass = 'canada';
-    const countyLine = c.county ? `<p style="margin:2px 0;color:#6B7280;font-size:12px;">${{c.county}} County</p>` : '';
+    const color = TYPE_COLOR_MAP[c.type] || '#7C3AED';
+    const countyLine = c.county ? `<span class="popup-county">${{c.county}} County</span>` : '';
     const popupHtml = `
-        <div class="popup-content">
-            <h3>${{c.store_name}}</h3>
-            <p>${{c.address || ''}}</p>
-            <p>${{c.city}}, ${{c.state}} ${{c.zip || ''}}</p>
-            ${{countyLine}}
-            <span class="popup-type type-${{typeClass}}">${{c.type || 'Unknown'}}</span>
+        <div>
+            <div class="popup-header" style="border-left-color:${{color}}">
+                <h3 class="popup-content">${{c.store_name}}</h3>
+                <div class="popup-addr">${{c.address || ''}}</div>
+                <div class="popup-addr">${{c.city}}, ${{c.state}} ${{c.zip || ''}}</div>
+            </div>
+            <div class="popup-footer">
+                <span class="popup-type-badge" style="background:${{color}}">${{c.type || 'Unknown'}}</span>
+                ${{countyLine}}
+            </div>
         </div>
     `;
-
-    const marker = L.marker([c.latitude, c.longitude], {{
-        icon: createIcon(c.type || 'Unknown')
-    }}).bindPopup(popupHtml);
-
+    const marker = L.marker([c.latitude, c.longitude], {{ icon: createIcon(c.type || 'Unknown') }}).bindPopup(popupHtml);
     marker._customerData = c;
     allMarkers.push(marker);
 }});
@@ -420,8 +572,7 @@ const states = [...new Set(customers.map(c => c.state).filter(Boolean))].sort();
 const stateSelect = document.getElementById('state-filter');
 states.forEach(function(s) {{
     const opt = document.createElement('option');
-    opt.value = s;
-    opt.textContent = s;
+    opt.value = s; opt.textContent = s;
     stateSelect.appendChild(opt);
 }});
 
@@ -429,8 +580,7 @@ const counties = [...new Set(customers.map(c => c.county).filter(Boolean))].sort
 const countySelect = document.getElementById('county-filter');
 counties.forEach(function(co) {{
     const opt = document.createElement('option');
-    opt.value = co;
-    opt.textContent = co + ' County';
+    opt.value = co; opt.textContent = co + ' County';
     countySelect.appendChild(opt);
 }});
 
@@ -443,105 +593,197 @@ document.getElementById('state-filter').addEventListener('change', function() {{
         : counties;
     filtered.forEach(function(co) {{
         const opt = document.createElement('option');
-        opt.value = co;
-        opt.textContent = co + ' County';
+        opt.value = co; opt.textContent = co + ' County';
         cf.appendChild(opt);
     }});
+    filterMarkers();
 }});
 
+/* ── Type pill filter state ── */
+let activeTypeFilter = '';
+
+function buildTypePills() {{
+    const container = document.getElementById('type-pills');
+    container.innerHTML = '';
+    TYPE_CONFIG.forEach(function(tc) {{
+        const pill = document.createElement('div');
+        pill.className = 'type-pill';
+        pill.dataset.key = tc.key;
+        pill.innerHTML =
+            `<div class="pill-dot" style="background:${{tc.color}}"></div>` +
+            `<span class="pill-label">${{tc.label}}</span>` +
+            `<span class="pill-count" id="pill-count-${{tc.key.replace(/[^a-z0-9]/gi,'_')}}">0</span>`;
+        pill.style.color = tc.color;
+        pill.style.borderColor = tc.color + '44';
+        pill.addEventListener('click', function() {{
+            if (activeTypeFilter === tc.key) {{
+                activeTypeFilter = '';
+            }} else {{
+                activeTypeFilter = tc.key;
+            }}
+            filterMarkers();
+        }});
+        container.appendChild(pill);
+    }});
+}}
+
+function updatePillStyles(typeCounts) {{
+    document.querySelectorAll('.type-pill').forEach(function(pill) {{
+        const key = pill.dataset.key;
+        const cfg = TYPE_CONFIG.find(t => t.key === key);
+        const countEl = document.getElementById('pill-count-' + key.replace(/[^a-z0-9]/gi,'_'));
+        if (countEl) countEl.textContent = (typeCounts[key] || 0).toLocaleString();
+
+        if (activeTypeFilter === '') {{
+            pill.classList.remove('active', 'dimmed');
+            pill.style.background = 'white';
+            pill.style.color = cfg.color;
+        }} else if (activeTypeFilter === key) {{
+            pill.classList.add('active');
+            pill.classList.remove('dimmed');
+            pill.style.background = cfg.color;
+            pill.style.color = 'white';
+        }} else {{
+            pill.classList.add('dimmed');
+            pill.classList.remove('active');
+            pill.style.background = 'white';
+            pill.style.color = cfg.color;
+        }}
+    }});
+}}
+
+function buildLegend() {{
+    const container = document.getElementById('legend-rows');
+    container.innerHTML = '';
+    TYPE_CONFIG.forEach(function(tc) {{
+        const row = document.createElement('div');
+        row.className = 'legend-row';
+        row.innerHTML =
+            `<div class="legend-left">` +
+            `<div class="legend-swatch" style="background:${{tc.color}}"></div>` +
+            `<span class="legend-label">${{tc.label}}</span>` +
+            `</div>` +
+            `<span class="legend-count" id="leg-count-${{tc.key.replace(/[^a-z0-9]/gi,'_')}}">–</span>`;
+        container.appendChild(row);
+    }});
+}}
+
+function updateLegendCounts(typeCounts) {{
+    TYPE_CONFIG.forEach(function(tc) {{
+        const el = document.getElementById('leg-count-' + tc.key.replace(/[^a-z0-9]/gi,'_'));
+        if (el) el.textContent = (typeCounts[tc.key] || 0).toLocaleString();
+    }});
+}}
+
 function filterMarkers() {{
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
+    const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
     const stateVal = document.getElementById('state-filter').value;
     const countyVal = document.getElementById('county-filter').value;
-    const typeVal = document.getElementById('type-filter').value;
 
     markerClusterGroup.clearLayers();
     let visibleCount = 0;
+    const typeCounts = {{}};
 
     allMarkers.forEach(function(marker) {{
         const c = marker._customerData;
         let show = true;
-
         if (searchTerm && !c.store_name.toLowerCase().includes(searchTerm)) show = false;
         if (stateVal && c.state !== stateVal) show = false;
         if (countyVal && (c.county || '') !== countyVal) show = false;
-        if (typeVal && c.type !== typeVal) show = false;
-
+        if (activeTypeFilter && c.type !== activeTypeFilter) show = false;
         if (show) {{
             markerClusterGroup.addLayer(marker);
             visibleCount++;
+            typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;
         }}
     }});
 
-    const typeCounts = {{}};
-    markerClusterGroup.eachLayer(function(m) {{
-        const t = m._customerData.type;
-        typeCounts[t] = (typeCounts[t] || 0) + 1;
-    }});
+    updatePillStyles(typeCounts);
+    updateLegendCounts(typeCounts);
 
-    const tc = typeCounts;
+    const hasFilters = searchTerm || stateVal || countyVal || activeTypeFilter;
+    document.getElementById('clear-filters').style.display = hasFilters ? 'inline-block' : 'none';
+    document.getElementById('search-clear').style.display = searchTerm ? 'block' : 'none';
+
     document.getElementById('stats-bar').innerHTML =
-        '<strong>' + visibleCount + '</strong> of ' + allMarkers.length + ' shown — ' +
-        '<span style="color:#DC2626">&#9679;' + (tc['Promo Only (Not on C4C)']||0) + '</span> ' +
-        '<span style="color:#16A34A">&#9679;' + (tc['On Both Lists']||0) + '</span> ' +
-        '<span style="color:#2563EB">&#9679;' + (tc['C4C Only']||0) + '</span> ' +
-        '<span style="color:#7C3AED">&#9679;' + (tc['Rack Installer']||0) + '</span> ' +
-        '<span style="color:#F59E0B">&#9733;' + (tc['Distributor']||0) + '</span> ' +
-        '<span style="color:#E11D48">&#9679;' + (tc['Powersports/Motorsports']||0) + '</span> ' +
-        '<span style="color:#4F46E5">&#9679;' + (tc['International']||0) + '</span> ' +
-        '<span style="color:#059669">&#9679;' + (tc['Canada']||0) + '</span>';
+        '<strong>' + visibleCount.toLocaleString() + '</strong> of ' + allMarkers.length.toLocaleString() + ' locations shown';
 
-    updateSidebar();
+    updateSidebar(visibleCount);
 
-    if (visibleCount > 0 && (stateVal || countyVal || searchTerm)) {{
+    if (visibleCount > 0 && hasFilters) {{
         const bounds = markerClusterGroup.getBounds();
-        if (bounds.isValid()) map.fitBounds(bounds, {{ padding: [50, 50] }});
+        if (bounds.isValid()) map.fitBounds(bounds, {{ padding: [60, 60] }});
     }}
 }}
 
+function clearSearch() {{
+    document.getElementById('search-input').value = '';
+    filterMarkers();
+}}
+
+function clearAllFilters() {{
+    document.getElementById('search-input').value = '';
+    document.getElementById('state-filter').value = '';
+    document.getElementById('county-filter').innerHTML = '<option value="">All Counties</option>';
+    counties.forEach(function(co) {{
+        const opt = document.createElement('option');
+        opt.value = co; opt.textContent = co + ' County';
+        document.getElementById('county-filter').appendChild(opt);
+    }});
+    activeTypeFilter = '';
+    filterMarkers();
+    map.setView([39.8283, -98.5795], 4);
+}}
+
 document.getElementById('search-input').addEventListener('input', filterMarkers);
-document.getElementById('state-filter').addEventListener('change', function() {{ filterMarkers(); }});
 document.getElementById('county-filter').addEventListener('change', filterMarkers);
-document.getElementById('type-filter').addEventListener('change', filterMarkers);
 
-filterMarkers();
-
-function updateSidebar() {{
+function updateSidebar(visibleCount) {{
     const list = document.getElementById('sidebar-list');
+    const countEl = document.getElementById('sidebar-count');
     list.innerHTML = '';
 
     const visible = [];
-    markerClusterGroup.eachLayer(function(marker) {{
-        visible.push(marker);
-    }});
+    markerClusterGroup.eachLayer(function(marker) {{ visible.push(marker); }});
+    visible.sort(function(a, b) {{ return a._customerData.store_name.localeCompare(b._customerData.store_name); }});
 
-    visible.sort(function(a, b) {{
-        return a._customerData.store_name.localeCompare(b._customerData.store_name);
-    }});
+    countEl.textContent = '(' + (visibleCount || visible.length).toLocaleString() + ')';
 
     visible.forEach(function(marker) {{
         const c = marker._customerData;
-        const div = document.createElement('div');
-        div.className = 'sidebar-item';
-        const dotColor = TYPE_COLORS[c.type] || '#999';
-        const countyInfo = c.county ? ' (' + c.county + ' Co.)' : '';
-        div.innerHTML = '<div class="si-name">' + c.store_name + '</div>' +
-            '<div class="si-loc"><span style="color:' + dotColor + '">&#9679;</span> ' + c.city + ', ' + c.state + countyInfo + ' &middot; ' + (c.type || 'Unknown') + '</div>';
-        div.onclick = function() {{
+        const color = TYPE_COLOR_MAP[c.type] || '#999';
+        const typeCfg = TYPE_CONFIG.find(t => t.key === c.type);
+        const label = typeCfg ? typeCfg.label : (c.type || 'Unknown');
+        const countyInfo = c.county ? c.county + ' Co. · ' : '';
+
+        const item = document.createElement('div');
+        item.className = 'sidebar-item';
+        item.innerHTML =
+            `<div class="sidebar-color-bar" style="background:${{color}}"></div>` +
+            `<div class="sidebar-item-body">` +
+            `<div class="si-name">${{c.store_name}}</div>` +
+            `<div class="si-loc">${{countyInfo}}${{c.city}}, ${{c.state}}</div>` +
+            `<span class="si-type-badge" style="background:${{color}}">${{label}}</span>` +
+            `</div>`;
+        item.onclick = function() {{
             map.setView([c.latitude, c.longitude], 15);
             marker.openPopup();
         }};
-        list.appendChild(div);
+        list.appendChild(item);
     }});
 }}
 
 let sidebarOpen = false;
 function toggleSidebar() {{
     sidebarOpen = !sidebarOpen;
-    document.getElementById('sidebar').style.display = sidebarOpen ? 'block' : 'none';
+    document.getElementById('sidebar').style.display = sidebarOpen ? 'flex' : 'none';
     document.getElementById('toggle-sidebar').style.display = sidebarOpen ? 'none' : 'block';
     if (sidebarOpen) updateSidebar();
 }}
+
+buildTypePills();
+buildLegend();
+filterMarkers();
 </script>
 </body>
 </html>
