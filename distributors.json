@@ -6,8 +6,8 @@
     "state": "AR",
     "zip": "72034",
     "county": "Faulkner",
-    "latitude": 35.0823,
-    "longitude": -92.4683
+    "latitude": 35.074693,
+    "longitude": -92.43843
   },
   {
     "name": "Napa Auto Parts",
@@ -16,8 +16,8 @@
     "state": "AZ",
     "zip": "85020",
     "county": "Maricopa",
-    "latitude": 33.5623,
-    "longitude": -112.0559
+    "latitude": 33.571659,
+    "longitude": -112.065129
   },
   {
     "name": "JM OIL",
@@ -26,8 +26,8 @@
     "state": "CA",
     "zip": "90670",
     "county": "Los Angeles",
-    "latitude": 33.9464,
-    "longitude": -118.0838
+    "latitude": 33.919968,
+    "longitude": -118.058013
   },
   {
     "name": "MIGHTY SAN DIEGO",
@@ -36,8 +36,8 @@
     "state": "CA",
     "zip": "91950",
     "county": "San Diego",
-    "latitude": 32.6749,
-    "longitude": -117.0897
+    "latitude": 32.657518,
+    "longitude": -117.099856
   },
   {
     "name": "NAPA AUTO PARTS",
@@ -46,8 +46,8 @@
     "state": "DE",
     "zip": "19703",
     "county": "New Castle",
-    "latitude": 39.8044,
-    "longitude": -75.4649
+    "latitude": 39.81345,
+    "longitude": -75.442649
   },
   {
     "name": "LEWIS MARINE",
@@ -56,8 +56,8 @@
     "state": "FL",
     "zip": "33315",
     "county": "Broward",
-    "latitude": 26.0989,
-    "longitude": -80.1541
+    "latitude": 26.085241,
+    "longitude": -80.143012
   },
   {
     "name": "Mighty Distributing of SW Florida",
@@ -66,8 +66,8 @@
     "state": "FL",
     "zip": "33990",
     "county": "Lee",
-    "latitude": 26.6265,
-    "longitude": -81.9677
+    "latitude": 26.636053,
+    "longitude": -81.948571
   },
   {
     "name": "Mighty of North Fort Meyers",
@@ -76,8 +76,8 @@
     "state": "FL",
     "zip": "33903",
     "county": "Lee",
-    "latitude": 26.693,
-    "longitude": -81.9125
+    "latitude": 26.680782,
+    "longitude": -81.901124
   },
   {
     "name": "MIGHTY OF PENSACOLA",
@@ -86,8 +86,8 @@
     "state": "FL",
     "zip": "32534",
     "county": "Escambia",
-    "latitude": 30.5301,
-    "longitude": -87.2793
+    "latitude": 30.540556,
+    "longitude": -87.275102
   },
   {
     "name": "SANTEX CORPORATION",
@@ -116,8 +116,8 @@
     "state": "HI",
     "zip": "96732",
     "county": "Maui",
-    "latitude": 20.8814,
-    "longitude": -156.4783
+    "latitude": 20.885532,
+    "longitude": -156.4626
   },
   {
     "name": "Parts Center Hawaii - Hilo",
@@ -126,8 +126,8 @@
     "state": "HI",
     "zip": "96720",
     "county": "Hawaii",
-    "latitude": 19.7025,
-    "longitude": -155.0939
+    "latitude": 19.708873,
+    "longitude": -155.064381
   },
   {
     "name": "KELLER-HEARTT OIL",
@@ -136,8 +136,8 @@
     "state": "IL",
     "zip": "60632",
     "county": "Cook",
-    "latitude": 41.8093,
-    "longitude": -87.7052
+    "latitude": 41.813086,
+    "longitude": -87.729896
   },
   {
     "name": "MIGHTY SOUTH SIDE CHICAGO",
@@ -146,8 +146,8 @@
     "state": "IL",
     "zip": "60423",
     "county": "Will",
-    "latitude": 41.5094,
-    "longitude": -87.8248
+    "latitude": 41.475716,
+    "longitude": -87.834973
   },
   {
     "name": "MIGHTY AUTO PARTS",
@@ -156,8 +156,8 @@
     "state": "IN",
     "zip": "46202",
     "county": "Marion",
-    "latitude": 39.7851,
-    "longitude": -86.1595
+    "latitude": 39.773672,
+    "longitude": -86.139929
   },
   {
     "name": "MIGHTY AUTO PARTS",
@@ -166,8 +166,8 @@
     "state": "KY",
     "zip": "40218",
     "county": "Jefferson",
-    "latitude": 38.189,
-    "longitude": -85.654
+    "latitude": 38.18902,
+    "longitude": -85.641419
   },
   {
     "name": "GAUBERT OIL COMPANY",
@@ -176,8 +176,8 @@
     "state": "LA",
     "zip": "70301",
     "county": "Lafourche",
-    "latitude": 29.7992,
-    "longitude": -90.8096
+    "latitude": 29.806892,
+    "longitude": -90.815998
   },
   {
     "name": "STERLING PETROLEUM",
@@ -186,8 +186,8 @@
     "state": "LA",
     "zip": "70123",
     "county": "Jefferson Parish",
-    "latitude": 29.9511,
-    "longitude": -90.206
+    "latitude": 29.948944,
+    "longitude": -90.186701
   },
   {
     "name": "MIGHTY GREAT LAKES",
@@ -206,8 +206,8 @@
     "state": "MI",
     "zip": "48336",
     "county": "Oakland",
-    "latitude": 42.4656,
-    "longitude": -83.3638
+    "latitude": 42.444884,
+    "longitude": -83.329048
   },
   {
     "name": "ROWLEYS WHOLESALE",
@@ -216,8 +216,8 @@
     "state": "MI",
     "zip": "48706",
     "county": "Bay",
-    "latitude": 43.6088,
-    "longitude": -83.953
+    "latitude": 43.62372,
+    "longitude": -83.909771
   },
   {
     "name": "Mighty Midwest",
@@ -226,8 +226,8 @@
     "state": "MO",
     "zip": "63303",
     "county": "Saint Charles",
-    "latitude": 38.7622,
-    "longitude": -90.5471
+    "latitude": 38.764061,
+    "longitude": -90.527119
   },
   {
     "name": "ROCKY MOUNTAIN MIGHTY",
@@ -236,8 +236,8 @@
     "state": "MT",
     "zip": "59106",
     "county": "Yellowstone",
-    "latitude": 45.7753,
-    "longitude": -108.6519
+    "latitude": 45.731823,
+    "longitude": -108.612364
   },
   {
     "name": "Mighty of ND",
@@ -246,8 +246,8 @@
     "state": "ND",
     "zip": "58504",
     "county": "Burleigh",
-    "latitude": 46.7231,
-    "longitude": -100.678
+    "latitude": 46.794589,
+    "longitude": -100.767873
   },
   {
     "name": "MIGHTY AUTO PARTS",
@@ -256,8 +256,8 @@
     "state": "NY",
     "zip": "11520",
     "county": "Nassau",
-    "latitude": 40.6536,
-    "longitude": -73.5866
+    "latitude": 40.668314,
+    "longitude": -73.587532
   },
   {
     "name": "MIGHTY AUTO PARTS",
@@ -266,8 +266,8 @@
     "state": "NY",
     "zip": "10532",
     "county": "Westchester",
-    "latitude": 41.1073,
-    "longitude": -73.796
+    "latitude": 41.100009,
+    "longitude": -73.807755
   },
   {
     "name": "OK PETROLEUM DISTRIBUTION CORP",
@@ -276,8 +276,8 @@
     "state": "NY",
     "zip": "11788",
     "county": "Suffolk",
-    "latitude": 40.8231,
-    "longitude": -73.1958
+    "latitude": 40.8101,
+    "longitude": -73.267119
   },
   {
     "name": "Mighty of Northern Ohio",
@@ -286,8 +286,8 @@
     "state": "OH",
     "zip": "44125",
     "county": "Cuyahoga",
-    "latitude": 41.4335,
-    "longitude": -81.6323
+    "latitude": 41.412962,
+    "longitude": -81.634577
   },
   {
     "name": "MIGHTY AUTO PARTS-MEDFORD,OR",
@@ -296,8 +296,8 @@
     "state": "OR",
     "zip": "97502",
     "county": "Jackson",
-    "latitude": 42.3899,
-    "longitude": -122.9222
+    "latitude": 42.394917,
+    "longitude": -122.881646
   },
   {
     "name": "Mighty of South Dakota",
@@ -306,8 +306,8 @@
     "state": "SD",
     "zip": "57104",
     "county": "Minnehaha",
-    "latitude": 43.5514,
-    "longitude": -96.7375
+    "latitude": 43.58942,
+    "longitude": -96.72047
   },
   {
     "name": "MIGHTY, VOLUNTEER AUTO PARTS",
@@ -316,8 +316,8 @@
     "state": "TN",
     "zip": "37771",
     "county": "Loudon",
-    "latitude": 35.8104,
-    "longitude": -84.2665
+    "latitude": 35.83996,
+    "longitude": -84.302128
   },
   {
     "name": "4M Parts Warehouse",
@@ -326,8 +326,8 @@
     "state": "TX",
     "zip": "75237",
     "county": "Dallas",
-    "latitude": 32.659,
-    "longitude": -96.8765
+    "latitude": 32.682348,
+    "longitude": -96.886634
   },
   {
     "name": "ALLIED SALES COMPANY",
@@ -336,8 +336,8 @@
     "state": "TX",
     "zip": "78702",
     "county": "Travis",
-    "latitude": 30.2638,
-    "longitude": -97.7166
+    "latitude": 30.253832,
+    "longitude": -97.698422
   },
   {
     "name": "AMERICAN LUBE SUPPLY (HJDJ)",
@@ -346,8 +346,8 @@
     "state": "TX",
     "zip": "78266",
     "county": "Comal",
-    "latitude": 29.6643,
-    "longitude": -98.3118
+    "latitude": 29.615928,
+    "longitude": -98.31231
   },
   {
     "name": "ARNOLD OIL",
@@ -366,8 +366,8 @@
     "state": "TX",
     "zip": "78415",
     "county": "Nueces",
-    "latitude": 27.7262,
-    "longitude": -97.4078
+    "latitude": 27.729794,
+    "longitude": -97.430792
   },
   {
     "name": "ARNOLD OIL COMPANY",
@@ -376,8 +376,8 @@
     "state": "TX",
     "zip": "78570",
     "county": "Hidalgo",
-    "latitude": 26.1513,
-    "longitude": -97.9185
+    "latitude": 26.171685,
+    "longitude": -97.878079
   },
   {
     "name": "AVERY OIL COMPANY",
@@ -386,8 +386,8 @@
     "state": "TX",
     "zip": "78124",
     "county": "Guadalupe",
-    "latitude": 29.5683,
-    "longitude": -98.1517
+    "latitude": 29.516906,
+    "longitude": -98.143463
   },
   {
     "name": "AVERY OIL COMPANY",
@@ -396,8 +396,8 @@
     "state": "TX",
     "zip": "76063",
     "county": "Tarrant",
-    "latitude": 32.5773,
-    "longitude": -97.1416
+    "latitude": 32.551501,
+    "longitude": -97.132872
   },
   {
     "name": "AVERY OIL COMPANY",
@@ -406,8 +406,8 @@
     "state": "TX",
     "zip": "77041",
     "county": "Harris",
-    "latitude": 29.8602,
-    "longitude": -95.5817
+    "latitude": 29.853062,
+    "longitude": -95.58141
   },
   {
     "name": "COMPETITIVE EDGE DISTRIBUTING",
@@ -416,8 +416,8 @@
     "state": "TX",
     "zip": "76031",
     "county": "Johnson",
-    "latitude": 32.3485,
-    "longitude": -97.3311
+    "latitude": 32.356824,
+    "longitude": -97.363716
   },
   {
     "name": "GOLDEN WEST CORPUS CHRISTI",
@@ -426,8 +426,8 @@
     "state": "TX",
     "zip": "78408",
     "county": "Nueces",
-    "latitude": 27.7945,
-    "longitude": -97.4381
+    "latitude": 27.792656,
+    "longitude": -97.450492
   },
   {
     "name": "Golden West San Antonio",
@@ -436,8 +436,8 @@
     "state": "TX",
     "zip": "78219",
     "county": "Bexar",
-    "latitude": 29.4492,
-    "longitude": -98.3446
+    "latitude": 29.434066,
+    "longitude": -98.438827
   },
   {
     "name": "Hollon Oil Co.",
@@ -446,8 +446,8 @@
     "state": "TX",
     "zip": "78596",
     "county": "Hidalgo",
-    "latitude": 26.1694,
-    "longitude": -97.9887
+    "latitude": 26.159788,
+    "longitude": -97.978537
   },
   {
     "name": "LPS, LLC",
@@ -456,8 +456,8 @@
     "state": "TX",
     "zip": "78758",
     "county": "Travis",
-    "latitude": 30.3764,
-    "longitude": -97.7078
+    "latitude": 30.378083,
+    "longitude": -97.723885
   },
   {
     "name": "LUBE PLUS",
@@ -466,8 +466,8 @@
     "state": "TX",
     "zip": "75602",
     "county": "Gregg",
-    "latitude": 32.4724,
-    "longitude": -94.7101
+    "latitude": 32.496275,
+    "longitude": -94.708991
   },
   {
     "name": "LUBE PLUS",
@@ -476,8 +476,8 @@
     "state": "TX",
     "zip": "76250",
     "county": "Cooke",
-    "latitude": 33.636,
-    "longitude": -97.2214
+    "latitude": 33.635862,
+    "longitude": -97.22215
   },
   {
     "name": "LUBE PLUS",
@@ -486,8 +486,8 @@
     "state": "TX",
     "zip": "75470",
     "county": "Lamar",
-    "latitude": 33.6098,
-    "longitude": -95.7891
+    "latitude": 33.687717,
+    "longitude": -95.817058
   },
   {
     "name": "MIGHTY DFW",
@@ -496,8 +496,8 @@
     "state": "TX",
     "zip": "76040",
     "county": "Tarrant",
-    "latitude": 32.8264,
-    "longitude": -97.0972
+    "latitude": 32.812389,
+    "longitude": -97.126989
   },
   {
     "name": "MIGHTY OF EL PASO",
@@ -506,8 +506,8 @@
     "state": "TX",
     "zip": "79915",
     "county": "El Paso",
-    "latitude": 31.7432,
-    "longitude": -106.3686
+    "latitude": 31.763571,
+    "longitude": -106.374546
   },
   {
     "name": "UNITED OIL & GREASE LUBBOCK",
@@ -526,8 +526,8 @@
     "state": "TX",
     "zip": "79935",
     "county": "El Paso",
-    "latitude": 31.7718,
-    "longitude": -106.3303
+    "latitude": 31.752711,
+    "longitude": -106.331072
   },
   {
     "name": "BUCHANAN OIL",
@@ -536,8 +536,8 @@
     "state": "VA",
     "zip": "24631",
     "county": "Buchanan",
-    "latitude": 37.2138,
-    "longitude": -81.9917
+    "latitude": 37.224268,
+    "longitude": -82.039083
   },
   {
     "name": "COMPETITION SPECIALTIES INC.",
@@ -546,8 +546,8 @@
     "state": "WA",
     "zip": "98001",
     "county": "King",
-    "latitude": 47.3099,
-    "longitude": -122.2653
+    "latitude": 47.328781,
+    "longitude": -122.249729
   },
   {
     "name": "MIGHTY AUTO PARTS-SEATTLE",
@@ -556,8 +556,8 @@
     "state": "WA",
     "zip": "98125",
     "county": "King",
-    "latitude": 47.717,
-    "longitude": -122.3015
+    "latitude": 47.713882,
+    "longitude": -122.299028
   },
   {
     "name": "Mighty Pacific",
@@ -566,8 +566,8 @@
     "state": "WA",
     "zip": "98665",
     "county": "Clark",
-    "latitude": 45.6892,
-    "longitude": -122.6616
+    "latitude": 45.690399,
+    "longitude": -122.660352
   },
   {
     "name": "Blain\u2019s Supply",
@@ -576,7 +576,7 @@
     "state": "WI",
     "zip": "53546",
     "county": "Rock",
-    "latitude": 42.6683,
-    "longitude": -89.0025
+    "latitude": 42.671165,
+    "longitude": -88.974717
   }
 ]
