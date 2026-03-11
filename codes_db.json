@@ -303,6 +303,18 @@
         }
       ],
       "conversion_note": "PS/PU = premium syn \u2192 RS direct. PB conventional \u2192 full upsell opportunity."
+    },
+    {
+      "brand": "Chase's Oil",
+      "type": "Full Syn",
+      "color": "#DC2626",
+      "codes": [
+        {
+          "code": "CBFS53W0",
+          "product": "Chase's Best F'n Oil"
+        }
+      ],
+      "conversion_note": "Best Oil Around"
     }
   ],
   "service_tiers": [

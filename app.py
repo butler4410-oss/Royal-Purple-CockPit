@@ -10,6 +10,7 @@ from report_generator import (
 from customer_map import load_customers, load_distributors, parse_csv_customers, build_leaflet_html, get_states
 from c4c_report_generator import generate_c4c_report
 from map_data_exporter import generate_map_export
+from code_detector import detect_new_codes, add_new_codes_to_db
 import product_reference
 import admin_panel
 
@@ -263,6 +264,87 @@ elif nav == "Report Generator":
                 bk3.metric("MC Solo (Non-RP OC)", fmt_number(mc_solo), f"{mc_solo/network_mc*100:.1f}%" if network_mc else "")
 
             st.markdown("")
+
+            # ── New Code Detection ────────────────────────────────────────────
+            detect_key = f"detected_codes_{uploaded_file.name}"
+            dismiss_key = f"dismissed_codes_{uploaded_file.name}"
+
+            if not st.session_state.get(dismiss_key, False):
+                if detect_key not in st.session_state:
+                    new_codes, _db_snap = detect_new_codes(stores)
+                    st.session_state[detect_key] = new_codes
+                    st.session_state[f"_db_snap_{uploaded_file.name}"] = _db_snap
+
+                new_codes = st.session_state.get(detect_key, [])
+                db_snap = st.session_state.get(f"_db_snap_{uploaded_file.name}", {})
+
+                rp_items = [x for x in new_codes if x["classification"]["type"] == "rp"]
+                comp_items = [x for x in new_codes if x["classification"]["type"] == "competitor"]
+                unk_items = [x for x in new_codes if x["classification"]["type"] == "unknown"]
+                auto_items = rp_items + comp_items
+
+                if new_codes:
+                    with st.expander(
+                        f"**{len(new_codes)} new product code{'s' if len(new_codes) != 1 else ''} detected** — "
+                        f"{len(rp_items)} RP, {len(comp_items)} competitor"
+                        + (f", {len(unk_items)} unrecognized" if unk_items else ""),
+                        expanded=True,
+                    ):
+                        st.caption(
+                            "These codes appear in the report but are not yet in the Product Reference database. "
+                            "Auto-classified codes can be added in one click."
+                        )
+
+                        if auto_items:
+                            rows = []
+                            for item in auto_items:
+                                cl = item["classification"]
+                                if cl["type"] == "rp":
+                                    dest = cl.get("series", "RP")
+                                    badge = "Royal Purple"
+                                else:
+                                    dest = cl.get("brand", cl.get("label", ""))
+                                    badge = "Competitor"
+                                rows.append({
+                                    "Code": item["code"],
+                                    "Classified As": badge,
+                                    "Destination": dest,
+                                    "In Reports": f"{item['store_count']} store{'s' if item['store_count'] != 1 else ''}",
+                                    "Lines": item["line_count"],
+                                })
+                            st.dataframe(rows, use_container_width=True, hide_index=True)
+
+                        if unk_items:
+                            st.markdown("**Unrecognized codes** (no prefix match — add manually via Admin):")
+                            unk_row = [{"Code": x["code"], "Lines": x["line_count"]} for x in unk_items]
+                            st.dataframe(unk_row, use_container_width=True, hide_index=True)
+
+                        btn_col, skip_col = st.columns([2, 1])
+                        with btn_col:
+                            if auto_items:
+                                if st.button(
+                                    f"Add {len(auto_items)} recognized code{'s' if len(auto_items) != 1 else ''} to database",
+                                    type="primary",
+                                    key=f"add_codes_{uploaded_file.name}",
+                                ):
+                                    added_rp, added_comp, _ = add_new_codes_to_db(auto_items, db_snap)
+                                    try:
+                                        from product_reference import load_codes_db
+                                        load_codes_db.clear()
+                                    except Exception:
+                                        pass
+                                    st.session_state[dismiss_key] = True
+                                    st.success(
+                                        f"Added {added_rp} RP SKU{'s' if added_rp != 1 else ''} "
+                                        f"and {added_comp} competitor code{'s' if added_comp != 1 else ''} to the database."
+                                    )
+                                    st.rerun()
+                        with skip_col:
+                            if st.button("Dismiss", key=f"skip_codes_{uploaded_file.name}"):
+                                st.session_state[dismiss_key] = True
+                                st.rerun()
+
+            # ─────────────────────────────────────────────────────────────────
 
             tab_rankings, tab_mc, tab_details = st.tabs(["Store Rankings", "Max-Clean by Store", "Store Details"])
 
