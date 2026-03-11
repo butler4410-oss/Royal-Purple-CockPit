@@ -199,7 +199,7 @@ def add_new_codes_to_db(confirmed_items, db=None):
                     if not any(c.get("code", "").upper() == code.upper() for c in codes_list):
                         codes_list.append({
                             "code": code,
-                            "name": code,
+                            "product": code,
                             "viscosity": "",
                             "notes": "Auto-detected from report",
                         })
