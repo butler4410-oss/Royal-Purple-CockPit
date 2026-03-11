@@ -4,7 +4,7 @@
 "The Royal Purple Partnership Hub by ThrottlePro" — a Streamlit web app for Royal Purple installer partners with three sections: Report Generator (Excel→PPTX), Customer Map (Leaflet.js interactive marker map), and Product Reference.
 
 ## Architecture
-- **app.py** — Streamlit frontend with 3-page sidebar nav: Report Generator, Customer Map, Product Reference
+- **app.py** — Streamlit frontend with 4-page sidebar nav: Home (dashboard), Report Generator, Customer Map, Product Reference
 - **report_generator.py** — PPTX engine + adaptive Excel parser with invoice deduplication and Max-Clean attachment analysis
 - **customer_map.py** — Leaflet.js map builder: loads customers.json + distributors.json, generates embedded HTML map with 8 marker categories
 - **c4c_report_generator.py** — Excel report generator: C4C gap analysis → 10-sheet .xlsx workbook
@@ -43,7 +43,7 @@
 - Metrics: two-row layout (Total Locations, Installer Accounts, Distributors, Powersports / Promo Only, On Both, C4C Only, Rack Installer)
 - **Export Map Data**: Branded Excel workbook (62 sheets) with per-state tabs, county breakdown, distributor tab
 - **Export C4C Report**: 19-sheet comprehensive account intelligence workbook
-- CARTO light basemap tiles
+- ESRI English-only basemap tiles
 
 ## C4C Report (19 Sheets)
 1. Dashboard — C4C explanation, network overview (all 8 types), gap summary
@@ -111,9 +111,17 @@
 ## PPTX Slide Structure (dynamic)
 Cover → TOC → Exec Summary → Exec Observations → Revenue Overview → Rankings → Matrix → Product Mix → Product Deep Dives Section Divider → Product Deep Dives (per category) → [Map Images] → Store Deep Dives Section Divider → Store Deep Dives → Next Steps → Closing
 
+## Product Reference Database (codes_db.json)
+- **11 RP product lines, 66 total SKUs**: HP API (11), HMX (6), HPS (5), RP Synthetic (6), Duralec (6), XPR Racing (10), Max-Cycle (2), Break-In Oil (1), HP 2-C (1), Snow 2-C (1), Additives/Specialty (17)
+- **6 competitor brands**: CAM2, Valvoline, Mobil 1, Castrol, Pennzoil, Chase's Oil
+- **SKU Lookup tab**: Search any code for full product reference card with catalog descriptions, application notes, and cross-series recommendations
+- **Code detector** (code_detector.py): Auto-classifies new codes from uploads by prefix — XPR, HPS, HMX, RMS, RSD, RS, RP
+- **Admin panel**: Login-protected CRUD for codes_db.json; cache cleared after saves via `load_codes_db.clear()`
+- Source data: 2025 RP Consumer Products Catalog + Consumer Brochure (pdfplumber extracted)
+
 ## Dependencies
 - Python 3.11
-- streamlit, python-pptx, openpyxl, Pillow, plotly, pgeocode
+- streamlit, python-pptx, openpyxl, Pillow, plotly, pgeocode, pdfplumber
 
 ## Running
 ```

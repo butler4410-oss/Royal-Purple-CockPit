@@ -341,10 +341,12 @@ def _render_code_lookup(db, all_codes):
 
 def _try_prefix_lookup(code):
     RP_PREFIXES = [
-        ("RS",  "Royal Purple", "RS Series — High Performance Synthetic", "#4B2D8A"),
+        ("XPR", "Royal Purple", "XPR Series — Extreme Performance Racing", "#B91C1C"),
+        ("HPS", "Royal Purple", "HPS Series — High Performance Street",    "#7C3AED"),
         ("HMX", "Royal Purple", "HMX Series — High Mileage Synthetic",    "#7C3AED"),
         ("RMS", "Royal Purple", "HMX Series — High Mileage Synthetic",    "#7C3AED"),
         ("RSD", "Royal Purple", "Duralec — Diesel Synthetic",              "#1D4ED8"),
+        ("RS",  "Royal Purple", "HP API Series — High Performance Synthetic", "#4B2D8A"),
         ("RP",  "Royal Purple", "RP Synthetic",                            "#059669"),
     ]
     COMP_PREFIXES = [

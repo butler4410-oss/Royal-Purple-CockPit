@@ -3,7 +3,7 @@
     "HMX Series \u2014 High Mileage Synthetic": {
       "color": "#7C3AED",
       "badge": "HMX",
-      "description": "Formulated for vehicles with 75,000+ miles. Reduces oil consumption, revitalizes aged seals, and removes years of deposits. Synerlec technology provides superior film strength in worn engines.",
+      "description": "Formulated for vehicles with 75,000+ miles. Minimizes wear, restores lost engine performance, revitalizes hardened seals, reduces oil consumption, and removes engine deposits. Synerlec technology provides exceptional film strength increase and ionic attraction to metal components. Outstanding LSPI protection and unmatched cold-start wear protection.",
       "application": "High-mileage engines (75K+ miles), older vehicles, engines with oil consumption",
       "skus": [
         {
@@ -41,8 +41,8 @@
     "Duralec Series \u2014 Diesel Synthetic": {
       "color": "#1D4ED8",
       "badge": "RSD",
-      "description": "Premium diesel motor oils with Synerlec technology. Duralec Super (CK-4) for light-duty trucks and fleets. Duralec Ultra for high-output, heavy-duty diesel engines \u2014 up to 33% better wear protection and 40% extended oil life vs CK-4 requirements.",
-      "application": "Diesel trucks, fleet vehicles, over-the-road trucking, agriculture, construction",
+      "description": "Premium diesel motor oils with Synerlec technology. Duralec Super (CK-4) provides high performance for diesel engines requiring emissions-compliant oil \u2014 excellent high-temperature breakdown resistance and low-temperature pumpability. Duralec Ultra delivers unsurpassed film strength and lubricity (up to 4X more than top competitors) for rigorous on/off highway applications.",
+      "application": "Diesel trucks, fleet vehicles, over-the-road trucking, agriculture, construction, emissions-controlled engines with DPF/EGR/SCR",
       "skus": [
         {
           "code": "RSD5W40",
@@ -63,6 +63,16 @@
           "code": "RSD10W30",
           "viscosity": "10W-30",
           "notes": "Duralec Super"
+        },
+        {
+          "code": "RSD10W30U",
+          "viscosity": "10W-30",
+          "notes": "Duralec Ultra \u2014 heavy-duty on/off highway"
+        },
+        {
+          "code": "RSD15W40U",
+          "viscosity": "15W-40",
+          "notes": "Duralec Ultra \u2014 heavy-duty on/off highway"
         }
       ]
     },
@@ -107,7 +117,7 @@
     "Royal Purple Additives": {
       "color": "#D97706",
       "badge": "ADD",
-      "description": "Royal Purple specialty products including fuel system cleaners, transmission fluid, gear oil, and grease. Max-Clean deeply cleans injectors and combustion chambers. Max ATF and Max Gear provide synthetic protection for drivetrain components.",
+      "description": "Royal Purple performance additives and specialty products. Max-Clean deeply cleans fuel systems. Max-Atomizer optimizes fuel injector spray patterns. Max-Restore high mileage engine treatment. Max-Tane diesel fuel treatment. Max-Boost octane booster. Purple Ice coolant additive. Max ATF synthetic transmission fluid. Max Gear synthetic gear oil. Synchromax manual trans fluid. Ultra-Performance Grease. Plus specialty lubricants: Max EZ, Max-Chain, and MaxFilm.",
       "application": "Fuel system maintenance, transmission service, differential service, chassis lubrication",
       "skus": [
         {
@@ -154,13 +164,53 @@
           "code": "01312",
           "viscosity": "",
           "notes": "Ultra-Performance Grease (UPG) NLGI 2"
+        },
+        {
+          "code": "18001",
+          "viscosity": "",
+          "notes": "Max-Restore High Mileage Engine Treatment"
+        },
+        {
+          "code": "11757",
+          "viscosity": "",
+          "notes": "Max-Boost Octane Booster"
+        },
+        {
+          "code": "01600",
+          "viscosity": "",
+          "notes": "Purple Ice Coolant Additive"
+        },
+        {
+          "code": "01326",
+          "viscosity": "",
+          "notes": "Max EZ Power Steering & Penetrant"
+        },
+        {
+          "code": "05330",
+          "viscosity": "",
+          "notes": "Max-Chain Synthetic Chain Lube"
+        },
+        {
+          "code": "05000",
+          "viscosity": "",
+          "notes": "MaxFilm Multi-Purpose Penetrant Lubricant"
+        },
+        {
+          "code": "06303",
+          "viscosity": "",
+          "notes": "Max Gear 85W-140 Synthetic Gear Oil"
+        },
+        {
+          "code": "05302",
+          "viscosity": "",
+          "notes": "Max Gear 80W-90 Synthetic Gear Oil"
         }
       ]
     },
     "HP API Series \u2014 High Performance Synthetic": {
       "color": "#4B2D8A",
       "badge": "HP API",
-      "description": "Royal Purple's flagship full synthetic with API SP/ILSAC GF-6A licenses and GM dexos1 approval. Combines premium synthetic base oils with proprietary Synerlec additive technology. 300% better oxidation resistance, 100% LSPI protection, 50% improved deposit control vs API SP requirements.",
+      "description": "Royal Purple's flagship full synthetic with API SP/ILSAC GF-6A licenses and GM dexos1 approval. Combines premium synthetic base oils with proprietary Synerlec additive technology. Optimized fuel economy, enhanced engine performance, and long-term protection. 5X increased protection against LSPI, superior corrosion protection, 50% improved deposit control.",
       "application": "Modern GDI/turbo engines, start/stop systems, daily drivers, import vehicles, performance cars",
       "skus": [
         {
@@ -223,8 +273,8 @@
     "HPS Series \u2014 High Performance Street": {
       "badge": "HPS",
       "color": "#7C3AED",
-      "description": "HPS motor oil is specifically formulated to maximize performance and meet the demands of high performance, modified, and street-driven vehicles. Uses proprietary Synerlec additive technology for superior film strength and wear protection in demanding driving conditions.",
-      "application": "Modified engines, street performance, enthusiast builds, classic cars",
+      "description": "Specifically formulated to maximize performance in high performance, modified, and street-driven vehicles. High level of zinc/phosphorus anti-wear additive with a generous dose of Synerlec. Outstanding wear protection, increased power, exceptional oxidation stability, superior high-temperature performance, and greater engine cleanliness.",
+      "application": "Modified engines, street performance, enthusiast builds, classic cars, muscle cars, out-of-warranty vehicles",
       "skus": [
         {
           "code": "HPS5W20",
@@ -250,6 +300,121 @@
           "code": "HPS20W50",
           "viscosity": "20W-50",
           "notes": "Classic/V8 applications"
+        }
+      ]
+    },
+    "XPR Series \u2014 Extreme Performance Racing": {
+      "badge": "XPR",
+      "color": "#B91C1C",
+      "description": "Formulated for the rigorous demands and severe operating conditions of racing and extreme performance engine applications. State-of-the-art formulation and additive chemistry fortified with high level of zinc/phosphorus anti-wear additive and Synerlec. Unsurpassed wear protection, outstanding oxidation resistance, increased efficiency, outstanding deposit control, and improved compatibility with exotic fuels.",
+      "application": "Professional racing, drag racing, circle track, road racing, extreme performance engine builds",
+      "skus": [
+        {
+          "code": "XPR0W8",
+          "viscosity": "0W-8",
+          "notes": "Ultra-low drag racing formula"
+        },
+        {
+          "code": "XPR0W20",
+          "viscosity": "0W-20",
+          "notes": "Low-viscosity racing formula"
+        },
+        {
+          "code": "XPR5W20",
+          "viscosity": "5W-20",
+          "notes": ""
+        },
+        {
+          "code": "XPR0W30",
+          "viscosity": "0W-30",
+          "notes": ""
+        },
+        {
+          "code": "XPR5W30",
+          "viscosity": "5W-30",
+          "notes": ""
+        },
+        {
+          "code": "XPR5W40",
+          "viscosity": "5W-40",
+          "notes": ""
+        },
+        {
+          "code": "XPR10W40",
+          "viscosity": "10W-40",
+          "notes": "Most popular racing viscosity"
+        },
+        {
+          "code": "XPR5W50",
+          "viscosity": "5W-50",
+          "notes": "High-temp racing applications"
+        },
+        {
+          "code": "XPR20W50",
+          "viscosity": "20W-50",
+          "notes": "Classic muscle car racing"
+        },
+        {
+          "code": "XPR10W60",
+          "viscosity": "10W-60",
+          "notes": "Extreme high-temp racing"
+        }
+      ]
+    },
+    "Max-Cycle \u2014 Motorcycle Oil": {
+      "badge": "MXCY",
+      "color": "#E11D48",
+      "description": "Exceeds the demands of highly stressed motorcycle engines and transmissions. Recommended for air-cooled and liquid-cooled 4-cycle engines. Compatible with wet-clutch transmissions. Improved film strength, shear stability, and oxidation resistance. Outstanding wet clutch performance, superior high-temperature protection, and lower cylinder temperatures.",
+      "application": "Motorcycles \u2014 air-cooled and liquid-cooled 4-cycle, wet-clutch compatible, sport bikes, cruisers, touring",
+      "skus": [
+        {
+          "code": "06315",
+          "viscosity": "10W-40",
+          "notes": "Standard motorcycle viscosity"
+        },
+        {
+          "code": "06316",
+          "viscosity": "20W-50",
+          "notes": "V-twin / cruiser applications"
+        }
+      ]
+    },
+    "Break-In Oil": {
+      "badge": "BIO",
+      "color": "#78716C",
+      "description": "Conventional SAE 10W-30 engine oil providing outstanding wear protection during the critical break-in period for new and rebuilt engines. Protects engine valve train and camshaft while allowing piston rings to quickly seat. Optimized wear protection during the break-in phase.",
+      "application": "New engine builds, rebuilt engines, re-ringed engines \u2014 break-in period only",
+      "skus": [
+        {
+          "code": "11487",
+          "viscosity": "10W-30",
+          "notes": "Engine break-in oil \u2014 not for sustained use"
+        }
+      ]
+    },
+    "HP 2-C \u2014 Two-Cycle Oil": {
+      "badge": "2C",
+      "color": "#0891B2",
+      "description": "High performance synthetic 2-cycle oil for standard and high performance gasoline engines. Recommended for pre-mixed and oil-injected applications. Ashless formulation keeps spark plugs and exhaust ports clean. Increased horsepower and engine speed, greatest wear protection, superior rust and corrosion protection.",
+      "application": "2-cycle gasoline engines \u2014 chainsaws, weed trimmers, dirt bikes, jet skis, outboard motors",
+      "skus": [
+        {
+          "code": "01311",
+          "viscosity": "",
+          "notes": "HP 2-C 1 Qt. \u2014 pre-mix or oil-injected"
+        }
+      ]
+    },
+    "Snow 2-C \u2014 Snowmobile Oil": {
+      "badge": "S2C",
+      "color": "#0369A1",
+      "description": "High performance synthetic 2-cycle oil for snowmobile gasoline engines. Synthetic solvency keeps spark plugs and exhaust ports clean. Low coefficient of friction promotes increased horsepower and engine speed. Low temperature fluidity and pumpability for superior cold temperature operation.",
+      "application": "2-cycle snowmobile engines \u2014 trail, mountain, cross-country",
+      "skus": [
+        {
+          "code": "04511",
+          "viscosity": "",
+          "notes": "Snow 2-C 1 Gal."
         }
       ]
     }
