@@ -178,31 +178,53 @@ elif nav == "Admin":
     admin_panel.render()
 
 elif nav == "Report Generator":
-    page_header("Installer Report Generator", "Upload a Royal Purple monthly report to generate a branded PowerPoint presentation.")
+    st.markdown(
+        """
+        <div style="background:linear-gradient(135deg,#2D1B5E 0%,#4B2D8A 60%,#6B3FA0 100%);
+                    border-radius:12px;padding:32px 36px 28px;margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#C4B5E8;
+                        text-transform:uppercase;margin-bottom:8px;">Royal Purple Partnership Hub</div>
+            <div style="font-size:28px;font-weight:800;color:#FFFFFF;line-height:1.2;margin-bottom:8px;">
+                Installer Report Generator
+            </div>
+            <div style="font-size:14px;color:#C4B5E8;max-width:560px;line-height:1.6;">
+                Upload your monthly Royal Purple Excel export to get a fully branded PowerPoint
+                with network-level analytics, Max-Clean attachment metrics, and per-store deep dives.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.markdown("")
 
-    col_upload1, col_upload2 = st.columns(2)
-    with col_upload1:
+    upload_col, info_col = st.columns([3, 2], gap="large")
+    with upload_col:
         uploaded_file = st.file_uploader(
-            "Upload Royal Purple Excel Report (.xlsx)",
+            "Drop your Excel report here",
             type=["xlsx"],
             help="The app auto-detects columns, deduplicates multi-product invoices, and computes corrected revenue.",
+            label_visibility="visible",
         )
-    with col_upload2:
-        map_files = st.file_uploader(
-            "Upload Map Images (optional)",
-            type=["png", "jpg", "jpeg"],
-            accept_multiple_files=True,
-            help="Upload map images to include as slides in the report.",
+    with info_col:
+        st.markdown(
+            """
+            <div style="background:#F8F5FF;border-left:4px solid #4B2D8A;border-radius:0 8px 8px 0;
+                        padding:16px 18px;margin-top:8px;">
+                <div style="font-weight:700;color:#2D1B5E;font-size:13px;margin-bottom:8px;">
+                    What this generates
+                </div>
+                <div style="font-size:12px;color:#4B5563;line-height:1.8;">
+                    ✦ &nbsp;Network revenue &amp; invoice summary<br>
+                    ✦ &nbsp;Max-Clean attachment analysis<br>
+                    ✦ &nbsp;Per-store ranked deep dives<br>
+                    ✦ &nbsp;Top product &amp; SKU breakdown<br>
+                    ✦ &nbsp;Fully branded Royal Purple PPTX
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
-
-    if map_files:
-        st.caption(f"{len(map_files)} map image(s) uploaded — will be included before store deep dives.")
-        with st.expander("Preview Maps"):
-            map_cols = st.columns(min(len(map_files), 3))
-            for i, mf in enumerate(map_files):
-                with map_cols[i % 3]:
-                    st.image(mf, caption=mf.name, width="stretch")
 
     if uploaded_file is not None:
         with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
@@ -218,13 +240,31 @@ elif nav == "Report Generator":
             total_veh = sum(s["vehicles"] for s in stores)
             total_raw = sum(s.get("rawLineCount", 0) for s in stores)
 
-            dedup_note = f" (deduplicated from {fmt_number(total_raw)} raw lines)" if total_raw > total_inv else ""
-            st.success(f"Parsed **{len(stores)}** locations for **{month_year}**{dedup_note}")
+            dedup_note = f"  ·  deduplicated from {fmt_number(total_raw)} raw lines" if total_raw > total_inv else ""
+            st.markdown(
+                f"""
+                <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;
+                            padding:12px 18px;margin:12px 0 20px;">
+                    <span style="color:#166534;font-weight:700;">
+                        {len(stores)} locations parsed &nbsp;·&nbsp; {month_year}
+                    </span>
+                    <span style="color:#4B7A5E;font-size:13px;">{dedup_note}</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
+            st.markdown(
+                """
+                <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#9CA3AF;
+                            text-transform:uppercase;margin-bottom:4px;">Network Summary</div>
+                """,
+                unsafe_allow_html=True,
+            )
             col1, col2, col3, col4 = st.columns(4)
             col1.metric("Total Revenue", fmt_currency(total_rev))
             col2.metric("Unique Invoices", fmt_number(total_inv))
-            col3.metric("Avg Rev/Invoice", f"${avg_rev:.2f}")
+            col3.metric("Avg Rev / Invoice", f"${avg_rev:.2f}")
             col4.metric("Unique Vehicles", fmt_number(total_veh))
 
             st.markdown("")
@@ -242,22 +282,33 @@ elif nav == "Report Generator":
                 non_mc_avg = non_mc_rev / non_mc_count if non_mc_count else 0
                 network_lift = mc_avg - non_mc_avg
 
-                st.markdown("### Max-Clean Attachment Analysis")
+                st.markdown(
+                    """
+                    <div style="border-top:2px solid #EDE9FE;margin:8px 0 16px;">
+                        <span style="display:inline-block;background:#4B2D8A;color:white;
+                                     font-size:10px;font-weight:700;letter-spacing:2px;
+                                     text-transform:uppercase;padding:3px 10px;border-radius:0 0 6px 6px;">
+                            Max-Clean Attachment
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
                 st.caption(
                     "The RP export only shows Royal Purple products. 'Solo' Max-Clean lines represent "
-                    "non-RP oil changes (Castrol, conventional, etc.) where Max-Clean was added as an upsell."
+                    "non-RP oil changes where Max-Clean was added as an upsell."
                 )
 
                 mc1, mc2, mc3, mc4 = st.columns(4)
-                mc1.metric("MC Invoices", fmt_number(network_mc), f"{mc_pct:.1f}% attachment rate")
+                mc1.metric("MC Invoices", fmt_number(network_mc), f"{mc_pct:.1f}% attach rate")
                 mc2.metric("MC Avg Ticket", f"${mc_avg:.2f}")
                 mc3.metric("Non-MC Avg Ticket", f"${non_mc_avg:.2f}")
                 mc4.metric("MC Ticket Lift", f"+${network_lift:.2f}", f"+{network_lift/non_mc_avg*100:.1f}%" if non_mc_avg else "")
 
                 mc_with_rp = sum(s.get("maxClean", {}).get("withRpOil", 0) for s in stores)
                 mc_non_rp = sum(s.get("maxClean", {}).get("withNonRpOil", 0) for s in stores)
-                st.markdown("")
                 mc_solo = sum(s.get("maxClean", {}).get("soloInData", 0) for s in stores)
+                st.markdown("")
                 bk1, bk2, bk3 = st.columns(3)
                 bk1.metric("MC + RP Oil", fmt_number(mc_with_rp), f"{mc_with_rp/network_mc*100:.1f}%" if network_mc else "")
                 bk2.metric("MC + Non-RP Oil", fmt_number(mc_non_rp), f"{mc_non_rp/network_mc*100:.1f}%" if network_mc else "")
@@ -429,30 +480,33 @@ elif nav == "Report Generator":
                                 ct_str = f" ({line_ct} lines)" if line_ct else ""
                                 st.text(f"  {display_name} ({pb['category']}){ct_str}")
 
-            st.markdown("")
-            if st.button("Generate PowerPoint Report", type="primary"):
-                map_temp_paths = []
+            st.markdown(
+                f"""
+                <div style="background:linear-gradient(135deg,#1E0F3C 0%,#2D1B5E 100%);
+                            border-radius:10px;padding:24px 28px;margin:24px 0 8px;">
+                    <div style="color:#C4B5E8;font-size:11px;font-weight:700;letter-spacing:2px;
+                                text-transform:uppercase;margin-bottom:6px;">Ready to Export</div>
+                    <div style="color:white;font-size:18px;font-weight:700;margin-bottom:4px;">
+                        {len(stores)} stores &nbsp;·&nbsp; {month_year}
+                    </div>
+                    <div style="color:#A78BCC;font-size:13px;">
+                        Branded PowerPoint with network summary, Max-Clean analysis, and per-store slides
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button("Generate PowerPoint Report", type="primary", use_container_width=True):
                 try:
-                    for mf in (map_files or []):
-                        ext = os.path.splitext(mf.name)[1] or ".png"
-                        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as mtmp:
-                            mtmp.write(mf.getvalue())
-                            raw_name = os.path.splitext(mf.name)[0].replace("_", " ").replace("-", " ")
-                            map_temp_paths.append({
-                                "path": mtmp.name,
-                                "title": raw_name,
-                            })
-
                     with st.spinner("Generating branded presentation..."):
                         output_filename = f"Royal_Purple_Partnership_Report_{month_year.replace(' ', '_')}.pptx"
                         output_path = os.path.join(tempfile.gettempdir(), output_filename)
-                        generate_report(tmp_path, output_path, map_images=map_temp_paths if map_temp_paths else None)
+                        generate_report(tmp_path, output_path)
 
                         with open(output_path, "rb") as f:
                             pptx_data = f.read()
 
-                        map_note = f" + {len(map_temp_paths)} map image(s)" if map_temp_paths else ""
-                        st.success(f"Report generated — {len(stores)} store deep dives{map_note} included.")
+                        st.success(f"Report generated — {len(stores)} store deep dives included.")
 
                         st.download_button(
                             label="Download PowerPoint Report",
@@ -460,15 +514,12 @@ elif nav == "Report Generator":
                             file_name=output_filename,
                             mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
                             type="primary",
+                            use_container_width=True,
                         )
 
                         os.unlink(output_path)
-                finally:
-                    for mp in map_temp_paths:
-                        try:
-                            os.unlink(mp["path"])
-                        except OSError:
-                            pass
+                except Exception as gen_err:
+                    st.error(f"Error generating report: {gen_err}")
 
         except Exception as e:
             st.error(f"Error processing file: {str(e)}")
