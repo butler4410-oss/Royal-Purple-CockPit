@@ -152,7 +152,7 @@ if nav == "Customer Map":
                     st.success(
                         f"Report generated — {stats['sheets']} sheets: "
                         f"{stats['not_on_c4c']} not on C4C, {stats['c4c_matched']} matched, "
-                        f"{stats['states']} US states."
+                        f"{stats['states']} US states, {stats['counties']} counties."
                     )
 
                     st.download_button(

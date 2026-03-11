@@ -1,5 +1,6 @@
 import json
 import os
+from collections import defaultdict
 import openpyxl as oxl
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -277,6 +278,12 @@ def _auto_width(ws, num_cols, max_width=40):
         ws.column_dimensions[letter].width = min(max_len + 3, max_width)
 
 
+def _add_auto_filter(ws, header_row, num_cols):
+    last_col = get_column_letter(num_cols)
+    ws.auto_filter.ref = f"A{header_row}:{last_col}{ws.max_row}"
+    ws.freeze_panes = f"A{header_row + 1}"
+
+
 def generate_c4c_report(output_path):
     customers = _load_customers()
 
@@ -480,68 +487,76 @@ def generate_c4c_report(output_path):
             cell.alignment = Alignment(horizontal="center")
 
     _auto_width(ws2, len(state_headers))
+    _add_auto_filter(ws2, 3, len(state_headers))
 
     # ── Sheet 3: Not on C4C (Full List) ──
     ws4 = wb.create_sheet("Not on C4C — Full List")
     ws4.sheet_properties.tabColor = "D97706"
 
-    ws4.merge_cells("A1:G1")
+    ws4.merge_cells("A1:H1")
     ws4["A1"] = f"Installer Accounts NOT on C4C ({len(not_c4c)} accounts)"
     ws4["A1"].font = TITLE_FONT
     ws4.row_dimensions[1].height = 28
 
     row = 3
-    list_headers = ["Store Name", "Address", "City", "State", "Zip",
+    list_headers = ["Store Name", "Address", "City", "State", "County", "Zip",
                      "Latitude", "Longitude"]
     for ci, h in enumerate(list_headers, 1):
         ws4.cell(row=row, column=ci, value=h)
     _apply_header_row(ws4, row, len(list_headers))
     row += 1
 
-    for c in sorted(not_c4c, key=lambda x: (x["state"], x["store_name"])):
+    for c in sorted(not_c4c, key=lambda x: (x.get("state", ""), x.get("county", ""), x["store_name"])):
         ws4.cell(row=row, column=1, value=c["store_name"])
-        ws4.cell(row=row, column=2, value=c["address"])
-        ws4.cell(row=row, column=3, value=c["city"])
-        ws4.cell(row=row, column=4, value=c["state"])
-        ws4.cell(row=row, column=5, value=c["zip"])
-        ws4.cell(row=row, column=6, value=c["latitude"])
-        ws4.cell(row=row, column=7, value=c["longitude"])
+        ws4.cell(row=row, column=2, value=c.get("address", ""))
+        ws4.cell(row=row, column=3, value=c.get("city", ""))
+        ws4.cell(row=row, column=4, value=c.get("state", ""))
+        ws4.cell(row=row, column=5, value=c.get("county", ""))
+        ws4.cell(row=row, column=6, value=c.get("zip", ""))
+        ws4.cell(row=row, column=7, value=c.get("latitude", ""))
+        ws4.cell(row=row, column=8, value=c.get("longitude", ""))
 
         _apply_data_row(ws4, row, len(list_headers), alt=(row % 2 == 0))
         ws4.cell(row=row, column=4).alignment = Alignment(horizontal="center")
         row += 1
 
     _auto_width(ws4, len(list_headers))
+    _add_auto_filter(ws4, 3, len(list_headers))
 
-    # ── Sheet 5: C4C Matched (Full List) ──
+    # ── Sheet 4: C4C Matched (Full List) ──
     ws5 = wb.create_sheet("C4C Matched — Full List")
     ws5.sheet_properties.tabColor = "16A34A"
 
-    ws5.merge_cells("A1:G1")
+    ws5.merge_cells("A1:I1")
     ws5["A1"] = f"Installer Accounts Matched on C4C ({len(c4c_matched)} accounts)"
     ws5["A1"].font = TITLE_FONT
     ws5.row_dimensions[1].height = 28
 
     row = 3
-    for ci, h in enumerate(list_headers, 1):
+    matched_headers = ["Store Name", "Address", "City", "State", "County", "Zip",
+                        "Type", "Latitude", "Longitude"]
+    for ci, h in enumerate(matched_headers, 1):
         ws5.cell(row=row, column=ci, value=h)
-    _apply_header_row(ws5, row, len(list_headers))
+    _apply_header_row(ws5, row, len(matched_headers))
     row += 1
 
-    for c in sorted(c4c_matched, key=lambda x: (x["state"], x["store_name"])):
+    for c in sorted(c4c_matched, key=lambda x: (x.get("state", ""), x.get("county", ""), x["store_name"])):
         ws5.cell(row=row, column=1, value=c["store_name"])
-        ws5.cell(row=row, column=2, value=c["address"])
-        ws5.cell(row=row, column=3, value=c["city"])
-        ws5.cell(row=row, column=4, value=c["state"])
-        ws5.cell(row=row, column=5, value=c["zip"])
-        ws5.cell(row=row, column=6, value=c["latitude"])
-        ws5.cell(row=row, column=7, value=c["longitude"])
+        ws5.cell(row=row, column=2, value=c.get("address", ""))
+        ws5.cell(row=row, column=3, value=c.get("city", ""))
+        ws5.cell(row=row, column=4, value=c.get("state", ""))
+        ws5.cell(row=row, column=5, value=c.get("county", ""))
+        ws5.cell(row=row, column=6, value=c.get("zip", ""))
+        ws5.cell(row=row, column=7, value=c.get("type", ""))
+        ws5.cell(row=row, column=8, value=c.get("latitude", ""))
+        ws5.cell(row=row, column=9, value=c.get("longitude", ""))
 
-        _apply_data_row(ws5, row, len(list_headers), alt=(row % 2 == 0))
+        _apply_data_row(ws5, row, len(matched_headers), alt=(row % 2 == 0))
         ws5.cell(row=row, column=4).alignment = Alignment(horizontal="center")
         row += 1
 
-    _auto_width(ws5, len(list_headers))
+    _auto_width(ws5, len(matched_headers))
+    _add_auto_filter(ws5, 3, len(matched_headers))
 
     # ── Sheet 6: Top Priority States ──
     ws6 = wb.create_sheet("Top Priority States")
@@ -591,6 +606,94 @@ def generate_c4c_report(output_path):
         row += 1
 
     _auto_width(ws6, len(priority_headers))
+    _add_auto_filter(ws6, 3, len(priority_headers))
+
+    # ── Sheet 6: County Breakdown ──
+    ws_county = wb.create_sheet("County Breakdown")
+    ws_county.sheet_properties.tabColor = "0891B2"
+
+    ws_county.merge_cells("A1:G1")
+    ws_county["A1"] = "C4C Gap Analysis by State and County"
+    ws_county["A1"].font = TITLE_FONT
+    ws_county.row_dimensions[1].height = 28
+
+    ws_county.merge_cells("A2:G2")
+    ws_county["A2"] = "Breakdown of installer accounts by county within each state, showing C4C onboarding gaps at the county level."
+    ws_county["A2"].font = Font(name="Calibri", italic=True, size=10, color="64748B")
+
+    crow = 4
+    county_headers = ["State", "State Code", "County", "Not on C4C", "C4C Matched",
+                       "Total", "Gap %"]
+    for ci, h in enumerate(county_headers, 1):
+        ws_county.cell(row=crow, column=ci, value=h)
+    _apply_header_row(ws_county, crow, len(county_headers))
+    crow += 1
+
+    county_data = defaultdict(lambda: {"not_c4c": 0, "matched": 0})
+    for c in c4c_accounts:
+        st = c.get("state", "")
+        county = c.get("county", "")
+        if not st or st not in US_STATE_NAMES or not county:
+            continue
+        key = (st, county)
+        if c["type"] == "Promo Only (Not on C4C)":
+            county_data[key]["not_c4c"] += 1
+        elif c["type"] in ("On Both Lists", "C4C Only"):
+            county_data[key]["matched"] += 1
+
+    sorted_counties = sorted(county_data.keys(), key=lambda k: (k[0], k[1]))
+
+    county_total_nc = 0
+    county_total_mc = 0
+
+    for (st, county) in sorted_counties:
+        d = county_data[(st, county)]
+        nc = d["not_c4c"]
+        mc = d["matched"]
+        total = nc + mc
+        gap = nc / total * 100 if total else 0
+
+        county_total_nc += nc
+        county_total_mc += mc
+
+        sname = state_names.get(st, st)
+
+        ws_county.cell(row=crow, column=1, value=sname)
+        ws_county.cell(row=crow, column=2, value=st)
+        ws_county.cell(row=crow, column=3, value=county)
+        ws_county.cell(row=crow, column=4, value=nc)
+        ws_county.cell(row=crow, column=5, value=mc)
+        ws_county.cell(row=crow, column=6, value=total)
+        ws_county.cell(row=crow, column=7, value=f"{gap:.1f}%")
+
+        _apply_data_row(ws_county, crow, len(county_headers), alt=(crow % 2 == 0))
+        for col in [2, 4, 5, 6, 7]:
+            ws_county.cell(row=crow, column=col).alignment = Alignment(horizontal="center")
+
+        if nc > 10 and gap > 70:
+            ws_county.cell(row=crow, column=4).fill = AMBER_FILL
+        if mc > 0:
+            ws_county.cell(row=crow, column=5).fill = GREEN_FILL
+
+        crow += 1
+
+    county_total_all = county_total_nc + county_total_mc
+    county_total_gap = county_total_nc / county_total_all * 100 if county_total_all else 0
+    ws_county.cell(row=crow, column=1, value="TOTAL")
+    ws_county.cell(row=crow, column=3, value=f"{len(sorted_counties)} counties")
+    ws_county.cell(row=crow, column=4, value=county_total_nc)
+    ws_county.cell(row=crow, column=5, value=county_total_mc)
+    ws_county.cell(row=crow, column=6, value=county_total_all)
+    ws_county.cell(row=crow, column=7, value=f"{county_total_gap:.1f}%")
+    for col in range(1, len(county_headers) + 1):
+        cell = ws_county.cell(row=crow, column=col)
+        cell.font = BOLD_FONT
+        cell.border = THIN_BORDER
+        if col in [2, 4, 5, 6, 7]:
+            cell.alignment = Alignment(horizontal="center")
+
+    _auto_width(ws_county, len(county_headers))
+    _add_auto_filter(ws_county, 4, len(county_headers))
 
     # ── Sheet 7: Reconciliation Summary ──
     xref = _cross_analyze_lists()
@@ -667,6 +770,7 @@ def generate_c4c_report(output_path):
 
     _auto_width(ws8, len(dupe_headers))
     ws8.column_dimensions["C"].width = 80
+    _add_auto_filter(ws8, 3, len(dupe_headers))
 
     # ── Sheet 9: Promo Duplicates ──
     ws9 = wb.create_sheet("Promo Duplicates")
@@ -693,6 +797,7 @@ def generate_c4c_report(output_path):
 
     _auto_width(ws9, len(dupe_headers))
     ws9.column_dimensions["C"].width = 80
+    _add_auto_filter(ws9, 3, len(dupe_headers))
 
     # ── Sheet 10: On C4C Only ──
     ws10 = wb.create_sheet("On C4C Only")
@@ -719,6 +824,7 @@ def generate_c4c_report(output_path):
         row += 1
 
     _auto_width(ws10, len(c4c_only_headers))
+    _add_auto_filter(ws10, 3, len(c4c_only_headers))
 
     # ── Sheet 11: Failed to Geolocate ──
     failed = _get_failed_geolocations()
@@ -759,6 +865,7 @@ def generate_c4c_report(output_path):
         row += 1
 
     _auto_width(ws7, len(fail_headers))
+    _add_auto_filter(ws7, 4, len(fail_headers))
 
     wb.save(output_path)
 
@@ -767,9 +874,10 @@ def generate_c4c_report(output_path):
         "not_on_c4c": len(not_c4c),
         "c4c_matched": len(c4c_matched),
         "states": len(us_states_only),
+        "counties": len(sorted_counties),
         "failed_geo": len(failed),
         "c4c_dupes": len(xref["c4c_dupes"]),
         "promo_dupes": len(xref["promo_dupes"]),
         "cross_matched": xref["matched"],
-        "sheets": 10,
+        "sheets": 11,
     }
