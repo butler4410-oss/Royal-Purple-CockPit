@@ -32,7 +32,7 @@ with st.sidebar:
 
     nav = st.radio(
         "Navigation",
-        ["Report Generator", "Customer Map", "Product Reference", "Admin"],
+        ["Home", "Report Generator", "Customer Map", "Product Reference", "Admin"],
         label_visibility="collapsed",
     )
 
@@ -50,7 +50,182 @@ def page_header(title, subtitle):
     )
 
 
-if nav == "Customer Map":
+if nav == "Home":
+    st.markdown(
+        """
+        <div style="background:linear-gradient(135deg,#1E0F3C 0%,#2D1B5E 40%,#4B2D8A 80%,#6B3FA0 100%);
+                    border-radius:14px;padding:44px 42px 36px;margin-bottom:28px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;right:0;width:260px;height:100%;
+                        background:radial-gradient(circle at 80% 30%,rgba(107,63,160,0.5) 0%,transparent 70%);"></div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:3.5px;color:#C4B5E8;
+                        text-transform:uppercase;margin-bottom:12px;">The Royal Purple Partnership Hub</div>
+            <div style="font-size:34px;font-weight:800;color:#FFFFFF;line-height:1.15;margin-bottom:6px;">
+                by ThrottlePro
+            </div>
+            <div style="font-size:15px;color:#C4B5E8;max-width:620px;line-height:1.7;margin-top:12px;">
+                Your centralized command center for Royal Purple installer analytics,
+                customer mapping, and product intelligence.
+                Upload reports, explore your network, and manage your product database — all in one place.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    customers_data = load_customers()
+    distributors_data = load_distributors()
+    all_locations = customers_data + distributors_data
+
+    type_counts = {}
+    for c in all_locations:
+        t = c.get("type", "Unknown")
+        type_counts[t] = type_counts.get(t, 0) + 1
+    unique_states = len(set(c.get("state", "") for c in all_locations if c.get("state")))
+    unique_counties = len(set(c.get("county", "") for c in all_locations if c.get("county")))
+    installer_types = ["Promo Only (Not on C4C)", "On Both Lists", "C4C Only", "Rack Installer"]
+    installer_total = sum(type_counts.get(t, 0) for t in installer_types)
+
+    import json as _json
+    with open("codes_db.json") as _f:
+        _db = _json.load(_f)
+    rp_series_count = len(_db["rp_products"])
+    rp_sku_count = sum(len(s["skus"]) for s in _db["rp_products"].values())
+    comp_brand_count = len(_db["competitor_brands"])
+
+    st.markdown(
+        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#9CA3AF;
+                    text-transform:uppercase;margin-bottom:4px;">Network at a Glance</div>""",
+        unsafe_allow_html=True,
+    )
+
+    m1, m2, m3, m4, m5 = st.columns(5)
+    m1.metric("Total Locations", f"{len(all_locations):,}")
+    m2.metric("Installer Accounts", f"{installer_total:,}")
+    m3.metric("Distributors", f"{type_counts.get('Distributor', 0):,}")
+    m4.metric("States Covered", unique_states)
+    m5.metric("Counties Reached", f"{unique_counties:,}")
+
+    st.markdown("")
+
+    card_style = (
+        "background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;"
+        "padding:28px 24px 24px;height:100%;"
+        "box-shadow:0 1px 3px rgba(0,0,0,0.06);"
+    )
+    icon_style = (
+        "width:44px;height:44px;border-radius:10px;display:flex;"
+        "align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;"
+    )
+
+    col1, col2, col3 = st.columns(3, gap="medium")
+
+    with col1:
+        st.markdown(
+            f"""
+            <div style="{card_style}">
+                <div style="{icon_style}background:#EDE9FE;color:#6B3FA0;">&#9889;</div>
+                <div style="font-size:17px;font-weight:700;color:#1F2937;margin-bottom:6px;">
+                    Report Generator
+                </div>
+                <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
+                    Upload monthly Royal Purple Excel exports and generate fully branded PowerPoint
+                    presentations with revenue analytics, Max-Clean attachment metrics, and per-store deep dives.
+                </div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Auto-parse</span>
+                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Deduplication</span>
+                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Branded PPTX</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col2:
+        st.markdown(
+            f"""
+            <div style="{card_style}">
+                <div style="{icon_style}background:#DBEAFE;color:#2563EB;">&#127758;</div>
+                <div style="font-size:17px;font-weight:700;color:#1F2937;margin-bottom:6px;">
+                    Customer Map
+                </div>
+                <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
+                    Interactive map of {len(all_locations):,} Royal Purple locations across {unique_states} states.
+                    Filter by 8 account types, search by name or address, and export data to branded Excel workbooks.
+                </div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                    <span style="font-size:11px;color:#2563EB;font-weight:600;">&#10003; {len(all_locations):,} pins</span>
+                    <span style="font-size:11px;color:#2563EB;font-weight:600;">&#10003; 8 account types</span>
+                    <span style="font-size:11px;color:#2563EB;font-weight:600;">&#10003; Excel export</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col3:
+        st.markdown(
+            f"""
+            <div style="{card_style}">
+                <div style="{icon_style}background:#FEF3C7;color:#D97706;">&#128218;</div>
+                <div style="font-size:17px;font-weight:700;color:#1F2937;margin-bottom:6px;">
+                    Product Reference
+                </div>
+                <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
+                    Complete database of {rp_sku_count} Royal Purple SKUs across {rp_series_count} product lines,
+                    plus {comp_brand_count} competitor brands. Operation codes, viscosities, and cross-references.
+                </div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                    <span style="font-size:11px;color:#D97706;font-weight:600;">&#10003; {rp_sku_count} RP SKUs</span>
+                    <span style="font-size:11px;color:#D97706;font-weight:600;">&#10003; {comp_brand_count} competitors</span>
+                    <span style="font-size:11px;color:#D97706;font-weight:600;">&#10003; Admin editable</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("")
+    st.markdown(
+        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#9CA3AF;
+                    text-transform:uppercase;margin-bottom:4px;">Account Type Breakdown</div>""",
+        unsafe_allow_html=True,
+    )
+
+    type_colors = {
+        "Promo Only (Not on C4C)": "#DC2626",
+        "On Both Lists": "#16A34A",
+        "C4C Only": "#2563EB",
+        "Rack Installer": "#7C3AED",
+        "Distributor": "#F59E0B",
+        "Powersports/Motorsports": "#E11D48",
+        "International": "#4F46E5",
+        "Canada": "#059669",
+    }
+
+    sorted_types = sorted(type_counts.items(), key=lambda x: -x[1])
+    cols = st.columns(min(len(sorted_types), 4))
+    for i, (ttype, count) in enumerate(sorted_types):
+        color = type_colors.get(ttype, "#6B7280")
+        with cols[i % 4]:
+            st.markdown(
+                f"""
+                <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;
+                            padding:14px 16px;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                        <div style="width:10px;height:10px;border-radius:50%;background:{color};"></div>
+                        <span style="font-size:12px;color:#6B7280;font-weight:500;">{ttype}</span>
+                    </div>
+                    <div style="font-size:22px;font-weight:700;color:#1F2937;">{count:,}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    st.markdown("")
+    st.caption("Use the sidebar to navigate between pages. Select Report Generator to upload Excel files, Customer Map to explore locations, or Product Reference to browse the code database.")
+
+elif nav == "Customer Map":
     page_header("Customer Map", "Interactive map of Royal Purple customer locations across the United States.")
     st.markdown("")
 

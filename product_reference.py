@@ -45,7 +45,7 @@ def _build_lookup(db):
             lookup[sku["code"].upper()] = {
                 "brand": brand_data["brand"],
                 "series": brand_data.get("type", ""),
-                "viscosity": sku["product"],
+                "viscosity": sku.get("product", sku.get("name", sku["code"])),
                 "notes": brand_data.get("conversion_note", ""),
                 "color": brand_data.get("color", "#DC2626"),
                 "category": "competitor",
@@ -224,7 +224,7 @@ def _render_code_lookup(db, all_codes):
         sample_comp = []
         for brand in competitors[:2]:
             for sku in brand.get("codes", [])[:1]:
-                sample_comp.append((sku["code"], brand.get("color", "#DC2626"), sku["product"]))
+                sample_comp.append((sku["code"], brand.get("color", "#DC2626"), sku.get("product", sku.get("name", sku["code"]))))
 
         examples = sample_rp + sample_comp
         if examples:
@@ -318,7 +318,7 @@ def _render_competitor_brands(db):
                             st.markdown(
                                 f'<div style="border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;margin-bottom:6px;">'
                                 f'<div style="font-weight:700;font-size:13px;color:{color};">{sku["code"]}</div>'
-                                f'<div style="font-size:12px;color:#64748B;">{sku["product"]}</div>'
+                                f'<div style="font-size:12px;color:#64748B;">{sku.get("product", sku.get("name", sku["code"]))}</div>'
                                 f'</div>',
                                 unsafe_allow_html=True,
                             )
