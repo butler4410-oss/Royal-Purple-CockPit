@@ -1458,5 +1458,155 @@
     "county": "10",
     "latitude": 39.747978428279,
     "longitude": -75.547855233077
+  },
+  {
+    "name": "Rilco Inc",
+    "address": "12700 S Cicero Ave",
+    "city": "Alsip",
+    "state": "IL",
+    "zip": "60803",
+    "county": "",
+    "latitude": 41.6689336,
+    "longitude": -87.7387003
+  },
+  {
+    "name": "Greson Technical Sales & Servi",
+    "address": "8040 Eastex Freeway",
+    "city": "Beaumont",
+    "state": "TX",
+    "zip": "77708",
+    "county": "",
+    "latitude": 30.0829344,
+    "longitude": -94.0984277
+  },
+  {
+    "name": "Aesseal, Llp",
+    "address": "433 Sun Belt Dr Ste A",
+    "city": "Corpus Christi",
+    "state": "TX",
+    "zip": "78408",
+    "county": "",
+    "latitude": 27.7635302,
+    "longitude": -97.4033191
+  },
+  {
+    "name": "Starlight Maintenance Incorporated",
+    "address": "66 Technology Park Ln",
+    "city": "Fuquay-Varina",
+    "state": "NC",
+    "zip": "27526",
+    "county": "",
+    "latitude": 35.5843849,
+    "longitude": -78.7998691
+  },
+  {
+    "name": "Royco Distributors, Inc",
+    "address": "211 Colony Rd",
+    "city": "Gardner",
+    "state": "MA",
+    "zip": "01440",
+    "county": "",
+    "latitude": 42.5763523,
+    "longitude": -71.9952737
+  },
+  {
+    "name": "Sun Coast Resources",
+    "address": "6405 Cavalcade St, Building 1",
+    "city": "Houston",
+    "state": "TX",
+    "zip": "77026",
+    "county": "",
+    "latitude": 29.7589382,
+    "longitude": -95.3676974
+  },
+  {
+    "name": "Xtreme Diesel Performance Llc",
+    "address": "5855 La Costa Canyon Ct, Ste 100",
+    "city": "Las Vegas",
+    "state": "NV",
+    "zip": "89139",
+    "county": "",
+    "latitude": 36.1674263,
+    "longitude": -115.1484131
+  },
+  {
+    "name": "Speedway Motors, Inc.",
+    "address": "340 Victory Ln",
+    "city": "Lincoln",
+    "state": "NE",
+    "zip": "68528",
+    "county": "",
+    "latitude": 40.8088861,
+    "longitude": -96.7077751
+  },
+  {
+    "name": "West View-Cunningham Co Inc",
+    "address": "3 Industrial Park Dr",
+    "city": "Oakdale",
+    "state": "PA",
+    "zip": "15071",
+    "county": "",
+    "latitude": 40.3981246,
+    "longitude": -80.1856134
+  },
+  {
+    "name": "Turn 5 Inc",
+    "address": "600 N Cedar Hollow Rd",
+    "city": "Paoli",
+    "state": "PA",
+    "zip": "19301",
+    "county": "",
+    "latitude": 40.0405675,
+    "longitude": -75.4927891
+  },
+  {
+    "name": "Formosa Plastics Corp Tx",
+    "address": "201 Formosa Dr",
+    "city": "Point Comfort",
+    "state": "TX",
+    "zip": "77978",
+    "county": "",
+    "latitude": 28.6797169,
+    "longitude": -96.5602537
+  },
+  {
+    "name": "The Dutra Group",
+    "address": "2350 Kerner Blvd, Suite 200",
+    "city": "San Rafael",
+    "state": "CA",
+    "zip": "94901",
+    "county": "",
+    "latitude": 37.9747795,
+    "longitude": -122.5316686
+  },
+  {
+    "name": "Hooten Oil, Llc",
+    "address": "12583 OK-99",
+    "city": "Seminole",
+    "state": "OK",
+    "zip": "74868",
+    "county": "",
+    "latitude": 35.1705939,
+    "longitude": -96.6263487
+  },
+  {
+    "name": "Silver State Petroleum Inc",
+    "address": "2225 E Greg St, Ste 103",
+    "city": "Sparks",
+    "state": "NV",
+    "zip": "89431",
+    "county": "",
+    "latitude": 39.5404679,
+    "longitude": -119.7487235
+  },
+  {
+    "name": "Performance Lubricants",
+    "address": "7460 Lancaster Pike, Ste 4",
+    "city": "Hockessin",
+    "state": "DE",
+    "zip": "19707",
+    "county": "",
+    "latitude": 39.7876112,
+    "longitude": -75.6966001
   }
 ]

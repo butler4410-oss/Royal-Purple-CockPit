@@ -9,34 +9,34 @@
 - **customer_map.py** — Leaflet.js map builder: loads customers.json + distributors.json, generates embedded HTML map with 8 marker categories
 - **c4c_report_generator.py** — Excel report generator: C4C gap analysis → 10-sheet .xlsx workbook
 - **map_data_exporter.py** — Excel export generator: branded workbook with Dashboard, per-state tabs, All Accounts, County Summary, Distributors
-- **customers.json** — All geocoded accounts (4,677 total: installers, powersports, international, Canada)
-- **distributors.json** — Geocoded distributor locations (58 total across 23 US states)
+- **customers.json** — All geocoded accounts (4,658 total: installers, powersports, international, Canada)
+- **distributors.json** — Geocoded distributor locations (161 total)
 - **distribution_data.py** — Legacy file (not imported by active code)
 - **assets/** — Royal Purple branding images
 
 ## Data Sources
 - **InstallerRack_RP Excel** — 5-sheet workbook:
   - Rack Installers USA (581): cross-referenced against promo/C4C lists — 331 matched existing, 240 new geocoded as "Rack Installer"
-  - Powersports/Motorsports (819): separate category, 804 geocoded
-  - International (27): manual coordinates for global locations → 28 entries (includes DISTRIBUIDORA BARJUM from Honduras)
-  - Canada (15): geocoded via pgeocode CA → 14 geocoded
-  - Distributors (58): all geocoded, stored in distributors.json
+  - Powersports/Motorsports: 797 geocoded (includes 4 Canadian dealers)
+  - International: 43 geocoded across 32 countries
+  - Canada: 22 geocoded
+  - Distributors: 161 geocoded, stored in distributors.json
 - **Promo List** (Installer_Promotion_Participation): 2,097 promo-only accounts
 - **C4C List** (Royal_Purple_C4C_Installer_List): 1,208 C4C-only + 234 on both lists
 - **rack_installer flag**: 554 accounts across all types flagged as having RP display racks
 
 ## Customer Map (Leaflet.js)
 - Embedded via st.components.v1.html() — full Leaflet map with marker clusters
-- **4,683 total locations**: 4,625 customer accounts + 58 distributors
+- **4,819 total locations**: 4,658 customer accounts + 161 distributors
 - 8 marker categories with distinct colors/icons:
-  - **Promo Only (Not on C4C)** — Red (#DC2626) — 2,097 accounts
-  - **On Both Lists** — Green (#16A34A) — 234 accounts
+  - **Promo Only (Not on C4C)** — Red (#DC2626) — 2,113 accounts
+  - **On Both Lists** — Green (#16A34A) — 235 accounts
   - **C4C Only** — Blue (#2563EB) — 1,208 accounts
   - **Rack Installer** — Purple (#7C3AED) — 240 accounts (new from rack list, not on promo/C4C)
-  - **Distributor** — Gold star (#F59E0B) — 58 locations (larger pin with star icon)
-  - **Powersports/Motorsports** — Rose (#E11D48) — 804 accounts
-  - **International** — Indigo (#4F46E5) — 28 locations (global)
-  - **Canada** — Emerald (#059669) — 14 locations
+  - **Distributor** — Gold star (#F59E0B) — 161 locations (larger pin with star icon)
+  - **Powersports/Motorsports** — Rose (#E11D48) — 797 accounts
+  - **International** — Indigo (#4F46E5) — 43 locations (32 countries)
+  - **Canada** — Emerald (#059669) — 22 locations
 - Filters: search bar, state dropdown, county dropdown (cascading), type dropdown (all 8 types)
 - Compact horizontal legend with all 8 categories
 - Stats bar with per-type colored counts
