@@ -1,0 +1,465 @@
+{
+  "rp_products": {
+    "RS Series \u2014 High Performance Synthetic": {
+      "color": "#4B2D8A",
+      "badge": "RS",
+      "description": "Royal Purple's flagship full synthetic for high-performance and everyday driving. Exceeds API/ILSAC standards. Synerlec\u00ae additive technology delivers superior film strength and wear protection.",
+      "application": "Modern engines, import vehicles, performance cars, daily drivers",
+      "skus": [
+        {
+          "code": "RS0W20",
+          "viscosity": "0W-20",
+          "notes": "Honda, Toyota, Mazda \u2014 most common modern spec"
+        },
+        {
+          "code": "RS5W20",
+          "viscosity": "5W-20",
+          "notes": "Ford, GM \u2014 wide-market workhorse"
+        },
+        {
+          "code": "RS5W30",
+          "viscosity": "5W-30",
+          "notes": "Most common viscosity across all platforms"
+        },
+        {
+          "code": "RS5W40",
+          "viscosity": "5W-40",
+          "notes": "European vehicles, Audi, BMW, Mercedes"
+        },
+        {
+          "code": "RS0W16",
+          "viscosity": "0W-16",
+          "notes": "Late-model Honda/Toyota ultra-low viscosity spec"
+        },
+        {
+          "code": "RS0W40",
+          "viscosity": "0W-40",
+          "notes": "European performance \u2014 Porsche, AMG, VW"
+        }
+      ]
+    },
+    "HMX Series \u2014 High Mileage Synthetic": {
+      "color": "#7C3AED",
+      "badge": "HMX",
+      "description": "Engineered for engines over 75,000 miles. Enhanced seal conditioners revitalize worn gaskets, reduce oil consumption, and clean sludge deposits while maintaining full synthetic protection.",
+      "application": "High-mileage vehicles (75K+ miles), vehicles with seeping gaskets or oil consumption issues",
+      "skus": [
+        {
+          "code": "HMX0W20",
+          "viscosity": "0W-20",
+          "notes": "High-mileage Japanese/domestic, most popular HMX"
+        },
+        {
+          "code": "HMX5W20",
+          "viscosity": "5W-20",
+          "notes": "High-mileage Ford/GM applications"
+        },
+        {
+          "code": "HMX5W30",
+          "viscosity": "5W-30",
+          "notes": "Broadest high-mileage coverage"
+        },
+        {
+          "code": "RMS5W20",
+          "viscosity": "5W-20",
+          "notes": "Royal Purple High Mileage Synthetic variant"
+        },
+        {
+          "code": "RMS5W30",
+          "viscosity": "5W-30",
+          "notes": "Royal Purple High Mileage Synthetic variant"
+        }
+      ]
+    },
+    "Duralec Series \u2014 Diesel Synthetic": {
+      "color": "#1D4ED8",
+      "badge": "RSD",
+      "description": "API CK-4 rated diesel engine oil for modern emission-controlled diesel engines. Compatible with DPF, EGR, and SCR after-treatment systems. Extended drain intervals.",
+      "application": "Diesel trucks, work vans, fleet vehicles with DPF/EGR systems",
+      "skus": [
+        {
+          "code": "RSD5W40",
+          "viscosity": "5W-40",
+          "notes": "Light-duty diesel \u2014 Cummins, Duramax, Power Stroke"
+        },
+        {
+          "code": "RSD15W40",
+          "viscosity": "15W-40",
+          "notes": "Heavy-duty diesel, fleet and commercial applications"
+        }
+      ]
+    },
+    "RP Synthetic \u2014 Standard Full Synthetic": {
+      "color": "#059669",
+      "badge": "RP",
+      "description": "Core Royal Purple synthetic line. Same Synerlec\u00ae technology as RS Series, positioned as the standard full synthetic offer across common viscosity grades.",
+      "application": "General full synthetic upsell, vehicles not requiring specialty RS or HMX formulations",
+      "skus": [
+        {
+          "code": "RP0W20",
+          "viscosity": "0W-20",
+          "notes": "Modern import spec"
+        },
+        {
+          "code": "RP5W20",
+          "viscosity": "5W-20",
+          "notes": "Ford/GM domestic spec"
+        },
+        {
+          "code": "RP5W30",
+          "viscosity": "5W-30",
+          "notes": "Universal synthetic coverage"
+        },
+        {
+          "code": "RP5W40",
+          "viscosity": "5W-40",
+          "notes": "European Synthetic"
+        },
+        {
+          "code": "RP0W16",
+          "viscosity": "0W-16",
+          "notes": "Ultra-low Honda/Toyota spec"
+        },
+        {
+          "code": "RP0W40",
+          "viscosity": "0W-40",
+          "notes": "European performance"
+        }
+      ]
+    },
+    "Royal Purple Additives": {
+      "color": "#D97706",
+      "badge": "ADD",
+      "description": "Royal Purple fuel and engine additives. Note: These are separate from oil revenue \u2014 they appear as line items on invoices alongside oil codes.",
+      "application": "Upsell items \u2014 added to fuel or oil at time of service",
+      "skus": [
+        {
+          "code": "18000",
+          "viscosity": "Max-Atomizer",
+          "notes": "Fuel injector cleaner \u2014 optimizes spray patterns"
+        },
+        {
+          "code": "11755",
+          "viscosity": "Max-Tane",
+          "notes": "Diesel fuel treatment \u2014 boosts cetane rating"
+        },
+        {
+          "code": "11722",
+          "viscosity": "Generic RP",
+          "notes": "Legacy catch-all RP code \u2014 no specific viscosity/formulation"
+        }
+      ]
+    }
+  },
+  "competitor_brands": [
+    {
+      "brand": "CAM2",
+      "type": "Synthetic & Conventional",
+      "color": "#DC2626",
+      "codes": [
+        {
+          "code": "S0W20",
+          "product": "Full Synthetic 0W-20"
+        },
+        {
+          "code": "S5W20",
+          "product": "Full Synthetic 5W-20"
+        },
+        {
+          "code": "S5W30",
+          "product": "Full Synthetic 5W-30"
+        },
+        {
+          "code": "5W20",
+          "product": "Conventional 5W-20"
+        },
+        {
+          "code": "5W30",
+          "product": "Conventional 5W-30"
+        },
+        {
+          "code": "5W40",
+          "product": "Conventional 5W-40"
+        },
+        {
+          "code": "10W30",
+          "product": "Conventional 10W-30"
+        },
+        {
+          "code": "10W40",
+          "product": "Conventional 10W-40"
+        }
+      ],
+      "conversion_note": "S-prefix = Full Synthetic \u2192 easiest RP convert (RS same tier). Bare viscosity codes = conventional \u2192 upsell opportunity."
+    },
+    {
+      "brand": "Valvoline",
+      "type": "Full Synthetic, MaxLife & Conventional",
+      "color": "#EA580C",
+      "codes": [
+        {
+          "code": "VS0W20",
+          "product": "Full Synthetic 0W-20"
+        },
+        {
+          "code": "VS5W20",
+          "product": "Full Synthetic 5W-20"
+        },
+        {
+          "code": "VS5W30",
+          "product": "Full Synthetic 5W-30"
+        },
+        {
+          "code": "VS0W16",
+          "product": "Full Synthetic 0W-16"
+        },
+        {
+          "code": "VM5W20",
+          "product": "MaxLife 5W-20"
+        },
+        {
+          "code": "VM5W30",
+          "product": "MaxLife 5W-30"
+        },
+        {
+          "code": "VB5W20",
+          "product": "Conventional 5W-20"
+        },
+        {
+          "code": "VB5W30",
+          "product": "Conventional 5W-30"
+        },
+        {
+          "code": "VE5W30",
+          "product": "Conventional 5W-30 (alt)"
+        }
+      ],
+      "conversion_note": "VS \u2192 RS direct swap. VM (MaxLife) \u2192 HMX direct swap. VB/VE conventional \u2192 upsell to RS or HMX."
+    },
+    {
+      "brand": "Mobil 1",
+      "type": "Full Synthetic",
+      "color": "#B91C1C",
+      "codes": [
+        {
+          "code": "M0W20",
+          "product": "Full Synthetic 0W-20"
+        },
+        {
+          "code": "M5W20",
+          "product": "Full Synthetic 5W-20"
+        },
+        {
+          "code": "M5W30",
+          "product": "Full Synthetic 5W-30"
+        }
+      ],
+      "conversion_note": "Mobil 1 buyers are already premium synthetic customers \u2014 brand loyalty is stronger but RP performance story closes the gap."
+    },
+    {
+      "brand": "Castrol",
+      "type": "Full Synthetic (Edge)",
+      "color": "#16A34A",
+      "codes": [
+        {
+          "code": "CS5W20",
+          "product": "Edge Full Synthetic 5W-20"
+        },
+        {
+          "code": "CS5W30",
+          "product": "Edge Full Synthetic 5W-30"
+        },
+        {
+          "code": "CS0W20",
+          "product": "Edge Full Synthetic 0W-20"
+        }
+      ],
+      "conversion_note": "CS prefix = Castrol Edge. Same tier as RS \u2014 direct competitive swap."
+    },
+    {
+      "brand": "Pennzoil",
+      "type": "Platinum, Ultra, & Conventional",
+      "color": "#CA8A04",
+      "codes": [
+        {
+          "code": "PS5W20",
+          "product": "Platinum Full Synthetic 5W-20"
+        },
+        {
+          "code": "PS5W30",
+          "product": "Platinum Full Synthetic 5W-30"
+        },
+        {
+          "code": "PU0W20",
+          "product": "Ultra Platinum 0W-20"
+        },
+        {
+          "code": "PB5W20",
+          "product": "Conventional 5W-20"
+        },
+        {
+          "code": "PB5W30",
+          "product": "Conventional 5W-30"
+        }
+      ],
+      "conversion_note": "PS/PU = premium syn \u2192 RS direct. PB conventional \u2192 full upsell opportunity."
+    }
+  ],
+  "service_tiers": [
+    {
+      "code": "CK",
+      "name": "Basic Check",
+      "description": "Quick check service \u2014 no oil product"
+    },
+    {
+      "code": "S1",
+      "name": "Service Tier 1",
+      "description": "Entry-level service package"
+    },
+    {
+      "code": "S2",
+      "name": "Service Tier 2",
+      "description": "Standard service package"
+    },
+    {
+      "code": "S3",
+      "name": "Service Tier 3",
+      "description": "Mid-tier service package"
+    },
+    {
+      "code": "S4",
+      "name": "Service Tier 4",
+      "description": "Premium service package"
+    },
+    {
+      "code": "S5",
+      "name": "Service Tier 5",
+      "description": "Full-service package"
+    },
+    {
+      "code": "S6",
+      "name": "Service Tier 6",
+      "description": "Top-tier service package"
+    },
+    {
+      "code": "B7",
+      "name": "Basic Service 7",
+      "description": "Base service tier"
+    },
+    {
+      "code": "B8",
+      "name": "Basic Service 8",
+      "description": "Base service tier"
+    },
+    {
+      "code": "B9",
+      "name": "Basic Service 9",
+      "description": "Base service tier"
+    },
+    {
+      "code": "B10",
+      "name": "Full Service (CAM2)",
+      "description": "Full service using CAM2 conventional"
+    }
+  ],
+  "spec_flags": [
+    {
+      "code": "GF6",
+      "name": "ILSAC GF-6",
+      "description": "Latest ILSAC standard \u2014 fuel economy + protection"
+    },
+    {
+      "code": "DEXOS1",
+      "name": "GM Dexos 1",
+      "description": "GM factory-fill specification for most GM gas engines"
+    },
+    {
+      "code": "AFC",
+      "name": "AFC",
+      "description": "Additive or formula certification flag"
+    },
+    {
+      "code": "VMATF",
+      "name": "VMATF",
+      "description": "Variable motor additive/treatment flag"
+    }
+  ],
+  "viscosity_crosswalk": [
+    {
+      "current": "*0W20 (any brand)",
+      "rs": "RS0W20",
+      "hmx": "HMX0W20",
+      "rsd": "\u2014"
+    },
+    {
+      "current": "*5W20 (any brand)",
+      "rs": "RS5W20",
+      "hmx": "HMX5W20",
+      "rsd": "\u2014"
+    },
+    {
+      "current": "*5W30 (any brand)",
+      "rs": "RS5W30",
+      "hmx": "HMX5W30",
+      "rsd": "\u2014"
+    },
+    {
+      "current": "*0W16 (any brand)",
+      "rs": "RS0W16",
+      "hmx": "\u2014",
+      "rsd": "\u2014"
+    },
+    {
+      "current": "*5W40 (any brand)",
+      "rs": "RS5W40",
+      "hmx": "\u2014",
+      "rsd": "RSD5W40"
+    },
+    {
+      "current": "*0W40 (any brand)",
+      "rs": "RS0W40",
+      "hmx": "\u2014",
+      "rsd": "\u2014"
+    },
+    {
+      "current": "*15W40 diesel",
+      "rs": "\u2014",
+      "hmx": "\u2014",
+      "rsd": "RSD15W40"
+    }
+  ],
+  "conversion_segments": [
+    {
+      "segment": "Full Synthetic \u2192 RS Series",
+      "codes": "S*, VS*, M*, CS*, PS*, PU*",
+      "difficulty": "Low",
+      "color": "#16A34A",
+      "rationale": "Already paying premium synthetic prices. RP performance story is the only lift needed.",
+      "suggested_sku": "RS (match viscosity)"
+    },
+    {
+      "segment": "MaxLife / High Mileage \u2192 HMX",
+      "codes": "VM*",
+      "difficulty": "Low",
+      "color": "#16A34A",
+      "rationale": "Already in the high-mileage segment at a comparable price tier. Direct lateral move.",
+      "suggested_sku": "HMX (match viscosity)"
+    },
+    {
+      "segment": "Conventional \u2192 RS or HMX",
+      "codes": "5W30, 5W20, VB*, VE*, PB*",
+      "difficulty": "Medium",
+      "color": "#D97706",
+      "rationale": "Price jump required. Needs an upsell conversation about long-term engine protection value.",
+      "suggested_sku": "RS or HMX depending on mileage"
+    },
+    {
+      "segment": "Unknown / No Oil Code",
+      "codes": "Ancillary only, or spec flags only",
+      "difficulty": "Unknown",
+      "color": "#64748B",
+      "rationale": "Invoice contained no classifiable oil product code. May be a filter-only visit or data gap.",
+      "suggested_sku": "N/A \u2014 investigate invoice"
+    }
+  ]
+}

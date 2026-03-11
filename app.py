@@ -11,6 +11,7 @@ from customer_map import load_customers, load_distributors, parse_csv_customers,
 from c4c_report_generator import generate_c4c_report
 from map_data_exporter import generate_map_export
 import product_reference
+import admin_panel
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
@@ -30,7 +31,7 @@ with st.sidebar:
 
     nav = st.radio(
         "Navigation",
-        ["Report Generator", "Customer Map", "Product Reference"],
+        ["Report Generator", "Customer Map", "Product Reference", "Admin"],
         label_visibility="collapsed",
     )
 
@@ -169,6 +170,11 @@ elif nav == "Product Reference":
     page_header("Product Reference", "Royal Purple operation codes, product catalog, competitor reference & conversion guide")
     st.markdown("")
     product_reference.render()
+
+elif nav == "Admin":
+    page_header("Admin", "Manage operation codes and product database")
+    st.markdown("")
+    admin_panel.render()
 
 elif nav == "Report Generator":
     page_header("Installer Report Generator", "Upload a Royal Purple monthly report to generate a branded PowerPoint presentation.")
