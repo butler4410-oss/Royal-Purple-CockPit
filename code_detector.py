@@ -6,7 +6,7 @@ CODES_DB_PATH = "codes_db.json"
 RP_PREFIXES = [
     ("RMS", "HMX Series"),
     ("RSD", "Duralec Series"),
-    ("RS",  "RS Series"),
+    ("RS",  "HP API Series"),
     ("HMX", "HMX Series"),
     ("RP",  "RP Synthetic"),
 ]

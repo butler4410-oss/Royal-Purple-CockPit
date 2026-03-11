@@ -40,7 +40,7 @@ Prefixes are checked in order — longer/more specific prefixes come first to av
 RP_PREFIXES = [
     ("RMS", "HMX Series"),       # High Mileage
     ("RSD", "Duralec Series"),   # Diesel
-    ("RS",  "RS Series"),        # High Performance
+    ("RS",  "HP API Series"),    # High Performance
     ("HMX", "HMX Series"),      # High Mileage
     ("RP",  "RP Synthetic"),    # Standard Synthetic
 ]

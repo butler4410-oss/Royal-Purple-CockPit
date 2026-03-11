@@ -1,43 +1,5 @@
 {
   "rp_products": {
-    "RS Series \u2014 High Performance Synthetic": {
-      "color": "#4B2D8A",
-      "badge": "RS",
-      "description": "Royal Purple's flagship full synthetic for high-performance and everyday driving. Exceeds API/ILSAC standards. Synerlec\u00ae additive technology delivers superior film strength and wear protection.",
-      "application": "Modern engines, import vehicles, performance cars, daily drivers",
-      "skus": [
-        {
-          "code": "RS0W20",
-          "viscosity": "0W-20",
-          "notes": "Honda, Toyota, Mazda \u2014 most common modern spec"
-        },
-        {
-          "code": "RS5W20",
-          "viscosity": "5W-20",
-          "notes": "Ford, GM \u2014 wide-market workhorse"
-        },
-        {
-          "code": "RS5W30",
-          "viscosity": "5W-30",
-          "notes": "Most common viscosity across all platforms"
-        },
-        {
-          "code": "RS5W40",
-          "viscosity": "5W-40",
-          "notes": "European vehicles, Audi, BMW, Mercedes"
-        },
-        {
-          "code": "RS0W16",
-          "viscosity": "0W-16",
-          "notes": "Late-model Honda/Toyota ultra-low viscosity spec"
-        },
-        {
-          "code": "RS0W40",
-          "viscosity": "0W-40",
-          "notes": "European performance \u2014 Porsche, AMG, VW"
-        }
-      ]
-    },
     "HMX Series \u2014 High Mileage Synthetic": {
       "color": "#7C3AED",
       "badge": "HMX",
@@ -147,6 +109,44 @@
           "code": "11722",
           "viscosity": "Generic RP",
           "notes": "Legacy catch-all RP code \u2014 no specific viscosity/formulation"
+        }
+      ]
+    },
+    "HP API Series \u2014 High Performance Synthetic": {
+      "color": "#4B2D8A",
+      "badge": "HP API",
+      "description": "Royal Purple's flagship full synthetic for high-performance and everyday driving. Exceeds API/ILSAC standards. Synerlec\u00ae additive technology delivers superior film strength and wear protection.",
+      "application": "Modern engines, import vehicles, performance cars, daily drivers",
+      "skus": [
+        {
+          "code": "RS0W20",
+          "viscosity": "0W-20",
+          "notes": "Honda, Toyota, Mazda \u2014 most common modern spec"
+        },
+        {
+          "code": "RS5W20",
+          "viscosity": "5W-20",
+          "notes": "Ford, GM \u2014 wide-market workhorse"
+        },
+        {
+          "code": "RS5W30",
+          "viscosity": "5W-30",
+          "notes": "Most common viscosity across all platforms"
+        },
+        {
+          "code": "RS5W40",
+          "viscosity": "5W-40",
+          "notes": "European vehicles, Audi, BMW, Mercedes"
+        },
+        {
+          "code": "RS0W16",
+          "viscosity": "0W-16",
+          "notes": "Late-model Honda/Toyota ultra-low viscosity spec"
+        },
+        {
+          "code": "RS0W40",
+          "viscosity": "0W-40",
+          "notes": "European performance \u2014 Porsche, AMG, VW"
         }
       ]
     }
