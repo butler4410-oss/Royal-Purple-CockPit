@@ -9,7 +9,7 @@
 - **customer_map.py** — Leaflet.js map builder: loads customers.json + distributors.json, generates embedded HTML map with 8 marker categories
 - **c4c_report_generator.py** — Excel report generator: C4C gap analysis → 10-sheet .xlsx workbook
 - **map_data_exporter.py** — Excel export generator: branded workbook with Dashboard, per-state tabs, All Accounts, County Summary, Distributors
-- **customers.json** — All geocoded accounts (4,625 total: installers, powersports, international, Canada)
+- **customers.json** — All geocoded accounts (4,677 total: installers, powersports, international, Canada)
 - **distributors.json** — Geocoded distributor locations (58 total across 23 US states)
 - **distribution_data.py** — Legacy file (not imported by active code)
 - **assets/** — Royal Purple branding images
