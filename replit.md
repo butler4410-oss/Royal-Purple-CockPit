@@ -42,20 +42,31 @@
 - Stats bar with per-type colored counts
 - Metrics: two-row layout (Total Locations, Installer Accounts, Distributors, Powersports / Promo Only, On Both, C4C Only, Rack Installer)
 - **Export Map Data**: Branded Excel workbook (62 sheets) with per-state tabs, county breakdown, distributor tab
-- **Export C4C Report**: 10-sheet Excel gap analysis report
+- **Export C4C Report**: 19-sheet comprehensive account intelligence workbook
 - CARTO light basemap tiles
 
-## C4C Report (10 Sheets)
-1. Executive Summary — totals, gap %, key findings
-2. State Breakdown — per-state counts (Not on C4C vs C4C Matched)
-3. Not on C4C Full List — promo-only accounts
-4. C4C Matched Full List — On Both Lists + C4C Only accounts
-5. Top Priority States — ranked by gap
-6. Reconciliation — cross-reference summary
-7. C4C Duplicates — duplicate entries in C4C list
-8. Promo Duplicates — duplicate entries in promo list
-9. On C4C Only — accounts on C4C but not matched to promo
-10. Failed to Geolocate — accounts with invalid zip codes
+## C4C Report (19 Sheets)
+1. Dashboard — C4C explanation, network overview (all 8 types), gap summary
+2. All Accounts — 4,683 master list with Type, County, Rack status (filterable)
+3. State Breakdown — all types per state: Promo, Both, C4C, Rack, Dist, Powersports, Gap%, C4C Rate
+4. County Breakdown — 1,088 counties with all type counts and gap analysis
+5. Not on C4C — 2,097 accounts needing C4C onboarding (with county, rack status)
+6. C4C Matched — 1,442 accounts on C4C (with C4C status type, rack status)
+7. Top Priority States — ranked by volume of accounts not on C4C
+8. Top Priority Counties — top 200 counties by onboarding need
+9. Distributors — 58 locations with full details
+10. Rack Installers — 554 flagged accounts with C4C status color-coding
+11. Powersports — 804 powersports/motorsports accounts
+12. International — 28 global partner locations
+13. Canada — 14 Canadian locations
+14. Distributor Coverage — installers per distributor ratio, identifies distribution gaps
+15. Reconciliation — C4C vs Promo list cross-reference and source file totals
+16. C4C Duplicates — duplicate entries in C4C source list
+17. Promo Duplicates — duplicate entries in promo source list
+18. On C4C Only — accounts on C4C but not matched to promo list
+19. Failed to Geolocate — accounts with invalid addresses
+- Every data sheet has auto-filters on all columns + frozen header rows
+- Color-coded by account type throughout (type-specific fill colors)
 
 ## Excel Parsing (Fully Adaptive)
 - Scans first 10 rows for best header match (keyword scoring, min 2 keywords)

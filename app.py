@@ -150,9 +150,9 @@ if nav == "Customer Map":
                     os.unlink(report_path)
 
                     st.success(
-                        f"Report generated — {stats['sheets']} sheets: "
+                        f"Report generated — {stats['sheets']} sheets, {stats['total_accounts']} total accounts: "
                         f"{stats['not_on_c4c']} not on C4C, {stats['c4c_matched']} matched, "
-                        f"{stats['states']} US states, {stats['counties']} counties."
+                        f"{stats['distributors']} distributors, {stats['states']} states, {stats['counties']} counties."
                     )
 
                     st.download_button(
