@@ -80,8 +80,25 @@ if nav == "Home":
     for c in all_locations:
         t = c.get("type", "Unknown")
         type_counts[t] = type_counts.get(t, 0) + 1
-    unique_states = len(set(c.get("state", "") for c in all_locations if c.get("state")))
-    unique_counties = len(set(c.get("county", "") for c in all_locations if c.get("county")))
+    us_states = set()
+    unique_countries = set()
+    unique_counties = set()
+    us_state_abbrs = {
+        "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
+        "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+        "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
+        "VA","WA","WV","WI","WY","DC","PR","GU","VI","AS","MP",
+    }
+    for c in all_locations:
+        st_val = c.get("state", "").strip()
+        county = c.get("county", "").strip()
+        country = c.get("country", "").strip()
+        if st_val and st_val.upper() in us_state_abbrs:
+            us_states.add(st_val.upper())
+        if country:
+            unique_countries.add(country if country != "US" else "United States")
+        if county:
+            unique_counties.add(county)
     installer_types = ["Promo Only (Not on C4C)", "On Both Lists", "C4C Only", "Rack Installer"]
     installer_total = sum(type_counts.get(t, 0) for t in installer_types)
 
@@ -98,12 +115,13 @@ if nav == "Home":
         unsafe_allow_html=True,
     )
 
-    m1, m2, m3, m4, m5 = st.columns(5)
+    m1, m2, m3, m4, m5, m6 = st.columns(6)
     m1.metric("Total Locations", f"{len(all_locations):,}")
     m2.metric("Installer Accounts", f"{installer_total:,}")
     m3.metric("Distributors", f"{type_counts.get('Distributor', 0):,}")
-    m4.metric("States Covered", unique_states)
-    m5.metric("Counties Reached", f"{unique_counties:,}")
+    m4.metric("States", len(us_states))
+    m5.metric("Countries", len(unique_countries))
+    m6.metric("Counties", f"{len(unique_counties):,}")
 
     st.markdown("")
 
@@ -150,7 +168,7 @@ if nav == "Home":
                     Customer Map
                 </div>
                 <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
-                    Interactive map of {len(all_locations):,} Royal Purple locations across {unique_states} states.
+                    Interactive map of {len(all_locations):,} Royal Purple locations across {len(us_states)} states and {len(unique_countries)} countries.
                     Filter by 8 account types, search by name or address, and export data to branded Excel workbooks.
                 </div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap;">
