@@ -10,6 +10,7 @@ from report_generator import (
 from customer_map import load_customers, load_distributors, parse_csv_customers, build_leaflet_html, get_states
 from c4c_report_generator import generate_c4c_report
 from map_data_exporter import generate_map_export
+import product_reference
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
@@ -165,13 +166,9 @@ if nav == "Customer Map":
         st.info("No customer data available. Upload a CSV file to get started.")
 
 elif nav == "Product Reference":
-    page_header("Product Reference", "Royal Purple product categories and descriptions")
+    page_header("Product Reference", "Royal Purple operation codes, product catalog, competitor reference & conversion guide")
     st.markdown("")
-    for cat, desc in PRODUCT_DESCRIPTIONS.items():
-        with st.container():
-            st.markdown(f"#### {cat}")
-            st.write(desc)
-            st.markdown("---")
+    product_reference.render()
 
 elif nav == "Report Generator":
     page_header("Installer Report Generator", "Upload a Royal Purple monthly report to generate a branded PowerPoint presentation.")
