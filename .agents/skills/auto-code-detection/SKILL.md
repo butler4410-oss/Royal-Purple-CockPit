@@ -38,10 +38,11 @@ Prefixes are checked in order — longer/more specific prefixes come first to av
 
 ```python
 RP_PREFIXES = [
-    ("RMS", "HMX Series"),       # High Mileage
-    ("RSD", "Duralec Series"),   # Diesel
-    ("RS",  "HP API Series"),    # High Performance
+    ("HPS", "HPS Series"),       # High Performance Street
     ("HMX", "HMX Series"),      # High Mileage
+    ("RMS", "HMX Series"),       # High Mileage (alternate prefix)
+    ("RSD", "Duralec Series"),   # Diesel
+    ("RS",  "HP API Series"),    # High Performance API-licensed
     ("RP",  "RP Synthetic"),    # Standard Synthetic
 ]
 ```

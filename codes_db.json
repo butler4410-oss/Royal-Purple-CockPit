@@ -3,8 +3,8 @@
     "HMX Series \u2014 High Mileage Synthetic": {
       "color": "#7C3AED",
       "badge": "HMX",
-      "description": "Engineered for engines over 75,000 miles. Enhanced seal conditioners revitalize worn gaskets, reduce oil consumption, and clean sludge deposits while maintaining full synthetic protection.",
-      "application": "High-mileage vehicles (75K+ miles), vehicles with seeping gaskets or oil consumption issues",
+      "description": "Formulated for vehicles with 75,000+ miles. Reduces oil consumption, revitalizes aged seals, and removes years of deposits. Synerlec technology provides superior film strength in worn engines.",
+      "application": "High-mileage engines (75K+ miles), older vehicles, engines with oil consumption",
       "skus": [
         {
           "code": "HMX0W20",
@@ -30,14 +30,19 @@
           "code": "RMS5W30",
           "viscosity": "5W-30",
           "notes": "Royal Purple High Mileage Synthetic variant"
+        },
+        {
+          "code": "HMX10W30",
+          "viscosity": "10W-30",
+          "notes": ""
         }
       ]
     },
     "Duralec Series \u2014 Diesel Synthetic": {
       "color": "#1D4ED8",
       "badge": "RSD",
-      "description": "API CK-4 rated diesel engine oil for modern emission-controlled diesel engines. Compatible with DPF, EGR, and SCR after-treatment systems. Extended drain intervals.",
-      "application": "Diesel trucks, work vans, fleet vehicles with DPF/EGR systems",
+      "description": "Premium diesel motor oils with Synerlec technology. Duralec Super (CK-4) for light-duty trucks and fleets. Duralec Ultra for high-output, heavy-duty diesel engines \u2014 up to 33% better wear protection and 40% extended oil life vs CK-4 requirements.",
+      "application": "Diesel trucks, fleet vehicles, over-the-road trucking, agriculture, construction",
       "skus": [
         {
           "code": "RSD5W40",
@@ -48,6 +53,16 @@
           "code": "RSD15W40",
           "viscosity": "15W-40",
           "notes": "Heavy-duty diesel, fleet and commercial applications"
+        },
+        {
+          "code": "RSD5W40U",
+          "viscosity": "5W-40",
+          "notes": "Duralec Ultra \u2014 heavy-duty"
+        },
+        {
+          "code": "RSD10W30",
+          "viscosity": "10W-30",
+          "notes": "Duralec Super"
         }
       ]
     },
@@ -92,8 +107,8 @@
     "Royal Purple Additives": {
       "color": "#D97706",
       "badge": "ADD",
-      "description": "Royal Purple fuel and engine additives. Note: These are separate from oil revenue \u2014 they appear as line items on invoices alongside oil codes.",
-      "application": "Upsell items \u2014 added to fuel or oil at time of service",
+      "description": "Royal Purple specialty products including fuel system cleaners, transmission fluid, gear oil, and grease. Max-Clean deeply cleans injectors and combustion chambers. Max ATF and Max Gear provide synthetic protection for drivetrain components.",
+      "application": "Fuel system maintenance, transmission service, differential service, chassis lubrication",
       "skus": [
         {
           "code": "18000",
@@ -109,14 +124,44 @@
           "code": "11722",
           "viscosity": "Generic RP",
           "notes": "Legacy catch-all RP code \u2014 no specific viscosity/formulation"
+        },
+        {
+          "code": "11723",
+          "viscosity": "",
+          "notes": "Max-Clean 20oz Can"
+        },
+        {
+          "code": "01320",
+          "viscosity": "",
+          "notes": "Max ATF Full Synthetic Transmission Fluid"
+        },
+        {
+          "code": "01300",
+          "viscosity": "",
+          "notes": "Max Gear 75W-90 Synthetic Gear Oil"
+        },
+        {
+          "code": "01301",
+          "viscosity": "",
+          "notes": "Max Gear 75W-140 Synthetic Gear Oil"
+        },
+        {
+          "code": "01512",
+          "viscosity": "",
+          "notes": "Synchromax Manual Transmission Fluid"
+        },
+        {
+          "code": "01312",
+          "viscosity": "",
+          "notes": "Ultra-Performance Grease (UPG) NLGI 2"
         }
       ]
     },
     "HP API Series \u2014 High Performance Synthetic": {
       "color": "#4B2D8A",
       "badge": "HP API",
-      "description": "Royal Purple's flagship full synthetic for high-performance and everyday driving. Exceeds API/ILSAC standards. Synerlec\u00ae additive technology delivers superior film strength and wear protection.",
-      "application": "Modern engines, import vehicles, performance cars, daily drivers",
+      "description": "Royal Purple's flagship full synthetic with API SP/ILSAC GF-6A licenses and GM dexos1 approval. Combines premium synthetic base oils with proprietary Synerlec additive technology. 300% better oxidation resistance, 100% LSPI protection, 50% improved deposit control vs API SP requirements.",
+      "application": "Modern GDI/turbo engines, start/stop systems, daily drivers, import vehicles, performance cars",
       "skus": [
         {
           "code": "RS0W20",
@@ -147,6 +192,59 @@
           "code": "RS0W40",
           "viscosity": "0W-40",
           "notes": "European performance \u2014 Porsche, AMG, VW"
+        },
+        {
+          "code": "RS10W30",
+          "viscosity": "10W-30",
+          "notes": ""
+        },
+        {
+          "code": "RS0W40E",
+          "viscosity": "0W-40",
+          "notes": "Euro Formula \u2014 ACEA C3"
+        },
+        {
+          "code": "RS5W30E",
+          "viscosity": "5W-30",
+          "notes": "Euro Formula \u2014 ACEA C3/C2"
+        },
+        {
+          "code": "RS5W40E",
+          "viscosity": "5W-40",
+          "notes": "Euro Formula \u2014 ACEA C3"
+        }
+      ]
+    },
+    "HPS Series \u2014 High Performance Street": {
+      "badge": "HPS",
+      "color": "#7C3AED",
+      "description": "HPS motor oil is specifically formulated to maximize performance and meet the demands of high performance, modified, and street-driven vehicles. Uses proprietary Synerlec additive technology for superior film strength and wear protection in demanding driving conditions.",
+      "application": "Modified engines, street performance, enthusiast builds, classic cars",
+      "skus": [
+        {
+          "code": "HPS5W20",
+          "viscosity": "5W-20",
+          "notes": ""
+        },
+        {
+          "code": "HPS5W30",
+          "viscosity": "5W-30",
+          "notes": ""
+        },
+        {
+          "code": "HPS10W30",
+          "viscosity": "10W-30",
+          "notes": ""
+        },
+        {
+          "code": "HPS10W40",
+          "viscosity": "10W-40",
+          "notes": ""
+        },
+        {
+          "code": "HPS20W50",
+          "viscosity": "20W-50",
+          "notes": "Classic/V8 applications"
         }
       ]
     }

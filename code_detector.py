@@ -4,10 +4,11 @@ import re
 CODES_DB_PATH = "codes_db.json"
 
 RP_PREFIXES = [
+    ("HPS", "HPS Series"),
+    ("HMX", "HMX Series"),
     ("RMS", "HMX Series"),
     ("RSD", "Duralec Series"),
     ("RS",  "HP API Series"),
-    ("HMX", "HMX Series"),
     ("RP",  "RP Synthetic"),
 ]
 
