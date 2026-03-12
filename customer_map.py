@@ -64,10 +64,7 @@ def build_leaflet_html(customers, height=700):
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }}
@@ -516,35 +513,14 @@ L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_L
     opacity: 1
 }}).addTo(map);
 
-const markerClusterGroup = L.markerClusterGroup({{
-    maxClusterRadius: 50,
-    spiderfyOnMaxZoom: true,
-    showCoverageOnHover: false,
-    iconCreateFunction: function(cluster) {{
-        const count = cluster.getChildCount();
-        return L.divIcon({{
-            html: '<div style="background:#4B2D8A;color:white;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">' + count + '</div>',
-            className: 'custom-cluster',
-            iconSize: L.point(40, 40)
-        }});
-    }}
-}});
+const markerLayerGroup = L.layerGroup();
 
-function createIcon(type) {{
-    const color = TYPE_COLOR_MAP[type] || '#7C3AED';
-    let svg;
-    if (type === 'Distributor') {{
-        svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="44" viewBox="0 0 32 44">
-            <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 28 16 28s16-16 16-28C32 7.16 24.84 0 16 0z" fill="${{color}}" stroke="#D97706" stroke-width="1.5"/>
-            <polygon points="16,6 18.5,12.5 25,13 20,17.5 21.5,24 16,20.5 10.5,24 12,17.5 7,13 13.5,12.5" fill="white"/>
-        </svg>`;
-        return L.divIcon({{ html: svg, className: '', iconSize: [32, 44], iconAnchor: [16, 44], popupAnchor: [0, -40] }});
-    }}
-    svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40">
-        <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.27 21.73 0 14 0z" fill="${{color}}"/>
-        <circle cx="14" cy="14" r="6" fill="white"/>
+function createDistributorIcon(color) {{
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="44" viewBox="0 0 32 44">
+        <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 28 16 28s16-16 16-28C32 7.16 24.84 0 16 0z" fill="${{color}}" stroke="#D97706" stroke-width="1.5"/>
+        <polygon points="16,6 18.5,12.5 25,13 20,17.5 21.5,24 16,20.5 10.5,24 12,17.5 7,13 13.5,12.5" fill="white"/>
     </svg>`;
-    return L.divIcon({{ html: svg, className: '', iconSize: [28, 40], iconAnchor: [14, 40], popupAnchor: [0, -36] }});
+    return L.divIcon({{ html: svg, className: '', iconSize: [32, 44], iconAnchor: [16, 44], popupAnchor: [0, -40] }});
 }}
 
 let allMarkers = [];
@@ -566,13 +542,25 @@ customers.forEach(function(c) {{
             </div>
         </div>
     `;
-    const marker = L.marker([c.latitude, c.longitude], {{ icon: createIcon(c.type || 'Unknown') }}).bindPopup(popupHtml);
+    let marker;
+    if (c.type === 'Distributor') {{
+        marker = L.marker([c.latitude, c.longitude], {{ icon: createDistributorIcon(color) }}).bindPopup(popupHtml);
+    }} else {{
+        marker = L.circleMarker([c.latitude, c.longitude], {{
+            radius: 6,
+            fillColor: color,
+            color: '#fff',
+            weight: 1.5,
+            opacity: 1,
+            fillOpacity: 0.85,
+        }}).bindPopup(popupHtml);
+    }}
     marker._customerData = c;
     allMarkers.push(marker);
 }});
 
-allMarkers.forEach(m => markerClusterGroup.addLayer(m));
-map.addLayer(markerClusterGroup);
+allMarkers.forEach(m => markerLayerGroup.addLayer(m));
+map.addLayer(markerLayerGroup);
 
 const states = [...new Set(customers.map(c => c.state).filter(Boolean))].sort();
 const stateSelect = document.getElementById('state-filter');
@@ -686,7 +674,7 @@ function filterMarkers() {{
     const stateVal = document.getElementById('state-filter').value;
     const countyVal = document.getElementById('county-filter').value;
 
-    markerClusterGroup.clearLayers();
+    markerLayerGroup.clearLayers();
     let visibleCount = 0;
     const typeCounts = {{}};
 
@@ -698,7 +686,7 @@ function filterMarkers() {{
         if (countyVal && (c.county || '') !== countyVal) show = false;
         if (activeTypeFilter && c.type !== activeTypeFilter) show = false;
         if (show) {{
-            markerClusterGroup.addLayer(marker);
+            markerLayerGroup.addLayer(marker);
             visibleCount++;
             typeCounts[c.type] = (typeCounts[c.type] || 0) + 1;
         }}
@@ -717,7 +705,7 @@ function filterMarkers() {{
     updateSidebar(visibleCount);
 
     if (visibleCount > 0 && hasFilters) {{
-        const bounds = markerClusterGroup.getBounds();
+        const bounds = markerLayerGroup.getBounds();
         if (bounds.isValid()) map.fitBounds(bounds, {{ padding: [60, 60] }});
     }}
 }}
@@ -750,7 +738,7 @@ function updateSidebar(visibleCount) {{
     list.innerHTML = '';
 
     const visible = [];
-    markerClusterGroup.eachLayer(function(marker) {{ visible.push(marker); }});
+    markerLayerGroup.eachLayer(function(marker) {{ visible.push(marker); }});
     visible.sort(function(a, b) {{ return a._customerData.store_name.localeCompare(b._customerData.store_name); }});
 
     countEl.textContent = '(' + (visibleCount || visible.length).toLocaleString() + ')';
