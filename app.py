@@ -216,7 +216,7 @@ if nav == "Home":
         "C4C Only": "#2563EB",
         "Rack Installer": "#7C3AED",
         "Distributor": "#F59E0B",
-        "Powersports/Motorsports": "#E11D48",
+        "Powersports/Motorsports": "#F97316",
         "International": "#4F46E5",
         "Canada": "#059669",
     }

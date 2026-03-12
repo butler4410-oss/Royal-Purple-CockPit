@@ -488,7 +488,7 @@ const TYPE_CONFIG = [
     {{ key: 'C4C Only',                 label: 'C4C Only',            color: '#2563EB' }},
     {{ key: 'Rack Installer',           label: 'Rack Installer',      color: '#7C3AED' }},
     {{ key: 'Distributor',              label: 'Distributor',         color: '#F59E0B' }},
-    {{ key: 'Powersports/Motorsports',  label: 'Powersports',         color: '#E11D48' }},
+    {{ key: 'Powersports/Motorsports',  label: 'Powersports',         color: '#F97316' }},
     {{ key: 'International',            label: 'International',       color: '#4F46E5' }},
     {{ key: 'Canada',                   label: 'Canada',              color: '#059669' }},
 ];
