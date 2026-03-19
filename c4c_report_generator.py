@@ -1405,6 +1405,152 @@ def generate_c4c_report(output_path):
     _add_auto_filter(ws19, 4, len(fail_headers))
 
     # ═══════════════════════════════════════════════════════════════
+    # SHEET 20: RPO AUTOCARE — ALL ACCOUNTS
+    # ═══════════════════════════════════════════════════════════════
+    RPO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rpo_autocare_processed.json")
+    rpo_data = []
+    if os.path.exists(RPO_PATH):
+        with open(RPO_PATH) as _rpf:
+            rpo_data = json.load(_rpf)
+
+    if rpo_data:
+        ORANGE_FILL = PatternFill(start_color="FFF7ED", end_color="FFF7ED", fill_type="solid")
+
+        ws20 = wb.create_sheet("RPO Autocare — All")
+        ws20.sheet_properties.tabColor = "F97316"
+        ws20.freeze_panes = "A5"
+
+        ws20.merge_cells("A1:H1")
+        ws20["A1"] = "RPO Autocare 2025 — All Accounts with C4C Status"
+        ws20["A1"].font = TITLE_FONT
+        ws20.row_dimensions[1].height = 28
+
+        rpo_on_c4c = sum(1 for a in rpo_data if a.get("c4c_status") == "On C4C")
+        rpo_not_c4c = len(rpo_data) - rpo_on_c4c
+        rpo_total_sales = sum(a.get("cytd_sales", 0) for a in rpo_data)
+        rpo_not_c4c_sales = sum(a.get("cytd_sales", 0) for a in rpo_data if a.get("c4c_status") != "On C4C")
+
+        ws20.merge_cells("A2:H2")
+        ws20["A2"] = (
+            f"{len(rpo_data):,} total accounts  |  "
+            f"{rpo_on_c4c:,} on C4C ({rpo_on_c4c/len(rpo_data)*100:.1f}%)  |  "
+            f"{rpo_not_c4c:,} NOT on C4C  |  "
+            f"Non-C4C CYTD Revenue: ${rpo_not_c4c_sales:,.0f}"
+        )
+        ws20["A2"].font = Font(name="Calibri", italic=True, size=10, color="64748B")
+        ws20.row_dimensions[2].height = 20
+        ws20.row_dimensions[3].height = 6
+
+        rpo_all_headers = [
+            "Installer Name", "C4C Status", "CYTD Sales", "Gold Flag",
+            "District", "Region", "Company Owned", "City",
+        ]
+
+        for ci, h in enumerate(rpo_all_headers, 1):
+            cell = ws20.cell(row=4, column=ci, value=h)
+            cell.font = HEADER_FONT
+            cell.fill = HEADER_FILL
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        rpo_sorted = sorted(rpo_data, key=lambda x: x.get("name", "").upper())
+        row = 5
+        for a in rpo_sorted:
+            ws20.cell(row=row, column=1, value=a.get("name", ""))
+            c4c_cell = ws20.cell(row=row, column=2, value=a.get("c4c_status", ""))
+            ws20.cell(row=row, column=3, value=a.get("cytd_sales", 0))
+            ws20.cell(row=row, column=4, value=a.get("gold_flag", ""))
+            ws20.cell(row=row, column=5, value=a.get("district", ""))
+            ws20.cell(row=row, column=6, value=a.get("region", ""))
+            ws20.cell(row=row, column=7, value=a.get("company_owned", ""))
+            ws20.cell(row=row, column=8, value=a.get("city", ""))
+
+            _apply_data_row(ws20, row, len(rpo_all_headers), alt=(row % 2 == 0))
+            ws20.cell(row=row, column=3).number_format = '$#,##0.00'
+            ws20.cell(row=row, column=4).alignment = Alignment(horizontal="center")
+            ws20.cell(row=row, column=7).alignment = Alignment(horizontal="center")
+
+            status = a.get("c4c_status", "")
+            if status == "On C4C":
+                c4c_cell.fill = GREEN_FILL
+            elif status == "Promo Only":
+                c4c_cell.fill = AMBER_FILL
+            elif status == "Rack Only":
+                c4c_cell.fill = PURPLE_LIGHT_FILL
+            else:
+                c4c_cell.fill = RED_FILL
+
+            row += 1
+
+        _auto_width(ws20, len(rpo_all_headers))
+        _add_auto_filter(ws20, 4, len(rpo_all_headers))
+
+        # ═══════════════════════════════════════════════════════════════
+        # SHEET 21: RPO AUTOCARE — NOT ON C4C (by CYTD Sales)
+        # ═══════════════════════════════════════════════════════════════
+        ws21 = wb.create_sheet("RPO — Not on C4C")
+        ws21.sheet_properties.tabColor = "DC2626"
+        ws21.freeze_panes = "A5"
+
+        ws21.merge_cells("A1:H1")
+        ws21["A1"] = "RPO Autocare 2025 — Accounts NOT on C4C (Prioritized by Sales)"
+        ws21["A1"].font = TITLE_FONT
+        ws21.row_dimensions[1].height = 28
+
+        ws21.merge_cells("A2:H2")
+        ws21["A2"] = (
+            f"{rpo_not_c4c:,} accounts not on C4C  |  "
+            f"CYTD Revenue at Risk: ${rpo_not_c4c_sales:,.0f}  |  "
+            f"Sorted by sales volume — highest priority targets at top"
+        )
+        ws21["A2"].font = Font(name="Calibri", italic=True, size=10, color="64748B")
+        ws21.row_dimensions[2].height = 20
+        ws21.row_dimensions[3].height = 6
+
+        rpo_notc4c_headers = [
+            "Installer Name", "C4C Status", "CYTD Sales", "Gold Flag",
+            "District", "Region", "Company Owned", "City",
+        ]
+
+        for ci, h in enumerate(rpo_notc4c_headers, 1):
+            cell = ws21.cell(row=4, column=ci, value=h)
+            cell.font = HEADER_FONT
+            cell.fill = HEADER_FILL
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        rpo_not_c4c_list = sorted(
+            [a for a in rpo_data if a.get("c4c_status") != "On C4C"],
+            key=lambda x: -x.get("cytd_sales", 0),
+        )
+        row = 5
+        for a in rpo_not_c4c_list:
+            ws21.cell(row=row, column=1, value=a.get("name", ""))
+            c4c_cell = ws21.cell(row=row, column=2, value=a.get("c4c_status", ""))
+            ws21.cell(row=row, column=3, value=a.get("cytd_sales", 0))
+            ws21.cell(row=row, column=4, value=a.get("gold_flag", ""))
+            ws21.cell(row=row, column=5, value=a.get("district", ""))
+            ws21.cell(row=row, column=6, value=a.get("region", ""))
+            ws21.cell(row=row, column=7, value=a.get("company_owned", ""))
+            ws21.cell(row=row, column=8, value=a.get("city", ""))
+
+            _apply_data_row(ws21, row, len(rpo_notc4c_headers), alt=(row % 2 == 0))
+            ws21.cell(row=row, column=3).number_format = '$#,##0.00'
+            ws21.cell(row=row, column=4).alignment = Alignment(horizontal="center")
+            ws21.cell(row=row, column=7).alignment = Alignment(horizontal="center")
+
+            status = a.get("c4c_status", "")
+            if status == "Promo Only":
+                c4c_cell.fill = AMBER_FILL
+            elif status == "Rack Only":
+                c4c_cell.fill = PURPLE_LIGHT_FILL
+            else:
+                c4c_cell.fill = RED_FILL
+
+            row += 1
+
+        _auto_width(ws21, len(rpo_notc4c_headers))
+        _add_auto_filter(ws21, 4, len(rpo_notc4c_headers))
+
+    # ═══════════════════════════════════════════════════════════════
     # SAVE
     # ═══════════════════════════════════════════════════════════════
     wb.save(output_path)
@@ -1427,5 +1573,7 @@ def generate_c4c_report(output_path):
         "c4c_dupes": len(xref["c4c_dupes"]),
         "promo_dupes": len(xref["promo_dupes"]),
         "cross_matched": xref["matched"],
+        "rpo_total": len(rpo_data),
+        "rpo_not_c4c": len([a for a in rpo_data if a.get("c4c_status") != "On C4C"]) if rpo_data else 0,
         "sheets": sheet_count,
     }

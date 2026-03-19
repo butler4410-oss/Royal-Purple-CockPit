@@ -345,10 +345,14 @@ elif nav == "Customer Map":
                         report_data = f.read()
                     os.unlink(report_path)
 
+                    rpo_msg = ""
+                    if stats.get("rpo_total"):
+                        rpo_msg = f" + RPO Autocare: {stats['rpo_total']:,} accounts ({stats['rpo_not_c4c']:,} not on C4C)."
                     st.success(
                         f"Report generated — {stats['sheets']} sheets, {stats['total_accounts']} total accounts: "
                         f"{stats['not_on_c4c']} not on C4C, {stats['c4c_matched']} matched, "
                         f"{stats['distributors']} distributors, {stats['states']} states, {stats['counties']} counties."
+                        f"{rpo_msg}"
                     )
 
                     st.download_button(
