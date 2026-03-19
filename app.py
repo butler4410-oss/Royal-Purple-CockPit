@@ -357,6 +357,96 @@ elif nav == "Customer Map":
                         file_name="RP_C4C_Report.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     )
+
+        st.markdown("---")
+        st.markdown("### RPO Autocare — C4C Gap Analysis")
+        st.caption("Cross-references 4,125 RPO Autocare 2025 installer accounts against C4C, Promo, and Rack lists to identify accounts not yet onboarded into C4C.")
+
+        rpo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rpo_autocare_processed.json")
+        if os.path.exists(rpo_path):
+            import pandas as pd
+
+            with open(rpo_path) as _rpf:
+                rpo_data = json.load(_rpf)
+
+            c4c_count = sum(1 for a in rpo_data if a['c4c_status'] == 'On C4C')
+            promo_count = sum(1 for a in rpo_data if a['c4c_status'] == 'Promo Only')
+            rack_count = sum(1 for a in rpo_data if a['c4c_status'] == 'Rack Only')
+            not_in_count = sum(1 for a in rpo_data if a['c4c_status'] == 'Not in System')
+            total_not_c4c = promo_count + rack_count + not_in_count
+            total_sales_not_c4c = sum(a['cytd_sales'] for a in rpo_data if a['c4c_status'] != 'On C4C')
+
+            rc1, rc2, rc3, rc4, rc5 = st.columns(5)
+            rc1.metric("Total RPO Accounts", f"{len(rpo_data):,}")
+            rc2.metric("On C4C", f"{c4c_count:,}")
+            rc3.metric("Not on C4C", f"{total_not_c4c:,}")
+            rc4.metric("C4C Rate", f"{c4c_count/len(rpo_data)*100:.1f}%")
+            rc5.metric("Non-C4C Revenue", f"${total_sales_not_c4c:,.0f}")
+
+            st.markdown("")
+            rpo_filter = st.selectbox(
+                "Filter by C4C Status",
+                ["All Not on C4C", "All Accounts", "Promo Only", "Rack Only", "Not in System", "On C4C"],
+                key="rpo_filter",
+            )
+            rpo_sort = st.selectbox(
+                "Sort by",
+                ["CYTD Sales (High to Low)", "CYTD Sales (Low to High)", "Name (A-Z)", "Name (Z-A)", "District", "Region"],
+                key="rpo_sort",
+            )
+
+            filtered = rpo_data
+            if rpo_filter == "All Not on C4C":
+                filtered = [a for a in rpo_data if a['c4c_status'] != 'On C4C']
+            elif rpo_filter == "On C4C":
+                filtered = [a for a in rpo_data if a['c4c_status'] == 'On C4C']
+            elif rpo_filter == "Promo Only":
+                filtered = [a for a in rpo_data if a['c4c_status'] == 'Promo Only']
+            elif rpo_filter == "Rack Only":
+                filtered = [a for a in rpo_data if a['c4c_status'] == 'Rack Only']
+            elif rpo_filter == "Not in System":
+                filtered = [a for a in rpo_data if a['c4c_status'] == 'Not in System']
+
+            if rpo_sort == "CYTD Sales (High to Low)":
+                filtered.sort(key=lambda x: -x['cytd_sales'])
+            elif rpo_sort == "CYTD Sales (Low to High)":
+                filtered.sort(key=lambda x: x['cytd_sales'])
+            elif rpo_sort == "Name (A-Z)":
+                filtered.sort(key=lambda x: x['name'].upper())
+            elif rpo_sort == "Name (Z-A)":
+                filtered.sort(key=lambda x: x['name'].upper(), reverse=True)
+            elif rpo_sort == "District":
+                filtered.sort(key=lambda x: (x['district'], -x['cytd_sales']))
+            elif rpo_sort == "Region":
+                filtered.sort(key=lambda x: (x['region'], -x['cytd_sales']))
+
+            st.markdown(f"**Showing {len(filtered):,} accounts**")
+
+            df = pd.DataFrame([{
+                "Installer Name": a['name'],
+                "C4C Status": a['c4c_status'],
+                "CYTD Sales": a['cytd_sales'],
+                "Gold Flag": a['gold_flag'],
+                "District": a['district'],
+                "Region": a['region'],
+                "Company Owned": a['company_owned'],
+                "City": a['city'],
+            } for a in filtered])
+
+            if not df.empty:
+                df["CYTD Sales"] = df["CYTD Sales"].apply(lambda x: f"${x:,.2f}")
+                st.dataframe(df, use_container_width=True, height=500, hide_index=True)
+
+                csv_export = df.to_csv(index=False)
+                st.download_button(
+                    label=f"Download {rpo_filter} ({len(filtered):,} accounts)",
+                    data=csv_export,
+                    file_name=f"RPO_Autocare_{rpo_filter.replace(' ', '_')}.csv",
+                    mime="text/csv",
+                    key="rpo_csv_download",
+                )
+        else:
+            st.info("RPO Autocare data not yet processed. Upload the RPO Autocare Excel to cross-reference.")
     else:
         st.info("No customer data available. Upload a CSV file to get started.")
 

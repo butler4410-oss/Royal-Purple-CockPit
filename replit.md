@@ -45,6 +45,14 @@
 - **Export C4C Report**: 19-sheet comprehensive account intelligence workbook
 - ESRI English-only basemap tiles
 
+## RPO Autocare C4C Gap Analysis
+- **rpo_autocare_processed.json** — 4,125 RPO Autocare 2025 installer accounts cross-referenced against C4C, Promo, and Rack lists
+- Results: 701 On C4C (17.0%), 836 Promo Only, 65 Rack Only, 2,523 Not in System → **3,424 total not on C4C**
+- Clean names (ID numbers stripped from "187612 | Name" format)
+- Filterable by C4C status, sortable by sales/name/district/region
+- CSV export for any filtered view
+- Located on Customer Map page below the map and export sections
+
 ## C4C Report (19 Sheets)
 1. Dashboard — C4C explanation, network overview (all 8 types), gap summary
 2. All Accounts — 4,683 master list with Type, County, Rack status (filterable)
