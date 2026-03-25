@@ -1,4 +1,5 @@
 import streamlit as st
+from profit_pdf import generate_profit_pdf
 
 def render():
     st.markdown(
@@ -166,4 +167,41 @@ def render():
                 {f'across <strong>{num_locations} locations</strong> for a total of <strong>${total_annual:,.2f}</strong>' if num_locations > 1 else ''}.
             </div>""",
             unsafe_allow_html=True,
+        )
+
+        st.markdown("")
+        pdf_data = {
+            "installer_name": installer_name,
+            "ocpd": ocpd,
+            "conversion_pct": conversion_pct,
+            "gallons_per": gallons_per,
+            "days_open": days_open,
+            "num_locations": num_locations,
+            "rp_product": rp_product,
+            "rp_distributor": rp_distributor,
+            "rp_selling_price": rp_selling_price,
+            "rp_pkg": rp_pkg,
+            "rp_prices": rp_prices,
+            "comp_brand": comp_brand,
+            "comp_selling_price": comp_selling_price,
+            "comp_pkg": comp_pkg,
+            "comp_prices": comp_prices,
+            "total_oil_changes": total_oil_changes,
+            "rp_converting": rp_converting,
+            "rp_fluid_cost": rp_fluid_cost,
+            "rp_gross_profit": rp_gross_profit,
+            "comp_fluid_cost": comp_fluid_cost,
+            "comp_gross_profit": comp_gross_profit,
+            "incremental_per_service": incremental_per_service,
+            "annual_per_location": annual_per_location,
+            "total_annual": total_annual,
+        }
+        pdf_bytes = generate_profit_pdf(pdf_data)
+        filename = f"RP_Profit_Calc_{installer_name.replace(' ', '_') or 'Report'}.pdf"
+        st.download_button(
+            label="Download PDF Report",
+            data=pdf_bytes,
+            file_name=filename,
+            mime="application/pdf",
+            use_container_width=True,
         )
