@@ -25,24 +25,24 @@ def render():
         st.markdown("##### Royal Purple Pricing")
         rp_product = st.text_input("RP Product", value="Royal Purple HP 5W-30", key="pc_rp_prod")
         rp_distributor = st.text_input("Distributor", value="", key="pc_rp_dist")
-        rp_selling_price = st.number_input("Suggested RP Selling Price ($)", min_value=0.0, value=124.95, step=1.0, format="%.2f", key="pc_rp_sell")
+        rp_selling_price = st.number_input("Suggested RP Selling Price ($)", min_value=0.0, value=0.0, step=1.0, format="%.2f", key="pc_rp_sell")
 
         rp_pkg = st.selectbox("RP Package Size", ["Bulk", "Drum", "Bag-n-Box", "5 Qt.", "1 Qt.", "1 Gallon"], index=2, key="pc_rp_pkg")
         rp_prices = {}
         st.markdown('<p style="font-size:13px;color:#6B7280;margin-bottom:4px;">RP Distributor Pricing (per gallon conversion):</p>', unsafe_allow_html=True)
         rp_c1, rp_c2, rp_c3 = st.columns(3)
-        rp_prices["Bulk"] = rp_c1.number_input("Bulk ($/gal)", min_value=0.0, value=23.58, step=0.5, format="%.2f", key="pc_rp_bulk")
-        rp_prices["Drum"] = rp_c2.number_input("Drum ($/gal)", min_value=0.0, value=25.98, step=0.5, format="%.2f", key="pc_rp_drum")
-        rp_prices["Bag-n-Box"] = rp_c3.number_input("BnB ($/gal)", min_value=0.0, value=25.33, step=0.5, format="%.2f", key="pc_rp_bnb")
+        rp_prices["Bulk"] = rp_c1.number_input("Bulk ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_rp_bulk")
+        rp_prices["Drum"] = rp_c2.number_input("Drum ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_rp_drum")
+        rp_prices["Bag-n-Box"] = rp_c3.number_input("BnB ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_rp_bnb")
         rp_c4, rp_c5, rp_c6 = st.columns(3)
-        rp_prices["5 Qt."] = rp_c4.number_input("5Qt ($/gal)", min_value=0.0, value=29.18, step=0.5, format="%.2f", key="pc_rp_5qt")
-        rp_prices["1 Qt."] = rp_c5.number_input("1Qt ($/gal)", min_value=0.0, value=30.80, step=0.5, format="%.2f", key="pc_rp_1qt")
-        rp_prices["1 Gallon"] = rp_c6.number_input("1Gal ($/gal)", min_value=0.0, value=23.02, step=0.5, format="%.2f", key="pc_rp_1gal")
+        rp_prices["5 Qt."] = rp_c4.number_input("5Qt ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_rp_5qt")
+        rp_prices["1 Qt."] = rp_c5.number_input("1Qt ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_rp_1qt")
+        rp_prices["1 Gallon"] = rp_c6.number_input("1Gal ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_rp_1gal")
 
         st.markdown("---")
         st.markdown("##### Current Top-Selling Brand")
         comp_brand = st.text_input("Current Brand", value="Mobil 1", key="pc_comp_brand")
-        comp_selling_price = st.number_input("Current Selling Price ($)", min_value=0.0, value=119.99, step=1.0, format="%.2f", key="pc_comp_sell")
+        comp_selling_price = st.number_input("Current Selling Price ($)", min_value=0.0, value=0.0, step=1.0, format="%.2f", key="pc_comp_sell")
 
         comp_pkg = st.selectbox("Competitor Package Size", ["Bulk", "Drum", "Bag-n-Box", "5 Qt.", "1 Qt.", "1 Gallon"], index=0, key="pc_comp_pkg")
         comp_prices = {}
