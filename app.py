@@ -13,6 +13,7 @@ from map_data_exporter import generate_map_export
 from code_detector import detect_new_codes, add_new_codes_to_db
 import product_reference
 import admin_panel
+import profit_calculator
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
@@ -32,7 +33,7 @@ with st.sidebar:
 
     nav = st.radio(
         "Navigation",
-        ["Home", "Report Generator", "Customer Map", "Product Reference", "Admin"],
+        ["Home", "Report Generator", "Customer Map", "Product Reference", "Profit Calculator", "Admin"],
         label_visibility="collapsed",
     )
 
@@ -458,6 +459,27 @@ elif nav == "Product Reference":
     page_header("Product Reference", "Royal Purple operation codes, product catalog, competitor reference & conversion guide")
     st.markdown("")
     product_reference.render()
+
+elif nav == "Profit Calculator":
+    st.markdown(
+        """
+        <div style="background:linear-gradient(135deg,#2D1B5E 0%,#4B2D8A 60%,#6B3FA0 100%);
+                    border-radius:12px;padding:32px 36px 28px;margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#C4B5E8;
+                        text-transform:uppercase;margin-bottom:8px;">Royal Purple Partnership Hub</div>
+            <div style="font-size:28px;font-weight:800;color:#FFFFFF;line-height:1.2;margin-bottom:8px;">
+                Installer Profit Calculator
+            </div>
+            <div style="font-size:14px;color:#C4B5E8;max-width:560px;line-height:1.6;">
+                Compare Royal Purple profitability vs. your installer's current top-selling brand.
+                See the incremental profit per service, per location, and total annual impact.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown("")
+    profit_calculator.render()
 
 elif nav == "Admin":
     page_header("Admin", "Manage operation codes and product database")

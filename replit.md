@@ -4,7 +4,8 @@
 "The Royal Purple Partnership Hub by ThrottlePro" — a Streamlit web app for Royal Purple installer partners with three sections: Report Generator (Excel→PPTX), Customer Map (Leaflet.js interactive marker map), and Product Reference.
 
 ## Architecture
-- **app.py** — Streamlit frontend with 4-page sidebar nav: Home (dashboard), Report Generator, Customer Map, Product Reference
+- **app.py** — Streamlit frontend with 6-page sidebar nav: Home, Report Generator, Customer Map, Product Reference, Profit Calculator, Admin
+- **profit_calculator.py** — Interactive RP vs competitor profit comparison tool with volume/pricing inputs and real-time results dashboard
 - **report_generator.py** — PPTX engine + adaptive Excel parser with invoice deduplication and Max-Clean attachment analysis
 - **customer_map.py** — Leaflet.js map builder: loads customers.json + distributors.json, generates embedded HTML map with 8 marker categories
 - **c4c_report_generator.py** — Excel report generator: C4C gap analysis → 10-sheet .xlsx workbook

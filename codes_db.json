@@ -300,6 +300,11 @@
           "code": "HPS20W50",
           "viscosity": "20W-50",
           "notes": "Classic/V8 applications"
+        },
+        {
+          "code": "HPSF",
+          "viscosity": "F",
+          "notes": "Auto-detected from report"
         }
       ]
     },
@@ -520,6 +525,36 @@
         {
           "code": "SS5W30",
           "name": "SS5W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "SPR",
+          "product": "SPR",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "SS0W16",
+          "product": "SS0W16",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "SS0W40",
+          "product": "SS0W40",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "SUPW",
+          "product": "SUPW",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "SW",
+          "product": "SW",
           "viscosity": "",
           "notes": "Auto-detected from report"
         }
@@ -986,6 +1021,318 @@
           "name": "VSM5W30",
           "viscosity": "",
           "notes": "Auto-detected from report"
+        },
+        {
+          "code": "V10W30B",
+          "product": "V10W30B",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VA169",
+          "product": "VA169",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VA180",
+          "product": "VA180",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VA206",
+          "product": "VA206",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VA287",
+          "product": "VA287",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VAS0W20",
+          "product": "VAS0W20",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VB10W30",
+          "product": "VB10W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VCA1034",
+          "product": "VCA1034",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VCA1118",
+          "product": "VCA1118",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VCA1183",
+          "product": "VCA1183",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VCA2046",
+          "product": "VCA2046",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VE0W40",
+          "product": "VE0W40",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VM10W30",
+          "product": "VM10W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VMS10W30",
+          "product": "VMS10W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO103",
+          "product": "VO103",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO116",
+          "product": "VO116",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO129",
+          "product": "VO129",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO133",
+          "product": "VO133",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO140",
+          "product": "VO140",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO149",
+          "product": "VO149",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO15",
+          "product": "VO15",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO150",
+          "product": "VO150",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO161",
+          "product": "VO161",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO164",
+          "product": "VO164",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO165",
+          "product": "VO165",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO166",
+          "product": "VO166",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO168",
+          "product": "VO168",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO170",
+          "product": "VO170",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO196",
+          "product": "VO196",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO197",
+          "product": "VO197",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO198",
+          "product": "VO198",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO199",
+          "product": "VO199",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO203",
+          "product": "VO203",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO211",
+          "product": "VO211",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO214",
+          "product": "VO214",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO238",
+          "product": "VO238",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO66",
+          "product": "VO66",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO69",
+          "product": "VO69",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO71",
+          "product": "VO71",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO75",
+          "product": "VO75",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO77",
+          "product": "VO77",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO80",
+          "product": "VO80",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO81",
+          "product": "VO81",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO86",
+          "product": "VO86",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO97",
+          "product": "VO97",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VO99",
+          "product": "VO99",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VPB10W30",
+          "product": "VPB10W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VPB15W40",
+          "product": "VPB15W40",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VS10W30",
+          "product": "VS10W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VSM5W20",
+          "product": "VSM5W20",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VTM-4",
+          "product": "VTM-4",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "VXL5W30",
+          "product": "VXL5W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
         }
       ],
       "conversion_note": "VS \u2192 RS direct swap. VM (MaxLife) \u2192 HMX direct swap. VB/VE conventional \u2192 upsell to RS or HMX."
@@ -1130,6 +1477,12 @@
         {
           "code": "MW",
           "name": "MW",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "MIS25",
+          "product": "MIS25",
           "viscosity": "",
           "notes": "Auto-detected from report"
         }
@@ -1452,6 +1805,222 @@
           "name": "COF",
           "viscosity": "",
           "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C25863",
+          "product": "C25863",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C26176",
+          "product": "C26176",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C26205",
+          "product": "C26205",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C29064",
+          "product": "C29064",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C31382",
+          "product": "C31382",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C31415",
+          "product": "C31415",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C31452",
+          "product": "C31452",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C35426",
+          "product": "C35426",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C35448",
+          "product": "C35448",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C35479",
+          "product": "C35479",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C35494",
+          "product": "C35494",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C35549",
+          "product": "C35549",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C35586",
+          "product": "C35586",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C35644",
+          "product": "C35644",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C35865",
+          "product": "C35865",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C36157",
+          "product": "C36157",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C36286",
+          "product": "C36286",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C41451",
+          "product": "C41451",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C45871",
+          "product": "C45871",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "C59186",
+          "product": "C59186",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CAF10022",
+          "product": "CAF10022",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CAF10059",
+          "product": "CAF10059",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CAF1956",
+          "product": "CAF1956",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CAF5005",
+          "product": "CAF5005",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CAF5007",
+          "product": "CAF5007",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF1437",
+          "product": "CF1437",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF1752",
+          "product": "CF1752",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF1756",
+          "product": "CF1756",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF5608",
+          "product": "CF5608",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF6135",
+          "product": "CF6135",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF6311",
+          "product": "CF6311",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF8165",
+          "product": "CF8165",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF9175",
+          "product": "CF9175",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF9205",
+          "product": "CF9205",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CF9207",
+          "product": "CF9207",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "CS5W40",
+          "product": "CS5W40",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
         }
       ],
       "conversion_note": "CS prefix = Castrol Edge. Same tier as RS \u2014 direct competitive swap."
@@ -1538,6 +2107,66 @@
         {
           "code": "PU5W30",
           "name": "PU5W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "P10W30B",
+          "product": "P10W30B",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "P5W20",
+          "product": "P5W20",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "PB",
+          "product": "PB",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "PBS5W40",
+          "product": "PBS5W40",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "PH5W20",
+          "product": "PH5W20",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "PH5W30",
+          "product": "PH5W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "PS0W16",
+          "product": "PS0W16",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "PSFF",
+          "product": "PSFF",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "PSU5W30",
+          "product": "PSU5W30",
+          "viscosity": "",
+          "notes": "Auto-detected from report"
+        },
+        {
+          "code": "PW",
+          "product": "PW",
           "viscosity": "",
           "notes": "Auto-detected from report"
         }
