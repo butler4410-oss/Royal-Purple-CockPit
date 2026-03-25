@@ -197,9 +197,9 @@ def render():
             "total_annual": total_annual,
         }
         pdf_bytes = generate_profit_pdf(pdf_data)
-        filename = f"RP_Profit_Calc_{installer_name.replace(' ', '_') or 'Report'}.pdf"
+        filename = f"Incremental_Profitability_Report_{installer_name.replace(' ', '_') or 'RP'}.pdf"
         st.download_button(
-            label="Download PDF Report",
+            label="Download Incremental Profitability Report",
             data=pdf_bytes,
             file_name=filename,
             mime="application/pdf",

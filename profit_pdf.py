@@ -62,7 +62,7 @@ def _styles():
 
 
 def _header_table(data, ss):
-    installer_name = data["installer_name"] or "Installer Profit Worksheet"
+    installer_name = data["installer_name"] or "Incremental Profitability Report"
     date_str = datetime.now().strftime("%B %d, %Y")
 
     header_data = []
@@ -85,7 +85,7 @@ def _header_table(data, ss):
     ]))
 
     elements = [t]
-    elements.append(Paragraph(f"Installer Profit Calculator  |  Generated {date_str}", ss["Subtitle_RP"]))
+    elements.append(Paragraph(f"Incremental Profitability Report  |  Generated {date_str}", ss["Subtitle_RP"]))
 
     d = Drawing(7.1 * inch, 2)
     d.add(Rect(0, 0, 7.1 * inch, 2, fillColor=PURPLE_DARK, strokeColor=None))
