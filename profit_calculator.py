@@ -42,6 +42,7 @@ def render():
         st.markdown("---")
         st.markdown("##### Current Top-Selling Brand")
         comp_brand = st.text_input("Current Brand", value="Mobil 1", key="pc_comp_brand")
+        comp_product = st.text_input("Top-Selling Product", value="", key="pc_comp_prod")
         comp_selling_price = st.number_input("Current Selling Price ($)", min_value=0.0, value=0.0, step=1.0, format="%.2f", key="pc_comp_sell")
 
         comp_pkg = st.selectbox("Competitor Package Size", ["Bulk", "Drum", "Bag-n-Box", "5 Qt.", "1 Qt.", "1 Gallon"], index=0, key="pc_comp_pkg")
@@ -112,7 +113,7 @@ def render():
             st.markdown(
                 f"""<div style="background:#FEF2F2;border:2px solid #DC2626;border-radius:10px;padding:16px;">
                     <div style="font-size:12px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:1px;">{comp_brand}</div>
-                    <div style="font-size:12px;color:#6B7280;margin-top:4px;">Current Top Brand</div>
+                    <div style="font-size:12px;color:#6B7280;margin-top:4px;">{comp_product or 'Current Top Brand'}</div>
                     <div style="margin-top:12px;">
                         <div style="font-size:11px;color:#6B7280;">Selling Price</div>
                         <div style="font-size:20px;font-weight:700;color:#1F2937;">${comp_selling_price:,.2f}</div>
@@ -183,6 +184,7 @@ def render():
             "rp_pkg": rp_pkg,
             "rp_prices": rp_prices,
             "comp_brand": comp_brand,
+            "comp_product": comp_product,
             "comp_selling_price": comp_selling_price,
             "comp_pkg": comp_pkg,
             "comp_prices": comp_prices,

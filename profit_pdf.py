@@ -27,68 +27,75 @@ AMBER_TEXT = HexColor("#92400E")
 
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 
+PAGE_W = letter[0]
+CONTENT_W = PAGE_W - 1.4 * inch
+
 
 def _styles():
     ss = getSampleStyleSheet()
     ss.add(ParagraphStyle("Title_RP", parent=ss["Title"], fontName="Helvetica-Bold",
-                          fontSize=18, textColor=PURPLE_DARK, spaceAfter=4, alignment=TA_LEFT))
+                          fontSize=18, textColor=PURPLE_DARK, spaceAfter=4, alignment=TA_CENTER))
     ss.add(ParagraphStyle("Subtitle_RP", parent=ss["Normal"], fontName="Helvetica",
-                          fontSize=10, textColor=GRAY, spaceAfter=12, alignment=TA_LEFT))
+                          fontSize=10, textColor=GRAY, spaceAfter=12, alignment=TA_CENTER))
     ss.add(ParagraphStyle("Section", parent=ss["Normal"], fontName="Helvetica-Bold",
-                          fontSize=11, textColor=PURPLE_DARK, spaceBefore=14, spaceAfter=6))
+                          fontSize=11, textColor=PURPLE_DARK, spaceBefore=14, spaceAfter=6, alignment=TA_CENTER))
     ss.add(ParagraphStyle("Label", parent=ss["Normal"], fontName="Helvetica",
-                          fontSize=8, textColor=GRAY))
+                          fontSize=8, textColor=GRAY, alignment=TA_CENTER))
+    ss.add(ParagraphStyle("LabelLeft", parent=ss["Normal"], fontName="Helvetica",
+                          fontSize=8, textColor=GRAY, alignment=TA_LEFT))
     ss.add(ParagraphStyle("Value", parent=ss["Normal"], fontName="Helvetica-Bold",
-                          fontSize=10, textColor=black))
+                          fontSize=10, textColor=black, alignment=TA_CENTER))
     ss.add(ParagraphStyle("ValueBig", parent=ss["Normal"], fontName="Helvetica-Bold",
-                          fontSize=14, textColor=PURPLE_DARK))
+                          fontSize=14, textColor=PURPLE_DARK, alignment=TA_CENTER))
     ss.add(ParagraphStyle("ValueGreen", parent=ss["Normal"], fontName="Helvetica-Bold",
-                          fontSize=12, textColor=GREEN))
+                          fontSize=12, textColor=GREEN, alignment=TA_CENTER))
     ss.add(ParagraphStyle("ValueRed", parent=ss["Normal"], fontName="Helvetica-Bold",
-                          fontSize=12, textColor=RED))
+                          fontSize=12, textColor=RED, alignment=TA_CENTER))
     ss.add(ParagraphStyle("ValueGold", parent=ss["Normal"], fontName="Helvetica-Bold",
-                          fontSize=16, textColor=GOLD))
+                          fontSize=16, textColor=GOLD, alignment=TA_CENTER))
     ss.add(ParagraphStyle("Footer", parent=ss["Normal"], fontName="Helvetica",
                           fontSize=7, textColor=GRAY, alignment=TA_CENTER))
     ss.add(ParagraphStyle("Takeaway", parent=ss["Normal"], fontName="Helvetica",
-                          fontSize=9, textColor=AMBER_TEXT, leading=13))
+                          fontSize=9, textColor=AMBER_TEXT, leading=13, alignment=TA_CENTER))
     ss.add(ParagraphStyle("WhiteLabel", parent=ss["Normal"], fontName="Helvetica",
-                          fontSize=8, textColor=HexColor("#C4B5E8")))
+                          fontSize=8, textColor=HexColor("#C4B5E8"), alignment=TA_CENTER))
     ss.add(ParagraphStyle("WhiteValue", parent=ss["Normal"], fontName="Helvetica-Bold",
-                          fontSize=14, textColor=white))
+                          fontSize=14, textColor=white, alignment=TA_CENTER))
     ss.add(ParagraphStyle("WhiteValueBig", parent=ss["Normal"], fontName="Helvetica-Bold",
-                          fontSize=18, textColor=GOLD))
+                          fontSize=18, textColor=GOLD, alignment=TA_CENTER))
     return ss
+
+
+def _wrap_centered(inner_table):
+    outer = Table([[inner_table]], colWidths=[CONTENT_W])
+    outer.setStyle(TableStyle([
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+    return outer
 
 
 def _header_table(data, ss):
     installer_name = data["installer_name"] or "Incremental Profitability Report"
     date_str = datetime.now().strftime("%B %d, %Y")
 
-    header_data = []
+    elements = []
     if os.path.exists(LOGO_PATH):
         logo = Image(LOGO_PATH, width=1.3 * inch, height=0.55 * inch)
-        header_data.append([
-            logo,
-            Paragraph(f"<b>{installer_name}</b>", ss["Title_RP"]),
-        ])
-    else:
-        header_data.append([
-            Paragraph("Royal Purple", ss["Title_RP"]),
-            Paragraph(f"<b>{installer_name}</b>", ss["Title_RP"]),
-        ])
+        logo.hAlign = "CENTER"
+        elements.append(logo)
+        elements.append(Spacer(1, 6))
 
-    t = Table(header_data, colWidths=[1.6 * inch, 5.5 * inch])
-    t.setStyle(TableStyle([
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-    ]))
-
-    elements = [t]
+    elements.append(Paragraph(f"<b>{installer_name}</b>", ss["Title_RP"]))
     elements.append(Paragraph(f"Incremental Profitability Report  |  Generated {date_str}", ss["Subtitle_RP"]))
 
-    d = Drawing(7.1 * inch, 2)
-    d.add(Rect(0, 0, 7.1 * inch, 2, fillColor=PURPLE_DARK, strokeColor=None))
+    d = Drawing(CONTENT_W, 2)
+    d.add(Rect(0, 0, CONTENT_W, 2, fillColor=PURPLE_DARK, strokeColor=None))
+    d.hAlign = "CENTER"
     elements.append(d)
     elements.append(Spacer(1, 8))
     return elements
@@ -109,10 +116,12 @@ def _volume_table(data, ss):
         [Paragraph("Gallons / Oil Change", ss["Label"]), Paragraph(f"{data['gallons_per']:.2f}", ss["ValueBig"])],
     ]]
 
-    t = Table(tbl_data, colWidths=[1.775 * inch] * 4)
+    col_w = CONTENT_W / 4
+    t = Table(tbl_data, colWidths=[col_w] * 4)
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), PURPLE_LIGHT),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
         ("TOPPADDING", (0, 0), (-1, -1), 8),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
         ("LEFTPADDING", (0, 0), (-1, -1), 10),
@@ -120,7 +129,7 @@ def _volume_table(data, ss):
         ("BOX", (0, 0), (-1, -1), 0.5, PURPLE_MID),
         ("ROUNDEDCORNERS", [6, 6, 6, 6]),
     ]))
-    elements.append(t)
+    elements.append(_wrap_centered(t))
     return elements
 
 
@@ -128,13 +137,14 @@ def _comparison_table(data, ss):
     elements = [Paragraph("PROFITABILITY COMPARISON", ss["Section"])]
 
     rp_label = Paragraph("ROYAL PURPLE", ParagraphStyle("rphead", parent=ss["Label"],
-                         fontName="Helvetica-Bold", fontSize=9, textColor=GREEN))
+                         fontName="Helvetica-Bold", fontSize=9, textColor=GREEN, alignment=TA_CENTER))
     comp_label = Paragraph(data["comp_brand"].upper(), ParagraphStyle("comphead", parent=ss["Label"],
-                           fontName="Helvetica-Bold", fontSize=9, textColor=RED))
+                           fontName="Helvetica-Bold", fontSize=9, textColor=RED, alignment=TA_CENTER))
 
     rp_product_p = Paragraph(data["rp_product"], ss["Label"])
-    comp_product_p = Paragraph("Current Top-Selling Brand", ss["Label"])
+    comp_product_p = Paragraph(data.get("comp_product") or "Current Top-Selling Brand", ss["Label"])
 
+    side_w = (CONTENT_W - 1.8 * inch) / 2
     rows = [
         ["", rp_label, comp_label],
         ["Product", rp_product_p, comp_product_p],
@@ -148,11 +158,12 @@ def _comparison_table(data, ss):
     ]
 
     if data.get("rp_distributor"):
-        rows.insert(2, ["Distributor", Paragraph(data["rp_distributor"], ss["Value"]), Paragraph("—", ss["Label"])])
+        rows.insert(2, ["Distributor", Paragraph(data["rp_distributor"], ss["Value"]), Paragraph("\u2014", ss["Label"])])
 
-    t = Table(rows, colWidths=[1.8 * inch, 2.65 * inch, 2.65 * inch])
+    t = Table(rows, colWidths=[1.8 * inch, side_w, side_w])
     style_cmds = [
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("ALIGN", (1, 0), (-1, -1), "CENTER"),
         ("TOPPADDING", (0, 0), (-1, -1), 6),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
         ("LEFTPADDING", (0, 0), (-1, -1), 10),
@@ -167,7 +178,7 @@ def _comparison_table(data, ss):
         ("LINEBELOW", (0, -1), (-1, -1), 1.5, PURPLE_MID),
     ]
     t.setStyle(TableStyle(style_cmds))
-    elements.append(t)
+    elements.append(_wrap_centered(t))
     return elements
 
 
@@ -180,10 +191,11 @@ def _profitability_block(data, ss):
     total = data["total_annual"]
     locs = data["num_locations"]
 
+    col_w = CONTENT_W / 3
     rows = [
         [
             [Paragraph("INCREMENTAL PROFITABILITY", ParagraphStyle("s", parent=ss["WhiteLabel"],
-             fontName="Helvetica-Bold", fontSize=9, textColor=HexColor("#C4B5E8")))],
+             fontName="Helvetica-Bold", fontSize=9, textColor=HexColor("#C4B5E8"), alignment=TA_CENTER))],
             "",
             "",
         ],
@@ -192,21 +204,22 @@ def _profitability_block(data, ss):
              Paragraph(f"{arrow} ${abs(inc):,.2f}", ss["WhiteValue"])],
             [Paragraph("Annual / Location", ss["WhiteLabel"]),
              Paragraph(f"${annual_loc:,.2f}", ss["WhiteValue"])],
-            [Paragraph(f"Days Open / Year", ss["WhiteLabel"]),
+            [Paragraph("Days Open / Year", ss["WhiteLabel"]),
              Paragraph(f"{data['days_open']}", ss["WhiteValue"])],
         ],
         [
-            [Paragraph(f"{locs} Location{'s' if locs > 1 else ''} — Total Annual Profitability", ss["WhiteLabel"]),
+            [Paragraph(f"{locs} Location{'s' if locs > 1 else ''} \u2014 Total Annual Profitability", ss["WhiteLabel"]),
              Paragraph(f"${total:,.2f}", ss["WhiteValueBig"])],
             "",
             "",
         ],
     ]
 
-    t = Table(rows, colWidths=[2.37 * inch] * 3)
+    t = Table(rows, colWidths=[col_w] * 3)
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), PURPLE_DARK),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
         ("TOPPADDING", (0, 0), (-1, -1), 8),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
         ("LEFTPADDING", (0, 0), (-1, -1), 12),
@@ -217,7 +230,7 @@ def _profitability_block(data, ss):
         ("BOX", (0, 0), (-1, -1), 1, PURPLE_MID),
         ("ROUNDEDCORNERS", [8, 8, 8, 8]),
     ]))
-    elements.append(t)
+    elements.append(_wrap_centered(t))
     return elements
 
 
@@ -239,7 +252,7 @@ def _takeaway(data, ss):
 
     elements = [Spacer(1, 10)]
 
-    tbl = Table([[Paragraph(msg, ss["Takeaway"])]], colWidths=[7.1 * inch])
+    tbl = Table([[Paragraph(msg, ss["Takeaway"])]], colWidths=[CONTENT_W])
     tbl.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), AMBER_BG),
         ("BOX", (0, 0), (-1, -1), 1, AMBER_BORDER),
@@ -249,7 +262,7 @@ def _takeaway(data, ss):
         ("RIGHTPADDING", (0, 0), (-1, -1), 12),
         ("ROUNDEDCORNERS", [6, 6, 6, 6]),
     ]))
-    elements.append(tbl)
+    elements.append(_wrap_centered(tbl))
     return elements
 
 
@@ -261,7 +274,9 @@ def _pricing_detail(data, ss):
     rp_row = ["Royal Purple"] + [f"${data['rp_prices'].get(p, 0):,.2f}" for p in pkg_names]
     comp_row = [data["comp_brand"]] + [f"${data['comp_prices'].get(p, 0):,.2f}" for p in pkg_names]
 
-    tbl = Table([header, rp_row, comp_row], colWidths=[1.2 * inch] + [0.98 * inch] * 6)
+    label_w = 1.2 * inch
+    data_w = (CONTENT_W - label_w) / 6
+    tbl = Table([header, rp_row, comp_row], colWidths=[label_w] + [data_w] * 6)
     tbl.setStyle(TableStyle([
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTSIZE", (0, 0), (-1, -1), 8),
@@ -278,7 +293,7 @@ def _pricing_detail(data, ss):
         ("RIGHTPADDING", (0, 0), (-1, -1), 6),
         ("ALIGN", (1, 0), (-1, -1), "CENTER"),
     ]))
-    elements.append(tbl)
+    elements.append(_wrap_centered(tbl))
     return elements
 
 
