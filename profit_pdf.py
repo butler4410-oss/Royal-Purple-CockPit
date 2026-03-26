@@ -11,14 +11,14 @@ from reportlab.graphics.shapes import Drawing, Rect, String
 from reportlab.graphics import renderPDF
 
 
-PURPLE_DARK = HexColor("#2D1B5E")
-PURPLE_MID = HexColor("#4B2D8A")
+PURPLE_DARK = HexColor("#16213e")
+PURPLE_MID = HexColor("#e31837")
 PURPLE_LIGHT = HexColor("#F3E8FF")
 GREEN = HexColor("#059669")
 GREEN_BG = HexColor("#ECFDF5")
 RED = HexColor("#DC2626")
 RED_BG = HexColor("#FEF2F2")
-GOLD = HexColor("#C8A951")
+GOLD = HexColor("#e31837")
 GRAY = HexColor("#6B7280")
 GRAY_LIGHT = HexColor("#F9FAFB")
 AMBER_BG = HexColor("#FFFBEB")
@@ -242,7 +242,7 @@ def _takeaway(data, ss):
 
     multi = locs > 1
     msg = (
-        f"<b>Key Takeaway:</b> By converting just {conv_pct}% of oil changes to Royal Purple, "
+        f"<b>Key Takeaway:</b> By converting just {conv_pct}% of oil changes to Butler Performance, "
         f"{'each location gains' if multi else 'this location gains'} "
         f"<b>${annual_loc:,.2f}</b> in additional annual profit"
     )
@@ -271,7 +271,7 @@ def _pricing_detail(data, ss):
 
     pkg_names = ["Bulk", "Drum", "Bag-n-Box", "5 Qt.", "1 Qt.", "1 Gallon"]
     header = ["Package"] + pkg_names
-    rp_row = ["Royal Purple"] + [f"${data['rp_prices'].get(p, 0):,.2f}" for p in pkg_names]
+    rp_row = ["Butler Performance"] + [f"${data['rp_prices'].get(p, 0):,.2f}" for p in pkg_names]
     comp_row = [data["comp_brand"]] + [f"${data['comp_prices'].get(p, 0):,.2f}" for p in pkg_names]
 
     label_w = 1.2 * inch
@@ -315,7 +315,7 @@ def generate_profit_pdf(data: dict) -> bytes:
     elements.extend(_pricing_detail(data, ss))
 
     elements.append(Spacer(1, 20))
-    elements.append(Paragraph("Royal Purple Partnership Hub by ThrottlePro  |  Confidential", ss["Footer"]))
+    elements.append(Paragraph("Butler Performance Partnership Hub by ThrottlePro  |  Confidential", ss["Footer"]))
 
     doc.build(elements)
     buf.seek(0)

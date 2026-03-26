@@ -106,7 +106,7 @@ def auto_classify_code(code, db):
         viscosity = c[len(prefix):]
         return {
             "type": "rp",
-            "label": "Royal Purple",
+            "label": "Butler Performance",
             "series": series,
             "viscosity": viscosity,
             "prefix": prefix,

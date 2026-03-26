@@ -20,15 +20,15 @@ LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "as
 LOGO_NEVER_SETTLE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg")
 
 st.set_page_config(
-    page_title="Royal Purple Partnership Hub",
-    page_icon="👑",
+    page_title="Butler Performance Analytics",
+    page_icon="📊",
     layout="wide",
 )
 
 with st.sidebar:
     st.markdown("")
-    st.markdown("**The Royal Purple Partnership Hub**")
-    st.caption("by ThrottlePro")
+    st.markdown("**The Butler Performance Analytics**")
+    st.caption("by Butler Analytics")
     st.markdown("---")
 
     nav = st.radio(
@@ -40,12 +40,12 @@ with st.sidebar:
     st.markdown("---")
     if os.path.exists(LOGO_NEVER_SETTLE):
         st.image(LOGO_NEVER_SETTLE, width="stretch")
-    st.caption("More Cars. More Loyalty. Less Stress.")
+    st.caption("Make Your Data Perform.")
 
 
 def page_header(title, subtitle):
     st.markdown(
-        f"<h1 style='color:#4B2D8A; margin: 0;'>{title}</h1>"
+        f"<h1 style='color:#e31837; margin: 0;'>{title}</h1>"
         f"<p style='color:#94A3B8; margin: 4px 0 0 0;'>{subtitle}</p>",
         unsafe_allow_html=True,
     )
@@ -54,17 +54,17 @@ def page_header(title, subtitle):
 if nav == "Home":
     st.markdown(
         """
-        <div style="background:linear-gradient(135deg,#1E0F3C 0%,#2D1B5E 40%,#4B2D8A 80%,#6B3FA0 100%);
+        <div style="background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 40%,#e31837 80%,#ff4d6a 100%);
                     border-radius:14px;padding:44px 42px 36px;margin-bottom:28px;position:relative;overflow:hidden;">
             <div style="position:absolute;top:0;right:0;width:260px;height:100%;
                         background:radial-gradient(circle at 80% 30%,rgba(107,63,160,0.5) 0%,transparent 70%);"></div>
             <div style="font-size:11px;font-weight:700;letter-spacing:3.5px;color:#C4B5E8;
-                        text-transform:uppercase;margin-bottom:12px;">The Royal Purple Partnership Hub</div>
+                        text-transform:uppercase;margin-bottom:12px;">The Butler Performance Analytics</div>
             <div style="font-size:34px;font-weight:800;color:#FFFFFF;line-height:1.15;margin-bottom:6px;">
-                by ThrottlePro
+                by Butler Analytics
             </div>
             <div style="font-size:15px;color:#C4B5E8;max-width:620px;line-height:1.7;margin-top:12px;">
-                Your centralized command center for Royal Purple installer analytics,
+                Your centralized command center for Butler Performance installer analytics,
                 customer mapping, and product intelligence.
                 Upload reports, explore your network, and manage your product database — all in one place.
             </div>
@@ -142,18 +142,18 @@ if nav == "Home":
         st.markdown(
             f"""
             <div style="{card_style}">
-                <div style="{icon_style}background:#EDE9FE;color:#6B3FA0;">&#9889;</div>
+                <div style="{icon_style}background:#EDE9FE;color:#ff4d6a;">&#9889;</div>
                 <div style="font-size:17px;font-weight:700;color:#1F2937;margin-bottom:6px;">
                     Report Generator
                 </div>
                 <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
-                    Upload monthly Royal Purple Excel exports and generate fully branded PowerPoint
+                    Upload monthly Butler Performance Excel exports and generate fully branded PowerPoint
                     presentations with revenue analytics, Max-Clean attachment metrics, and per-store deep dives.
                 </div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap;">
-                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Auto-parse</span>
-                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Deduplication</span>
-                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Branded PPTX</span>
+                    <span style="font-size:11px;color:#e31837;font-weight:600;">&#10003; Auto-parse</span>
+                    <span style="font-size:11px;color:#e31837;font-weight:600;">&#10003; Deduplication</span>
+                    <span style="font-size:11px;color:#e31837;font-weight:600;">&#10003; Branded PPTX</span>
                 </div>
             </div>
             """,
@@ -169,7 +169,7 @@ if nav == "Home":
                     Customer Map
                 </div>
                 <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
-                    Interactive map of {len(all_locations):,} Royal Purple locations across {len(us_states)} states and {len(unique_countries)} countries.
+                    Interactive map of {len(all_locations):,} Butler Performance locations across {len(us_states)} states and {len(unique_countries)} countries.
                     Filter by 8 account types, search by name or address, and export data to branded Excel workbooks.
                 </div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap;">
@@ -191,7 +191,7 @@ if nav == "Home":
                     Product Reference
                 </div>
                 <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
-                    Complete database of {rp_sku_count} Royal Purple SKUs across {rp_series_count} product lines,
+                    Complete database of {rp_sku_count} Butler Performance SKUs across {rp_series_count} product lines,
                     plus {comp_brand_count} competitor brands. Operation codes, viscosities, and cross-references.
                 </div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap;">
@@ -245,7 +245,7 @@ if nav == "Home":
     st.caption("Use the sidebar to navigate between pages. Select Report Generator to upload Excel files, Customer Map to explore locations, or Product Reference to browse the code database.")
 
 elif nav == "Customer Map":
-    page_header("Customer Map", "Interactive map of Royal Purple customer locations across the United States.")
+    page_header("Customer Map", "Interactive map of Butler Performance customer locations across the United States.")
     st.markdown("")
 
     csv_upload = st.file_uploader(
@@ -307,7 +307,7 @@ elif nav == "Customer Map":
 
         with exp_col1:
             st.markdown("### Export Map Data")
-            st.caption("Download a branded Excel workbook with per-state tabs, county breakdown, and filterable columns — ready to share with the Royal Purple team.")
+            st.caption("Download a branded Excel workbook with per-state tabs, county breakdown, and filterable columns — ready to share with the Butler Performance team.")
 
             if st.button("Generate Map Data Export", type="primary", key="map_export"):
                 with st.spinner("Building Excel workbook..."):
@@ -334,7 +334,7 @@ elif nav == "Customer Map":
 
         with exp_col2:
             st.markdown("### Export C4C Report")
-            st.caption("C4C (Connect for Calumet) gap analysis — identifies installer accounts not yet onboarded into Royal Purple's dealer system. Includes state breakdown, duplicates, and reconciliation.")
+            st.caption("C4C (Connect for Calumet) gap analysis — identifies installer accounts not yet onboarded into Butler Performance's dealer system. Includes state breakdown, duplicates, and reconciliation.")
 
             if st.button("Generate C4C Report", type="primary", key="c4c_export"):
                 with st.spinner("Building report..."):
@@ -456,22 +456,22 @@ elif nav == "Customer Map":
         st.info("No customer data available. Upload a CSV file to get started.")
 
 elif nav == "Product Reference":
-    page_header("Product Reference", "Royal Purple operation codes, product catalog, competitor reference & conversion guide")
+    page_header("Product Reference", "Butler Performance operation codes, product catalog, competitor reference & conversion guide")
     st.markdown("")
     product_reference.render()
 
 elif nav == "Profit Calculator":
     st.markdown(
         """
-        <div style="background:linear-gradient(135deg,#2D1B5E 0%,#4B2D8A 60%,#6B3FA0 100%);
+        <div style="background:linear-gradient(135deg,#1a1a2e 0%,#e31837 60%,#ff4d6a 100%);
                     border-radius:12px;padding:32px 36px 28px;margin-bottom:8px;">
             <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#C4B5E8;
-                        text-transform:uppercase;margin-bottom:8px;">Royal Purple Partnership Hub</div>
+                        text-transform:uppercase;margin-bottom:8px;">Butler Performance Analytics</div>
             <div style="font-size:28px;font-weight:800;color:#FFFFFF;line-height:1.2;margin-bottom:8px;">
                 Installer Profit Calculator
             </div>
             <div style="font-size:14px;color:#C4B5E8;max-width:560px;line-height:1.6;">
-                Compare Royal Purple profitability vs. your installer's current top-selling brand.
+                Compare Butler Performance profitability vs. your installer's current top-selling brand.
                 See the incremental profit per service, per location, and total annual impact.
             </div>
         </div>
@@ -489,15 +489,15 @@ elif nav == "Admin":
 elif nav == "Report Generator":
     st.markdown(
         """
-        <div style="background:linear-gradient(135deg,#2D1B5E 0%,#4B2D8A 60%,#6B3FA0 100%);
+        <div style="background:linear-gradient(135deg,#1a1a2e 0%,#e31837 60%,#ff4d6a 100%);
                     border-radius:12px;padding:32px 36px 28px;margin-bottom:8px;">
             <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#C4B5E8;
-                        text-transform:uppercase;margin-bottom:8px;">Royal Purple Partnership Hub</div>
+                        text-transform:uppercase;margin-bottom:8px;">Butler Performance Analytics</div>
             <div style="font-size:28px;font-weight:800;color:#FFFFFF;line-height:1.2;margin-bottom:8px;">
                 Installer Report Generator
             </div>
             <div style="font-size:14px;color:#C4B5E8;max-width:560px;line-height:1.6;">
-                Upload your monthly Royal Purple Excel export to get a fully branded PowerPoint
+                Upload your monthly Butler Performance Excel export to get a fully branded PowerPoint
                 with network-level analytics, Max-Clean attachment metrics, and per-store deep dives.
             </div>
         </div>
@@ -518,9 +518,9 @@ elif nav == "Report Generator":
     with info_col:
         st.markdown(
             """
-            <div style="background:#F8F5FF;border-left:4px solid #4B2D8A;border-radius:0 8px 8px 0;
+            <div style="background:#f0f2f5;border-left:4px solid #e31837;border-radius:0 8px 8px 0;
                         padding:16px 18px;margin-top:8px;">
-                <div style="font-weight:700;color:#2D1B5E;font-size:13px;margin-bottom:8px;">
+                <div style="font-weight:700;color:#1a1a2e;font-size:13px;margin-bottom:8px;">
                     What this generates
                 </div>
                 <div style="font-size:12px;color:#4B5563;line-height:1.8;">
@@ -528,7 +528,7 @@ elif nav == "Report Generator":
                     ✦ &nbsp;Max-Clean attachment analysis<br>
                     ✦ &nbsp;Per-store ranked deep dives<br>
                     ✦ &nbsp;Top product &amp; SKU breakdown<br>
-                    ✦ &nbsp;Fully branded Royal Purple PPTX
+                    ✦ &nbsp;Fully branded Butler Performance PPTX
                 </div>
             </div>
             """,
@@ -594,7 +594,7 @@ elif nav == "Report Generator":
                 st.markdown(
                     """
                     <div style="border-top:2px solid #EDE9FE;margin:8px 0 16px;">
-                        <span style="display:inline-block;background:#4B2D8A;color:white;
+                        <span style="display:inline-block;background:#e31837;color:white;
                                      font-size:10px;font-weight:700;letter-spacing:2px;
                                      text-transform:uppercase;padding:3px 10px;border-radius:0 0 6px 6px;">
                             Max-Clean Attachment
@@ -604,7 +604,7 @@ elif nav == "Report Generator":
                     unsafe_allow_html=True,
                 )
                 st.caption(
-                    "The RP export only shows Royal Purple products. 'Solo' Max-Clean lines represent "
+                    "The RP export only shows Butler Performance products. 'Solo' Max-Clean lines represent "
                     "non-RP oil changes where Max-Clean was added as an upsell."
                 )
 
@@ -661,7 +661,7 @@ elif nav == "Report Generator":
                                 cl = item["classification"]
                                 if cl["type"] == "rp":
                                     dest = cl.get("series", "RP")
-                                    badge = "Royal Purple"
+                                    badge = "Butler Performance"
                                 else:
                                     dest = cl.get("brand", cl.get("label", ""))
                                     badge = "Competitor"
@@ -791,7 +791,7 @@ elif nav == "Report Generator":
 
             st.markdown(
                 f"""
-                <div style="background:linear-gradient(135deg,#1E0F3C 0%,#2D1B5E 100%);
+                <div style="background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 100%);
                             border-radius:10px;padding:24px 28px;margin:24px 0 8px;">
                     <div style="color:#C4B5E8;font-size:11px;font-weight:700;letter-spacing:2px;
                                 text-transform:uppercase;margin-bottom:6px;">Ready to Export</div>

@@ -1,7 +1,7 @@
-# Royal Purple Partnership Hub
+# Butler Performance Partnership Hub
 
 ## Overview
-"The Royal Purple Partnership Hub by ThrottlePro" — a Streamlit web app for Royal Purple installer partners with three sections: Report Generator (Excel→PPTX), Customer Map (Leaflet.js interactive marker map), and Product Reference.
+"The Butler Performance Partnership Hub by ThrottlePro" — a Streamlit web app for Butler Performance installer partners with three sections: Report Generator (Excel→PPTX), Customer Map (Leaflet.js interactive marker map), and Product Reference.
 
 ## Architecture
 - **app.py** — Streamlit frontend with 6-page sidebar nav: Home, Report Generator, Customer Map, Product Reference, Profit Calculator, Admin
@@ -13,7 +13,7 @@
 - **customers.json** — All geocoded accounts (4,658 total: installers, powersports, international, Canada)
 - **distributors.json** — Geocoded distributor locations (161 total)
 - **distribution_data.py** — Legacy file (not imported by active code)
-- **assets/** — Royal Purple branding images
+- **assets/** — Butler Performance branding images
 
 ## Data Sources
 - **InstallerRack_RP Excel** — 5-sheet workbook:

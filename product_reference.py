@@ -33,11 +33,11 @@ def _build_lookup(db):
     for series_name, series in db.get("rp_products", {}).items():
         for sku in series.get("skus", []):
             lookup[sku["code"].upper()] = {
-                "brand": "Royal Purple",
+                "brand": "Butler Performance",
                 "series": series_name,
                 "viscosity": sku["viscosity"],
                 "notes": sku.get("notes", ""),
-                "color": series.get("color", "#4B2D8A"),
+                "color": series.get("color", "#e31837"),
                 "category": "rp",
             }
     for brand_data in db.get("competitor_brands", []):
@@ -102,8 +102,8 @@ def _badge(text, bg_color, text_color="#FFFFFF", size=11):
 
 def _render_rp_catalog(db):
     rp_products = db.get("rp_products", {})
-    st.markdown("### Royal Purple Product Catalog")
-    st.caption("Complete Royal Purple product reference — all SKUs, viscosities, and application details from the 2025 product guide.")
+    st.markdown("### Butler Performance Product Catalog")
+    st.caption("Complete Butler Performance product reference — all SKUs, viscosities, and application details from the 2025 product guide.")
     st.markdown("")
 
     if not rp_products:
@@ -111,7 +111,7 @@ def _render_rp_catalog(db):
         return
 
     for series_name, series in rp_products.items():
-        badge_color = series.get("color", "#4B2D8A")
+        badge_color = series.get("color", "#e31837")
         badge_label = series.get("badge", "RP")
         skus = series.get("skus", [])
 
@@ -120,7 +120,7 @@ def _render_rp_catalog(db):
             with col_info:
                 st.markdown(
                     f'{_badge(badge_label, badge_color, size=12)}&nbsp;&nbsp;'
-                    f'<span style="color:#4B2D8A;font-weight:600;font-size:14px;">{series_name}</span>',
+                    f'<span style="color:#e31837;font-weight:600;font-size:14px;">{series_name}</span>',
                     unsafe_allow_html=True,
                 )
                 st.markdown(
@@ -155,7 +155,7 @@ def _render_rp_catalog(db):
 
 def _render_code_lookup(db, all_codes):
     st.markdown("### SKU Lookup")
-    st.caption("Search any Royal Purple or competitor SKU to see full product details from the product reference guide.")
+    st.caption("Search any Butler Performance or competitor SKU to see full product details from the product reference guide.")
     st.markdown("")
 
     search = st.text_input(
@@ -192,7 +192,7 @@ def _render_code_lookup(db, all_codes):
                     f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
                     f'<span style="background:{color};color:white;padding:6px 16px;border-radius:8px;font-size:20px;font-weight:700;">{code_upper}</span>'
                     f'<div>'
-                    f'<div style="font-size:15px;font-weight:700;color:#1F2937;">Royal Purple</div>'
+                    f'<div style="font-size:15px;font-weight:700;color:#1F2937;">Butler Performance</div>'
                     f'<div style="font-size:12px;color:#6B7280;">{result["series"]}</div>'
                     f'</div>'
                     f'</div>',
@@ -273,7 +273,7 @@ def _render_code_lookup(db, all_codes):
                         for sname, sdata in rp_products.items():
                             for sku in sdata.get("skus", []):
                                 if sku.get("viscosity","").replace("-","").replace(" ","").upper() == v_str:
-                                    rp_replacements.append((sku["code"], sname, sdata.get("color","#4B2D8A"), sku["viscosity"]))
+                                    rp_replacements.append((sku["code"], sname, sdata.get("color","#e31837"), sku["viscosity"]))
                         break
 
                 if rp_replacements:
@@ -283,7 +283,7 @@ def _render_code_lookup(db, all_codes):
                     )
                     st.markdown(
                         f'<div style="margin-top:12px;padding-top:12px;border-top:1px solid #E5E7EB;">'
-                        f'<div style="font-size:11px;font-weight:600;color:#16A34A;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Royal Purple Replacements</div>'
+                        f'<div style="font-size:11px;font-weight:600;color:#16A34A;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Butler Performance Replacements</div>'
                         f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{pills}</div>'
                         f'</div>',
                         unsafe_allow_html=True,
@@ -315,7 +315,7 @@ def _render_code_lookup(db, all_codes):
         )
         quick_ref = []
         for sname, sdata in rp_products.items():
-            color = sdata.get("color", "#4B2D8A")
+            color = sdata.get("color", "#e31837")
             badge = sdata.get("badge", "RP")
             skus = sdata.get("skus", [])
             if skus:
@@ -341,13 +341,13 @@ def _render_code_lookup(db, all_codes):
 
 def _try_prefix_lookup(code):
     RP_PREFIXES = [
-        ("XPR", "Royal Purple", "XPR Series — Extreme Performance Racing", "#B91C1C"),
-        ("HPS", "Royal Purple", "HPS Series — High Performance Street",    "#7C3AED"),
-        ("HMX", "Royal Purple", "HMX Series — High Mileage Synthetic",    "#7C3AED"),
-        ("RMS", "Royal Purple", "HMX Series — High Mileage Synthetic",    "#7C3AED"),
-        ("RSD", "Royal Purple", "Duralec — Diesel Synthetic",              "#1D4ED8"),
-        ("RS",  "Royal Purple", "HP API Series — High Performance Synthetic", "#4B2D8A"),
-        ("RP",  "Royal Purple", "RP Synthetic",                            "#059669"),
+        ("XPR", "Butler Performance", "XPR Series — Extreme Performance Racing", "#B91C1C"),
+        ("HPS", "Butler Performance", "HPS Series — High Performance Street",    "#7C3AED"),
+        ("HMX", "Butler Performance", "HMX Series — High Mileage Synthetic",    "#7C3AED"),
+        ("RMS", "Butler Performance", "HMX Series — High Mileage Synthetic",    "#7C3AED"),
+        ("RSD", "Butler Performance", "Duralec — Diesel Synthetic",              "#1D4ED8"),
+        ("RS",  "Butler Performance", "HP API Series — High Performance Synthetic", "#e31837"),
+        ("RP",  "Butler Performance", "RP Synthetic",                            "#059669"),
     ]
     COMP_PREFIXES = [
         ("S0W", "CAM2",      "Full Synthetic",  "#DC2626"),
@@ -367,7 +367,7 @@ def _try_prefix_lookup(code):
         if code.startswith(prefix) and any(c.isdigit() for c in code):
             st.markdown(
                 f'<div style="background:white;border:2px solid {color};border-radius:10px;padding:16px 20px;">'
-                f'<div style="font-weight:700;color:{color};font-size:15px;margin-bottom:8px;">✅ Likely Royal Purple — {series}</div>'
+                f'<div style="font-weight:700;color:{color};font-size:15px;margin-bottom:8px;">✅ Likely Butler Performance — {series}</div>'
                 f'<p style="font-size:13px;color:#475569;">Code <strong>{code}</strong> matches the <strong>{prefix}*</strong> prefix pattern. '
                 f'Not in the known SKU list — add it in the Admin panel if confirmed.</p>'
                 f'</div>',
@@ -466,12 +466,12 @@ def _render_conversion_guide(db):
     st.markdown("")
 
     st.markdown("#### Viscosity Crosswalk")
-    st.caption("The correct Royal Purple SKU for every viscosity grade a competitor customer might be using.")
+    st.caption("The correct Butler Performance SKU for every viscosity grade a competitor customer might be using.")
 
     if crosswalk:
         header_cols = st.columns([3, 2, 2, 2])
         labels = [("CUSTOMER'S CURRENT OIL", "#94A3B8", "#E2E8F0"),
-                  ("→ RS Series", "#4B2D8A", "#4B2D8A"),
+                  ("→ RS Series", "#e31837", "#e31837"),
                   ("→ HMX (High Mileage)", "#7C3AED", "#7C3AED"),
                   ("→ Duralec (Diesel)", "#1D4ED8", "#1D4ED8")]
         for col, (text, color, border) in zip(header_cols, labels):
@@ -484,7 +484,7 @@ def _render_conversion_guide(db):
             cols = st.columns([3, 2, 2, 2])
             values = [
                 (row.get("current", ""), "#374151"),
-                (row.get("rs", "—"), "#4B2D8A" if row.get("rs", "—") != "—" else "#CBD5E1"),
+                (row.get("rs", "—"), "#e31837" if row.get("rs", "—") != "—" else "#CBD5E1"),
                 (row.get("hmx", "—"), "#7C3AED" if row.get("hmx", "—") != "—" else "#CBD5E1"),
                 (row.get("rsd", "—"), "#1D4ED8" if row.get("rsd", "—") != "—" else "#CBD5E1"),
             ]
@@ -524,6 +524,6 @@ def _render_conversion_guide(db):
         "All rows for the same Invoice # share the same revenue total.\n\n"
         "**Step 1:** Group all rows by Invoice #\n\n"
         "**Step 2:** Find the oil product code on that invoice (ignore spec flags like GF6/DEXOS1, service tiers like S1–S6, and ancillary items like OF*, AF*, FB)\n\n"
-        "**Step 3:** Classify the oil code as Royal Purple or a specific competitor brand using the prefix rules above\n\n"
+        "**Step 3:** Classify the oil code as Butler Performance or a specific competitor brand using the prefix rules above\n\n"
         "**Step 4:** Assign a conversion segment and calculate RP ticket premium vs. competitor avg ticket"
     )

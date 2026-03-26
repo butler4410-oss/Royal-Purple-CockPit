@@ -102,7 +102,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
     width: 220px;
     transition: border-color 0.2s;
 }}
-#search-input:focus {{ border-color: #4B2D8A; }}
+#search-input:focus {{ border-color: #e31837; }}
 
 #search-clear {{
     position: absolute;
@@ -116,7 +116,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
     display: none;
     padding: 0;
 }}
-#search-clear:hover {{ color: #4B2D8A; }}
+#search-clear:hover {{ color: #e31837; }}
 
 #toolbar select {{
     padding: 8px 10px;
@@ -130,7 +130,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
     transition: border-color 0.2s;
     cursor: pointer;
 }}
-#toolbar select:focus {{ border-color: #4B2D8A; }}
+#toolbar select:focus {{ border-color: #e31837; }}
 
 /* ── Type filter pills (below toolbar) ── */
 #type-pills {{
@@ -222,7 +222,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 #legend-title {{
     font-size: 11px;
     font-weight: 700;
-    color: #4B2D8A;
+    color: #e31837;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 8px;
@@ -275,7 +275,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 
 .popup-header {{
     padding: 10px 14px 8px;
-    border-left: 5px solid #4B2D8A;
+    border-left: 5px solid #e31837;
 }}
 
 .popup-content h3 {{
@@ -334,7 +334,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
 
 #sidebar-header {{
     padding: 12px 14px;
-    background: #4B2D8A;
+    background: #e31837;
     color: white;
     font-weight: 700;
     font-size: 14px;
@@ -364,7 +364,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
     transition: background 0.12s;
 }}
 
-.sidebar-item:hover {{ background: #F8F5FF; }}
+.sidebar-item:hover {{ background: #f0f2f5; }}
 
 .sidebar-color-bar {{
     width: 5px;
@@ -419,16 +419,16 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     font-size: 13px;
     font-weight: 600;
-    color: #4B2D8A;
+    color: #e31837;
     transition: all 0.15s;
 }}
-#toggle-sidebar:hover {{ background: #F8F5FF; border-color: #4B2D8A; }}
+#toggle-sidebar:hover {{ background: #f0f2f5; border-color: #e31837; }}
 
 /* ── Clear filters button ── */
 #clear-filters {{
     display: none;
     padding: 6px 11px;
-    background: #4B2D8A;
+    background: #e31837;
     color: white;
     border: none;
     border-radius: 6px;

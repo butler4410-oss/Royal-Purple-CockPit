@@ -8,9 +8,9 @@ from collections import Counter
 
 CUSTOMERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "customers.json")
 
-PURPLE = "1B1464"
-PURPLE_MED = "4B2D8A"
-GOLD = "C8A951"
+PURPLE = "1a1a2e"
+PURPLE_MED = "e31837"
+GOLD = "e31837"
 RED_ACCENT = "DC2626"
 GREEN_ACCENT = "16A34A"
 BLUE_ACCENT = "2563EB"
@@ -159,7 +159,7 @@ def generate_map_export(output_path, customers=None):
     ws_dash.sheet_properties.tabColor = PURPLE
 
     ws_dash.merge_cells("A1:H1")
-    ws_dash["A1"] = "Royal Purple Installer Account Map Data"
+    ws_dash["A1"] = "Butler Performance Installer Account Map Data"
     ws_dash["A1"].font = Font(name="Calibri", bold=True, size=18, color=PURPLE)
     ws_dash.row_dimensions[1].height = 36
 
@@ -527,7 +527,7 @@ def generate_map_export(output_path, customers=None):
         num_dh = len(dist_headers)
 
         ws_dist.merge_cells(f"A1:{get_column_letter(num_dh)}1")
-        ws_dist["A1"] = f"Royal Purple Distributors ({len(dist_list)})"
+        ws_dist["A1"] = f"Butler Performance Distributors ({len(dist_list)})"
         ws_dist["A1"].font = TITLE_FONT
         ws_dist.row_dimensions[1].height = 32
 

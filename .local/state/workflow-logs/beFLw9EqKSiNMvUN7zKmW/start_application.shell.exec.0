@@ -1,0 +1,26 @@
+
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+[0m
+[0m
+[34m[1m  You can now view your Streamlit app in your browser.[0m
+[0m
+[34m  Local URL: [0m[1mhttp://localhost:5000[0m
+[34m  Network URL: [0m[1mhttp://172.31.113.130:5000[0m
+[34m  External URL: [0m[1mhttp://34.138.197.92:5000[0m
+[0m
+2026-03-25 17:10:35.065 MediaFileHandler: Missing file aba190d0f2e15a2d7f792ff138b9b9803e47a9dbdb2cf35eb6c99cd7.pdf
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/memory_media_file_storage.py", line 152, in get_file
+    return self._files_by_id[file_id]
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'aba190d0f2e15a2d7f792ff138b9b9803e47a9dbdb2cf35eb6c99cd7'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/web/server/media_file_handler.py", line 95, in validate_absolute_path
+    self._storage.get_file(absolute_path)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/memory_media_file_storage.py", line 154, in get_file
+    raise MediaFileStorageError(
+streamlit.runtime.media_file_storage.MediaFileStorageError: Bad filename 'aba190d0f2e15a2d7f792ff138b9b9803e47a9dbdb2cf35eb6c99cd7.pdf'. (No media file with id 'aba190d0f2e15a2d7f792ff138b9b9803e47a9dbdb2cf35eb6c99cd7')
+[34m  Stopping...[0m
