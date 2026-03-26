@@ -35,7 +35,7 @@ def _check_password():
     )
 
     with st.form("admin_login_form"):
-        st.markdown('<div style="background:white;border:1px solid #E2E8F0;border-top:none;padding:20px 24px;border-radius:0 0 10px 10px;">', unsafe_allow_html=True)
+        st.markdown('<div style="background:#1a1a2e;border:1px solid #E2E8F0;border-top:none;padding:20px 24px;border-radius:0 0 10px 10px;">', unsafe_allow_html=True)
         username = st.text_input("Username", placeholder="admin")
         password = st.text_input("Password", type="password", placeholder="••••••••")
         submitted = st.form_submit_button("Sign In", use_container_width=True, type="primary")

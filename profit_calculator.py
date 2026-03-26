@@ -3,7 +3,7 @@ from profit_pdf import generate_profit_pdf
 
 def render():
     st.markdown(
-        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#9CA3AF;
+        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#666;
                     text-transform:uppercase;margin-bottom:12px;">Installer Profit Worksheet</div>""",
         unsafe_allow_html=True,
     )
@@ -29,7 +29,7 @@ def render():
 
         rp_pkg = st.selectbox("RP Package Size", ["Bulk", "Drum", "Bag-n-Box", "5 Qt.", "1 Qt.", "1 Gallon"], index=2, key="pc_rp_pkg")
         rp_prices = {}
-        st.markdown('<p style="font-size:13px;color:#6B7280;margin-bottom:4px;">RP Distributor Pricing (per gallon conversion):</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size:13px;color:#8888a8;margin-bottom:4px;">RP Distributor Pricing (per gallon conversion):</p>', unsafe_allow_html=True)
         rp_c1, rp_c2, rp_c3 = st.columns(3)
         rp_prices["Bulk"] = rp_c1.number_input("Bulk ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_rp_bulk")
         rp_prices["Drum"] = rp_c2.number_input("Drum ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_rp_drum")
@@ -47,7 +47,7 @@ def render():
 
         comp_pkg = st.selectbox("Competitor Package Size", ["Bulk", "Drum", "Bag-n-Box", "5 Qt.", "1 Qt.", "1 Gallon"], index=0, key="pc_comp_pkg")
         comp_prices = {}
-        st.markdown('<p style="font-size:13px;color:#6B7280;margin-bottom:4px;">Competitor Distributor Pricing (per gallon conversion):</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size:13px;color:#8888a8;margin-bottom:4px;">Competitor Distributor Pricing (per gallon conversion):</p>', unsafe_allow_html=True)
         cp_c1, cp_c2, cp_c3 = st.columns(3)
         comp_prices["Bulk"] = cp_c1.number_input("Bulk ($/gal)", min_value=0.0, value=25.50, step=0.5, format="%.2f", key="pc_cp_bulk")
         comp_prices["Drum"] = cp_c2.number_input("Drum ($/gal)", min_value=0.0, value=0.0, step=0.5, format="%.2f", key="pc_cp_drum")
@@ -80,9 +80,9 @@ def render():
             f"""<div style="background:#F3E8FF;border-radius:10px;padding:16px 20px;margin-bottom:16px;">
                 <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:#7C3AED;text-transform:uppercase;">Volume Overview</div>
                 <div style="display:flex;gap:24px;margin-top:8px;">
-                    <div><div style="font-size:24px;font-weight:800;color:#1F2937;">{ocpd}</div><div style="font-size:11px;color:#6B7280;">Oil Changes/Day</div></div>
-                    <div><div style="font-size:24px;font-weight:800;color:#1F2937;">{total_oil_changes:,}</div><div style="font-size:11px;color:#6B7280;">Annual Oil Changes</div></div>
-                    <div><div style="font-size:24px;font-weight:800;color:#4B2D8A;">{rp_converting:,.0f}</div><div style="font-size:11px;color:#6B7280;">Converting to RP ({conversion_pct}%)</div></div>
+                    <div><div style="font-size:24px;font-weight:800;color:#e8e8f0;">{ocpd}</div><div style="font-size:11px;color:#8888a8;">Oil Changes/Day</div></div>
+                    <div><div style="font-size:24px;font-weight:800;color:#e8e8f0;">{total_oil_changes:,}</div><div style="font-size:11px;color:#8888a8;">Annual Oil Changes</div></div>
+                    <div><div style="font-size:24px;font-weight:800;color:#4B2D8A;">{rp_converting:,.0f}</div><div style="font-size:11px;color:#8888a8;">Converting to RP ({conversion_pct}%)</div></div>
                 </div>
             </div>""",
             unsafe_allow_html=True,
@@ -93,17 +93,17 @@ def render():
             st.markdown(
                 f"""<div style="background:#ECFDF5;border:2px solid #059669;border-radius:10px;padding:16px;">
                     <div style="font-size:12px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:1px;">Royal Purple</div>
-                    <div style="font-size:12px;color:#6B7280;margin-top:4px;">{rp_product}</div>
+                    <div style="font-size:12px;color:#8888a8;margin-top:4px;">{rp_product}</div>
                     <div style="margin-top:12px;">
-                        <div style="font-size:11px;color:#6B7280;">Selling Price</div>
-                        <div style="font-size:20px;font-weight:700;color:#1F2937;">${rp_selling_price:,.2f}</div>
+                        <div style="font-size:11px;color:#8888a8;">Selling Price</div>
+                        <div style="font-size:20px;font-weight:700;color:#e8e8f0;">${rp_selling_price:,.2f}</div>
                     </div>
                     <div style="margin-top:8px;">
-                        <div style="font-size:11px;color:#6B7280;">Fluid Cost ({rp_pkg})</div>
+                        <div style="font-size:11px;color:#8888a8;">Fluid Cost ({rp_pkg})</div>
                         <div style="font-size:20px;font-weight:700;color:#DC2626;">${rp_fluid_cost:,.2f}</div>
                     </div>
                     <div style="margin-top:8px;padding-top:8px;border-top:1px solid #D1FAE5;">
-                        <div style="font-size:11px;color:#6B7280;">Gross Profit / Service</div>
+                        <div style="font-size:11px;color:#8888a8;">Gross Profit / Service</div>
                         <div style="font-size:22px;font-weight:800;color:#059669;">${rp_gross_profit:,.2f}</div>
                     </div>
                 </div>""",
@@ -113,17 +113,17 @@ def render():
             st.markdown(
                 f"""<div style="background:#FEF2F2;border:2px solid #DC2626;border-radius:10px;padding:16px;">
                     <div style="font-size:12px;font-weight:700;color:#DC2626;text-transform:uppercase;letter-spacing:1px;">{comp_brand}</div>
-                    <div style="font-size:12px;color:#6B7280;margin-top:4px;">{comp_product or 'Current Top Brand'}</div>
+                    <div style="font-size:12px;color:#8888a8;margin-top:4px;">{comp_product or 'Current Top Brand'}</div>
                     <div style="margin-top:12px;">
-                        <div style="font-size:11px;color:#6B7280;">Selling Price</div>
-                        <div style="font-size:20px;font-weight:700;color:#1F2937;">${comp_selling_price:,.2f}</div>
+                        <div style="font-size:11px;color:#8888a8;">Selling Price</div>
+                        <div style="font-size:20px;font-weight:700;color:#e8e8f0;">${comp_selling_price:,.2f}</div>
                     </div>
                     <div style="margin-top:8px;">
-                        <div style="font-size:11px;color:#6B7280;">Fluid Cost ({comp_pkg})</div>
+                        <div style="font-size:11px;color:#8888a8;">Fluid Cost ({comp_pkg})</div>
                         <div style="font-size:20px;font-weight:700;color:#DC2626;">${comp_fluid_cost:,.2f}</div>
                     </div>
                     <div style="margin-top:8px;padding-top:8px;border-top:1px solid #FEE2E2;">
-                        <div style="font-size:11px;color:#6B7280;">Gross Profit / Service</div>
+                        <div style="font-size:11px;color:#8888a8;">Gross Profit / Service</div>
                         <div style="font-size:22px;font-weight:800;color:#DC2626;">${comp_gross_profit:,.2f}</div>
                     </div>
                 </div>""",

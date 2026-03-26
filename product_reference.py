@@ -188,12 +188,12 @@ def _render_code_lookup(db, all_codes):
                         break
 
                 st.markdown(
-                    f'<div style="background:white;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
+                    f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
                     f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
                     f'<span style="background:{color};color:white;padding:6px 16px;border-radius:8px;font-size:20px;font-weight:700;">{code_upper}</span>'
                     f'<div>'
-                    f'<div style="font-size:15px;font-weight:700;color:#1F2937;">Royal Purple</div>'
-                    f'<div style="font-size:12px;color:#6B7280;">{result["series"]}</div>'
+                    f'<div style="font-size:15px;font-weight:700;color:#e8e8f0;">Royal Purple</div>'
+                    f'<div style="font-size:12px;color:#8888a8;">{result["series"]}</div>'
                     f'</div>'
                     f'</div>',
                     unsafe_allow_html=True,
@@ -206,18 +206,18 @@ def _render_code_lookup(db, all_codes):
                     desc = series_data.get("description", "")
                     application = series_data.get("application", "")
 
-                    detail_rows = f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Product Line</td><td style="padding:6px 0;color:#1F2937;font-weight:600;">{series_data["_name"]}</td></tr>'
+                    detail_rows = f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Product Line</td><td style="padding:6px 0;color:#e8e8f0;font-weight:600;">{series_data["_name"]}</td></tr>'
                     if visc:
-                        detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Viscosity</td><td style="padding:6px 0;color:#1F2937;">{visc}</td></tr>'
+                        detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Viscosity</td><td style="padding:6px 0;color:#e8e8f0;">{visc}</td></tr>'
                     if notes:
-                        detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Application</td><td style="padding:6px 0;color:#374151;">{notes}</td></tr>'
+                        detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Application</td><td style="padding:6px 0;color:#C4B5E8;">{notes}</td></tr>'
                     if desc:
                         detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Description</td><td style="padding:6px 0;color:#475569;font-size:12px;line-height:1.6;">{desc}</td></tr>'
                     if application:
                         detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Best For</td><td style="padding:6px 0;color:#475569;font-size:12px;">{application}</td></tr>'
 
                     st.markdown(
-                        f'<table style="font-size:13px;color:#374151;border-collapse:collapse;width:100%;margin-top:4px;">'
+                        f'<table style="font-size:13px;color:#C4B5E8;border-collapse:collapse;width:100%;margin-top:4px;">'
                         f'{detail_rows}'
                         f'</table>',
                         unsafe_allow_html=True,
@@ -241,16 +241,16 @@ def _render_code_lookup(db, all_codes):
 
             elif cat == "competitor":
                 st.markdown(
-                    f'<div style="background:white;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
+                    f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
                     f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
                     f'<span style="background:{color};color:white;padding:6px 16px;border-radius:8px;font-size:20px;font-weight:700;">{code_upper}</span>'
                     f'<div>'
                     f'<div style="font-size:15px;font-weight:700;color:{color};">Competitor SKU</div>'
-                    f'<div style="font-size:12px;color:#6B7280;">{result["brand"]}</div>'
+                    f'<div style="font-size:12px;color:#8888a8;">{result["brand"]}</div>'
                     f'</div>'
                     f'</div>'
-                    f'<table style="font-size:13px;color:#374151;border-collapse:collapse;width:100%">'
-                    f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;">Brand</td><td style="padding:6px 0;font-weight:600;color:#1F2937;">{result["brand"]}</td></tr>'
+                    f'<table style="font-size:13px;color:#C4B5E8;border-collapse:collapse;width:100%">'
+                    f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;">Brand</td><td style="padding:6px 0;font-weight:600;color:#e8e8f0;">{result["brand"]}</td></tr>'
                     f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;">Type</td><td style="padding:6px 0;">{result["series"]}</td></tr>'
                     f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;">Product</td><td style="padding:6px 0;">{result["viscosity"]}</td></tr>'
                     f'</table>',
@@ -292,12 +292,12 @@ def _render_code_lookup(db, all_codes):
 
             else:
                 st.markdown(
-                    f'<div style="background:white;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
+                    f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
                     f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">'
                     f'<span style="background:{color};color:white;padding:6px 16px;border-radius:8px;font-size:20px;font-weight:700;">{code_upper}</span>'
                     f'<span style="font-size:14px;font-weight:700;color:{color};">{"Service Tier" if cat == "service_tier" else "Spec Flag"}</span>'
                     f'</div>'
-                    f'<table style="font-size:13px;color:#374151;border-collapse:collapse;width:100%">'
+                    f'<table style="font-size:13px;color:#C4B5E8;border-collapse:collapse;width:100%">'
                     f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;">Type</td><td style="padding:6px 0;">{result["series"]}</td></tr>'
                     f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;">Description</td><td style="padding:6px 0;">{result["viscosity"]}</td></tr>'
                     f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;">Notes</td><td style="padding:6px 0;">{result["notes"]}</td></tr>'
@@ -310,7 +310,7 @@ def _render_code_lookup(db, all_codes):
     else:
         st.markdown("")
         st.markdown(
-            '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#9CA3AF;text-transform:uppercase;margin-bottom:8px;">Quick Reference</div>',
+            '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#666;text-transform:uppercase;margin-bottom:8px;">Quick Reference</div>',
             unsafe_allow_html=True,
         )
         quick_ref = []
@@ -328,12 +328,12 @@ def _render_code_lookup(db, all_codes):
             with cols[i % 3]:
                 short_name = sname.split("—")[0].strip() if "—" in sname else sname
                 st.markdown(
-                    f'<div style="border:1px solid #E5E7EB;border-radius:10px;padding:14px 16px;margin-bottom:10px;">'
+                    f'<div style="border:1px solid #2a2a45;border-radius:10px;padding:14px 16px;margin-bottom:10px;">'
                     f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
                     f'<span style="background:{color};color:white;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;">{badge}</span>'
-                    f'<span style="font-size:13px;font-weight:600;color:#1F2937;">{short_name}</span>'
+                    f'<span style="font-size:13px;font-weight:600;color:#e8e8f0;">{short_name}</span>'
                     f'</div>'
-                    f'<div style="font-size:11px;color:#6B7280;">{count} SKUs: {visc_list}</div>'
+                    f'<div style="font-size:11px;color:#8888a8;">{count} SKUs: {visc_list}</div>'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
@@ -366,7 +366,7 @@ def _try_prefix_lookup(code):
     for prefix, brand, series, color in RP_PREFIXES:
         if code.startswith(prefix) and any(c.isdigit() for c in code):
             st.markdown(
-                f'<div style="background:white;border:2px solid {color};border-radius:10px;padding:16px 20px;">'
+                f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:10px;padding:16px 20px;">'
                 f'<div style="font-weight:700;color:{color};font-size:15px;margin-bottom:8px;">✅ Likely Royal Purple — {series}</div>'
                 f'<p style="font-size:13px;color:#475569;">Code <strong>{code}</strong> matches the <strong>{prefix}*</strong> prefix pattern. '
                 f'Not in the known SKU list — add it in the Admin panel if confirmed.</p>'
@@ -377,7 +377,7 @@ def _try_prefix_lookup(code):
     for prefix, brand, series, color in COMP_PREFIXES:
         if code.startswith(prefix):
             st.markdown(
-                f'<div style="background:white;border:2px solid {color};border-radius:10px;padding:16px 20px;">'
+                f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:10px;padding:16px 20px;">'
                 f'<div style="font-weight:700;color:{color};font-size:15px;margin-bottom:8px;">⚠️ Likely Competitor — {brand} {series}</div>'
                 f'<p style="font-size:13px;color:#475569;">Code <strong>{code}</strong> matches the <strong>{prefix}*</strong> prefix pattern for <strong>{brand} {series}</strong>. '
                 f'Not in the known SKU list — add it in the Admin panel if confirmed.</p>'
@@ -413,7 +413,7 @@ def _render_competitor_brands(db):
                     st.markdown(
                         f'<div style="background:{color}11;border-left:4px solid {color};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:12px;">'
                         f'<span style="font-size:12px;color:{color};font-weight:600;">Conversion Strategy:</span>'
-                        f'<span style="font-size:13px;color:#374151;"> {note}</span>'
+                        f'<span style="font-size:13px;color:#C4B5E8;"> {note}</span>'
                         f'</div>',
                         unsafe_allow_html=True,
                     )
@@ -510,7 +510,7 @@ def _render_conversion_guide(db):
             f'<span style="background:{color};color:white;padding:2px 12px;border-radius:10px;font-size:12px;font-weight:700;">Difficulty: {seg.get("difficulty","")}</span>'
             f'</div>'
             f'<div style="font-size:12px;color:#64748B;margin-bottom:6px;"><strong>Codes:</strong> {seg.get("codes","")}</div>'
-            f'<div style="font-size:13px;color:#374151;margin-bottom:6px;">{seg.get("rationale","")}</div>'
+            f'<div style="font-size:13px;color:#C4B5E8;margin-bottom:6px;">{seg.get("rationale","")}</div>'
             f'<div style="font-size:12px;color:{color};font-weight:600;">Suggested RP: {seg.get("suggested_sku","")}</div>'
             f'</div>',
             unsafe_allow_html=True,
