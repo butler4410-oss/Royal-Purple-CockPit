@@ -122,7 +122,7 @@ PRODUCT_FULL_NAMES = {
     "04511": "Snow 2-C Snowmobile Oil",
     "18001": "Max-Restore Engine Treatment",
     "11757": "Max-Boost Octane Booster",
-    "01600": "Purple Ice Coolant Additive",
+    "01600": "Purple Ice Coolant Treatment",
     "01326": "Max EZ Penetrant",
     "05330": "Max-Chain Chain Lube",
     "05000": "MaxFilm Penetrant Lubricant",
@@ -131,14 +131,14 @@ PRODUCT_FULL_NAMES = {
 }
 
 PRODUCT_DESCRIPTIONS = {
-    "High Mileage": "Synthetic motor oil for engines with 75,000+ miles. Reduces oil consumption, revitalizes seals, and removes deposits using Synerlec additive technology.",
+    "High Mileage": "Synthetic motor oil for engines with 75,000+ miles. Reduces oil consumption, revitalizes seals, and removes deposits using Synerlec chemistry.",
     "High Mileage Syn": "Full synthetic high mileage formulation with enhanced seal conditioning and superior wear protection for high-mileage engines.",
     "Royal Purple High": "High-performance full synthetic oil with Synerlec technology for superior wear protection, reduced heat, and increased fuel efficiency.",
     "Royal Purple Syn": "Premium full synthetic oil exceeding API/ILSAC standards. Enhanced film strength minimizes metal-to-metal contact in modern engines.",
     "Duralec": "Premium synthetic diesel engine oil (API CK-4) for emission-controlled engines with DPF, EGR, and SCR systems. Extends drain intervals.",
     "Max-Clean": "High-performance fuel system cleaner and stabilizer. Deeply cleans injectors, carburetors, intake valves, and combustion chambers.",
     "Max-Atomizer": "Advanced fuel injector cleaner for optimized spray patterns and improved combustion efficiency.",
-    "Royal Purple Premium": "Premium synthetic motor oil with proprietary Synerlec additive technology for maximum engine protection.",
+    "Royal Purple Premium": "Premium synthetic motor oil with proprietary Synerlec chemistry for maximum engine protection.",
 }
 
 def get_product_display_name(code):

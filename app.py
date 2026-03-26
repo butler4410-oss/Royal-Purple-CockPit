@@ -848,7 +848,7 @@ elif nav == "Report Generator":
                         f"**{best_rate['name']}** leads in attachment rate at "
                         f"{br_mc.get('attachmentRate', 0):.1f}%. "
                         f"Stores with high non-RP oil + Max-Clean rates are successfully "
-                        f"selling the RP additive upsell even on conventional oil changes."
+                        f"selling the RP performance chemical upsell even on conventional oil changes."
                     )
                 else:
                     st.info("No Max-Clean data detected in this report.")
