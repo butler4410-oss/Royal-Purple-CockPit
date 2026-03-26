@@ -39,9 +39,9 @@ PROMO_EXCEL = os.path.join(
     "attached_assets", "Installer_Promotion_Participation_12.13.25_1772754933620.xlsx"
 )
 
-PURPLE = "1a1a2e"
-PURPLE_MED = "e31837"
-GOLD = "e31837"
+PURPLE = "1B1464"
+PURPLE_MED = "4B2D8A"
+GOLD = "C8A951"
 
 HEADER_FILL = PatternFill(start_color=PURPLE, end_color=PURPLE, fill_type="solid")
 HEADER_FONT = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
@@ -417,7 +417,7 @@ def generate_c4c_report(output_path):
     ws.sheet_properties.tabColor = PURPLE
 
     ws.merge_cells("A1:J1")
-    ws["A1"] = "Butler Performance — Complete Account Intelligence Report"
+    ws["A1"] = "Royal Purple — Complete Account Intelligence Report"
     ws["A1"].font = Font(name="Calibri", bold=True, size=18, color=PURPLE)
     ws["A1"].alignment = Alignment(vertical="center")
     ws.row_dimensions[1].height = 36
@@ -436,11 +436,11 @@ def generate_c4c_report(output_path):
 
     c4c_explanation = [
         "C4C (Connect for Calumet) is the official dealer/installer onboarding system used by",
-        "Butler Performance's parent company, Calumet Specialty Products. When an installer is \"on C4C,\"",
-        "they are registered as an authorized Butler Performance dealer — enabling direct pricing,",
+        "Royal Purple's parent company, Calumet Specialty Products. When an installer is \"on C4C,\"",
+        "they are registered as an authorized Royal Purple dealer — enabling direct pricing,",
         "promotional materials, marketing support, and product updates.",
         "",
-        "This report identifies the gap between installer accounts participating in Butler Performance",
+        "This report identifies the gap between installer accounts participating in Royal Purple",
         "promotions vs. those registered in C4C, alongside a complete view of all account",
         "categories including distributors, powersports, international, and Canadian partners.",
     ]
@@ -561,7 +561,7 @@ def generate_c4c_report(output_path):
     # SHEET 3: STATE BREAKDOWN (All Types)
     # ═══════════════════════════════════════════════════════════════
     ws3 = wb.create_sheet("State Breakdown")
-    ws3.sheet_properties.tabColor = "e31837"
+    ws3.sheet_properties.tabColor = "4B2D8A"
 
     _write_title(ws3,
                  "Account Breakdown by State — All Categories",
@@ -972,7 +972,7 @@ def generate_c4c_report(output_path):
     ws9.sheet_properties.tabColor = "D97706"
 
     _write_title(ws9,
-                 f"Butler Performance Distributor Directory — {len(distributors)} Locations",
+                 f"Royal Purple Distributor Directory — {len(distributors)} Locations",
                  "Complete list of authorized RP distributors. Filter by state or county to find nearby distribution.",
                  num_cols=8)
 
@@ -1013,7 +1013,7 @@ def generate_c4c_report(output_path):
 
     _write_title(ws10,
                  f"RP Display Rack Accounts — {len(all_rack)} Flagged ({len(new_rack)} unmatched new)",
-                 "All accounts identified as having Butler Performance display racks. Includes matched and unmatched installers.",
+                 "All accounts identified as having Royal Purple display racks. Includes matched and unmatched installers.",
                  num_cols=11)
 
     rack_headers = ["Store Name", "Address", "City", "State", "County", "Zip",
@@ -1101,7 +1101,7 @@ def generate_c4c_report(output_path):
 
     _write_title(ws12,
                  f"International Accounts — {len(international)} Locations",
-                 "Global Butler Performance partners outside the US and Canada.",
+                 "Global Royal Purple partners outside the US and Canada.",
                  num_cols=9)
 
     intl_headers = ["Store Name", "Address", "City", "State/Region", "Country", "Zip",
@@ -1134,7 +1134,7 @@ def generate_c4c_report(output_path):
 
     _write_title(ws13,
                  f"Canadian Accounts — {len(canada)} Locations",
-                 "Butler Performance partners in Canada.",
+                 "Royal Purple partners in Canada.",
                  num_cols=9)
 
     ca_headers = ["Store Name", "Address", "City", "Province", "Zip/Postal",
@@ -1339,7 +1339,7 @@ def generate_c4c_report(output_path):
     # SHEET 18: ON C4C ONLY (not on Promo)
     # ═══════════════════════════════════════════════════════════════
     ws18 = wb.create_sheet("On C4C Only")
-    ws18.sheet_properties.tabColor = "e31837"
+    ws18.sheet_properties.tabColor = "4B2D8A"
 
     _write_title(ws18,
                  f"Accounts on C4C but NOT on Promo List — {xref['only_c4c']} Accounts",

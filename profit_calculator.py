@@ -15,15 +15,15 @@ def render():
         installer_name = st.text_input("Customer / Installer Name", value="", key="pc_name")
         r1a, r1b = st.columns(2)
         ocpd = r1a.number_input("Avg Oil Changes Per Day", min_value=1, value=30, step=1, key="pc_ocpd")
-        conversion_pct = r1b.number_input("% Converting to Butler Performance", min_value=1, max_value=100, value=10, step=1, key="pc_conv")
+        conversion_pct = r1b.number_input("% Converting to Royal Purple", min_value=1, max_value=100, value=10, step=1, key="pc_conv")
         r2a, r2b = st.columns(2)
         gallons_per = r2a.number_input("Gallons Per Oil Change", min_value=0.5, value=1.25, step=0.25, format="%.2f", key="pc_gal")
         days_open = r2b.number_input("Number of Days Open / Year", min_value=1, value=310, step=1, key="pc_days")
         num_locations = st.number_input("Number of Locations", min_value=1, value=1, step=1, key="pc_locs")
 
         st.markdown("---")
-        st.markdown("##### Butler Performance Pricing")
-        rp_product = st.text_input("RP Product", value="Butler Performance HP 5W-30", key="pc_rp_prod")
+        st.markdown("##### Royal Purple Pricing")
+        rp_product = st.text_input("RP Product", value="Royal Purple HP 5W-30", key="pc_rp_prod")
         rp_distributor = st.text_input("Distributor", value="", key="pc_rp_dist")
         rp_selling_price = st.number_input("Suggested RP Selling Price ($)", min_value=0.0, value=0.0, step=1.0, format="%.2f", key="pc_rp_sell")
 
@@ -74,7 +74,7 @@ def render():
     with col_left:
         st.markdown("##### Results Dashboard")
         if installer_name:
-            st.markdown(f'<div style="font-size:15px;font-weight:600;color:#e31837;margin-bottom:12px;">{installer_name}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="font-size:15px;font-weight:600;color:#4B2D8A;margin-bottom:12px;">{installer_name}</div>', unsafe_allow_html=True)
 
         st.markdown(
             f"""<div style="background:#F3E8FF;border-radius:10px;padding:16px 20px;margin-bottom:16px;">
@@ -82,7 +82,7 @@ def render():
                 <div style="display:flex;gap:24px;margin-top:8px;">
                     <div><div style="font-size:24px;font-weight:800;color:#1F2937;">{ocpd}</div><div style="font-size:11px;color:#6B7280;">Oil Changes/Day</div></div>
                     <div><div style="font-size:24px;font-weight:800;color:#1F2937;">{total_oil_changes:,}</div><div style="font-size:11px;color:#6B7280;">Annual Oil Changes</div></div>
-                    <div><div style="font-size:24px;font-weight:800;color:#e31837;">{rp_converting:,.0f}</div><div style="font-size:11px;color:#6B7280;">Converting to RP ({conversion_pct}%)</div></div>
+                    <div><div style="font-size:24px;font-weight:800;color:#4B2D8A;">{rp_converting:,.0f}</div><div style="font-size:11px;color:#6B7280;">Converting to RP ({conversion_pct}%)</div></div>
                 </div>
             </div>""",
             unsafe_allow_html=True,
@@ -92,7 +92,7 @@ def render():
         with rp_col:
             st.markdown(
                 f"""<div style="background:#ECFDF5;border:2px solid #059669;border-radius:10px;padding:16px;">
-                    <div style="font-size:12px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:1px;">Butler Performance</div>
+                    <div style="font-size:12px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:1px;">Royal Purple</div>
                     <div style="font-size:12px;color:#6B7280;margin-top:4px;">{rp_product}</div>
                     <div style="margin-top:12px;">
                         <div style="font-size:11px;color:#6B7280;">Selling Price</div>
@@ -135,7 +135,7 @@ def render():
         profit_color = "#059669" if incremental_per_service >= 0 else "#DC2626"
         arrow = "&#9650;" if incremental_per_service >= 0 else "&#9660;"
         st.markdown(
-            f"""<div style="background:linear-gradient(135deg,#16213e 0%,#e31837 100%);border-radius:12px;padding:20px 24px;color:white;">
+            f"""<div style="background:linear-gradient(135deg,#2D1B5E 0%,#4B2D8A 100%);border-radius:12px;padding:20px 24px;color:white;">
                 <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C4B5E8;margin-bottom:12px;">Incremental Profitability</div>
                 <div style="display:flex;gap:24px;flex-wrap:wrap;">
                     <div style="flex:1;min-width:140px;">
@@ -151,7 +151,7 @@ def render():
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                         <div>
                             <div style="font-size:11px;color:#C4B5E8;">{num_locations} Location{'s' if num_locations > 1 else ''} — Total Annual Profitability</div>
-                            <div style="font-size:32px;font-weight:800;color:#e31837;">${total_annual:,.2f}</div>
+                            <div style="font-size:32px;font-weight:800;color:#C8A951;">${total_annual:,.2f}</div>
                         </div>
                     </div>
                 </div>
@@ -162,7 +162,7 @@ def render():
         st.markdown("")
         st.markdown(
             f"""<div style="background:#FFFBEB;border:1px solid #F59E0B;border-radius:8px;padding:12px 16px;font-size:12px;color:#92400E;">
-                <strong>Key Takeaway:</strong> By converting just {conversion_pct}% of oil changes to Butler Performance,
+                <strong>Key Takeaway:</strong> By converting just {conversion_pct}% of oil changes to Royal Purple,
                 {'each location gains' if num_locations > 1 else 'this location gains'}
                 <strong>${annual_per_location:,.2f}</strong> in additional annual profit
                 {f'across <strong>{num_locations} locations</strong> for a total of <strong>${total_annual:,.2f}</strong>' if num_locations > 1 else ''}.

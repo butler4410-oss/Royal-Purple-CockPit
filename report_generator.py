@@ -26,7 +26,7 @@ def _set_shape_alpha(shape, alpha_val):
         pass
 
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
-LOGO_WHITE = os.path.join(ASSETS_DIR, "Butler Performance White Logo.png")
+LOGO_WHITE = os.path.join(ASSETS_DIR, "Royal Purple White Logo.png")
 LOGO_SYNTHETIC = os.path.join(ASSETS_DIR, "RPMO_logo_BF_Outline.png")
 LOGO_EXPERT_YELLOW = os.path.join(ASSETS_DIR, "RP_Synthetic_Expert_Logo_Yellow_Text.png")
 LOGO_EXPERT_BLACK = os.path.join(ASSETS_DIR, "RP_Synthetic_Expert_Logo_Black_Text.png")
@@ -36,10 +36,10 @@ IMG_BETTER_OIL = os.path.join(ASSETS_DIR, "Better Oil Starts Here.png")
 
 
 C = {
-    "purple": "e31837",
+    "purple": "4B2D8A",
     "purpleMid": "6B44B8",
     "purpleLight": "9B6FD4",
-    "gold": "ff4d6a",
+    "gold": "C8973A",
     "goldLight": "E8B85A",
     "white": "FFFFFF",
     "offWhite": "F8F5FF",
@@ -54,11 +54,11 @@ C = {
 PRODUCT_MAP = {
     "HMX": "High Mileage",
     "RMS": "High Mileage Syn",
-    "RS": "Butler Performance High",
-    "RP": "Butler Performance Syn",
+    "RS": "Royal Purple High",
+    "RP": "Royal Purple Syn",
     "RSD": "Duralec",
     "11722": "Max-Clean",
-    "11755": "Butler Performance Premium",
+    "11755": "Royal Purple Premium",
     "18000": "Max-Atomizer",
 }
 
@@ -133,12 +133,12 @@ PRODUCT_FULL_NAMES = {
 PRODUCT_DESCRIPTIONS = {
     "High Mileage": "Synthetic motor oil for engines with 75,000+ miles. Reduces oil consumption, revitalizes seals, and removes deposits using Synerlec additive technology.",
     "High Mileage Syn": "Full synthetic high mileage formulation with enhanced seal conditioning and superior wear protection for high-mileage engines.",
-    "Butler Performance High": "High-performance full synthetic oil with Synerlec technology for superior wear protection, reduced heat, and increased fuel efficiency.",
-    "Butler Performance Syn": "Premium full synthetic oil exceeding API/ILSAC standards. Enhanced film strength minimizes metal-to-metal contact in modern engines.",
+    "Royal Purple High": "High-performance full synthetic oil with Synerlec technology for superior wear protection, reduced heat, and increased fuel efficiency.",
+    "Royal Purple Syn": "Premium full synthetic oil exceeding API/ILSAC standards. Enhanced film strength minimizes metal-to-metal contact in modern engines.",
     "Duralec": "Premium synthetic diesel engine oil (API CK-4) for emission-controlled engines with DPF, EGR, and SCR systems. Extends drain intervals.",
     "Max-Clean": "High-performance fuel system cleaner and stabilizer. Deeply cleans injectors, carburetors, intake valves, and combustion chambers.",
     "Max-Atomizer": "Advanced fuel injector cleaner for optimized spray patterns and improved combustion efficiency.",
-    "Butler Performance Premium": "Premium synthetic motor oil with proprietary Synerlec additive technology for maximum engine protection.",
+    "Royal Purple Premium": "Premium synthetic motor oil with proprietary Synerlec additive technology for maximum engine protection.",
 }
 
 def get_product_display_name(code):
@@ -1417,11 +1417,11 @@ def build_product_mix(prs, stores, month_year, total_slides, page_num):
             cat = pb["category"]
             cat_rev[cat] = cat_rev.get(cat, 0) + pb["revenue"]
 
-    rs_rev = sum(v for k, v in cat_rev.items() if k in ("Butler Performance High", "Butler Performance Syn"))
+    rs_rev = sum(v for k, v in cat_rev.items() if k in ("Royal Purple High", "Royal Purple Syn"))
     hmx_rev = sum(v for k, v in cat_rev.items() if k in ("High Mileage", "High Mileage Syn"))
     other_rev = total_rev - rs_rev - hmx_rev
     top3 = [
-        ("Butler Performance Synthetic", rs_rev),
+        ("Royal Purple Synthetic", rs_rev),
         ("High Mileage", hmx_rev),
         ("Other / Specialty", max(other_rev, 0)),
     ]

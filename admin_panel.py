@@ -6,7 +6,7 @@ from product_reference import load_codes_db, save_codes_db
 ADMIN_USERNAME = "admin"
 
 _COLOR_PRESETS = {
-    "Purple (RP default)": "#e31837",
+    "Purple (RP default)": "#4B2D8A",
     "Deep Purple": "#7C3AED",
     "Blue": "#1D4ED8",
     "Emerald": "#059669",
@@ -27,9 +27,9 @@ def _check_password():
 
     st.markdown(
         '<div style="max-width:400px;margin:60px auto 0;">'
-        '<div style="background:#e31837;color:white;padding:20px 24px;border-radius:10px 10px 0 0;">'
+        '<div style="background:#4B2D8A;color:white;padding:20px 24px;border-radius:10px 10px 0 0;">'
         '<h3 style="margin:0;font-size:18px;">Admin Login</h3>'
-        '<p style="margin:6px 0 0;font-size:13px;opacity:0.8;">Butler Performance Partnership Hub</p>'
+        '<p style="margin:6px 0 0;font-size:13px;opacity:0.8;">Royal Purple Partnership Hub</p>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -59,7 +59,7 @@ def render():
     col_title, col_logout = st.columns([5, 1])
     with col_title:
         st.markdown("### Code Database Editor")
-        st.caption("Add, edit, or remove Butler Performance and competitor operation codes. Changes save immediately to the live database.")
+        st.caption("Add, edit, or remove Royal Purple and competitor operation codes. Changes save immediately to the live database.")
     with col_logout:
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Sign Out", type="secondary"):
@@ -67,7 +67,7 @@ def render():
             st.rerun()
 
     st.markdown("")
-    tab_rp, tab_comp, tab_misc = st.tabs(["Butler Performance Products", "Competitor Brands", "Service Tiers & Spec Flags"])
+    tab_rp, tab_comp, tab_misc = st.tabs(["Royal Purple Products", "Competitor Brands", "Service Tiers & Spec Flags"])
 
     with tab_rp:
         _admin_rp_products()
@@ -77,7 +77,7 @@ def render():
         _admin_misc()
 
 
-def _color_picker(label, key, default="#e31837"):
+def _color_picker(label, key, default="#4B2D8A"):
     col_preset, col_hex = st.columns([3, 2])
     with col_preset:
         preset_key = f"{key}_preset"
@@ -96,7 +96,7 @@ def _color_picker(label, key, default="#e31837"):
             hex_val = _COLOR_PRESETS[chosen_preset]
         else:
             hex_val = current_val
-        val = st.text_input(f"{label} Hex", value=hex_val, key=key, label_visibility="collapsed", placeholder="#e31837")
+        val = st.text_input(f"{label} Hex", value=hex_val, key=key, label_visibility="collapsed", placeholder="#4B2D8A")
     return val
 
 
@@ -104,7 +104,7 @@ def _admin_rp_products():
     db = load_codes_db()
     rp_products = db.get("rp_products", {})
 
-    st.markdown("#### Butler Performance Product Series")
+    st.markdown("#### Royal Purple Product Series")
     st.caption("Each series groups related SKUs (e.g. RS Series, HMX, Duralec). SKUs are the individual operation codes.")
 
     series_names = list(rp_products.keys())
@@ -126,7 +126,7 @@ def _admin_rp_products():
         with col1:
             new_badge = st.text_input("Badge Label", placeholder="e.g. RS", max_chars=6)
         with col2:
-            new_color = st.text_input("Color (hex)", value="#e31837", placeholder="#e31837")
+            new_color = st.text_input("Color (hex)", value="#4B2D8A", placeholder="#4B2D8A")
         new_desc = st.text_area("Description", placeholder="Short description of this product series...")
         new_app = st.text_input("Best For / Application", placeholder="e.g. Modern engines, daily drivers")
         if st.form_submit_button("Add Series", type="primary"):
@@ -136,7 +136,7 @@ def _admin_rp_products():
                 st.error("A series with that name already exists.")
             else:
                 db["rp_products"][new_name.strip()] = {
-                    "color": new_color.strip() or "#e31837",
+                    "color": new_color.strip() or "#4B2D8A",
                     "badge": new_badge.strip().upper() or "RP",
                     "description": new_desc.strip(),
                     "application": new_app.strip(),
@@ -158,10 +158,10 @@ def _edit_rp_series(db, series_name, series):
             with c1:
                 new_badge = st.text_input("Badge", value=series.get("badge", ""), max_chars=6)
             with c2:
-                new_color = st.text_input("Color", value=series.get("color", "#e31837"))
+                new_color = st.text_input("Color", value=series.get("color", "#4B2D8A"))
             with c3:
                 st.markdown(
-                    f'<div style="background:{series.get("color","#e31837")};color:white;padding:6px 10px;border-radius:6px;font-size:13px;font-weight:700;text-align:center;margin-top:28px;">{series.get("badge","RP")}</div>',
+                    f'<div style="background:{series.get("color","#4B2D8A")};color:white;padding:6px 10px;border-radius:6px;font-size:13px;font-weight:700;text-align:center;margin-top:28px;">{series.get("badge","RP")}</div>',
                     unsafe_allow_html=True,
                 )
             new_desc = st.text_area("Description", value=series.get("description", ""), height=80)
@@ -169,7 +169,7 @@ def _edit_rp_series(db, series_name, series):
             if st.form_submit_button("Save Series Details"):
                 db["rp_products"][series_name].update({
                     "badge": new_badge.strip().upper() or "RP",
-                    "color": new_color.strip() or "#e31837",
+                    "color": new_color.strip() or "#4B2D8A",
                     "description": new_desc.strip(),
                     "application": new_app.strip(),
                 })
@@ -277,7 +277,7 @@ def _admin_competitor_brands():
         with c2:
             new_type = st.text_input("Type Description", placeholder="e.g. Full Synthetic")
         new_color = st.text_input("Color (hex)", value="#DC2626", placeholder="#DC2626")
-        new_note = st.text_area("Conversion Strategy Note", placeholder="What's the best approach to convert customers of this brand to Butler Performance?", height=80)
+        new_note = st.text_area("Conversion Strategy Note", placeholder="What's the best approach to convert customers of this brand to Royal Purple?", height=80)
         if st.form_submit_button("Add Brand", type="primary"):
             if not new_brand.strip():
                 st.error("Brand name is required.")
