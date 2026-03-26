@@ -25,6 +25,116 @@ st.set_page_config(
     layout="wide",
 )
 
+# ── BPA-style dark theme CSS injection ──────────────────────────────
+st.markdown("""
+<style>
+    /* Dark card backgrounds */
+    [data-testid="stMetric"] {
+        background: #1a1a2e;
+        border: 1px solid #2a2a45;
+        border-radius: 12px;
+        padding: 16px 20px;
+    }
+    [data-testid="stMetricValue"] { font-size: 24px; font-weight: 800; }
+    [data-testid="stMetricLabel"] { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #8888a8; }
+    [data-testid="stMetricDelta"] { font-size: 12px; }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0a0a18 0%, #1a1a2e 100%);
+        border-right: 1px solid #2a2a45;
+    }
+    [data-testid="stSidebar"] [data-testid="stRadio"] label {
+        font-size: 14px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        transition: background 0.15s;
+    }
+    [data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
+        background: rgba(75,45,138,0.15);
+    }
+    [data-testid="stSidebar"] [data-testid="stRadio"] label[data-checked="true"] {
+        background: rgba(75,45,138,0.25);
+        border-left: 3px solid #4B2D8A;
+    }
+
+    /* Tabs */
+    [data-testid="stTabs"] button {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-bottom: 3px solid transparent;
+    }
+    [data-testid="stTabs"] button[aria-selected="true"] {
+        border-bottom-color: #4B2D8A;
+        color: #4B2D8A;
+    }
+
+    /* Expanders */
+    [data-testid="stExpander"] {
+        background: #1a1a2e;
+        border: 1px solid #2a2a45;
+        border-radius: 12px;
+    }
+
+    /* Dataframes */
+    [data-testid="stDataFrame"] {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    /* File uploader */
+    [data-testid="stFileUploader"] {
+        background: #1a1a2e;
+        border: 2px dashed #2a2a45;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    /* Buttons */
+    [data-testid="stButton"] button[kind="primary"] {
+        background: #4B2D8A;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        padding: 12px 28px;
+    }
+    [data-testid="stButton"] button[kind="primary"]:hover {
+        background: #6B3FA0;
+    }
+
+    /* Download buttons */
+    [data-testid="stDownloadButton"] button {
+        background: linear-gradient(135deg, #4B2D8A, #6B3FA0);
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+    }
+
+    /* Info/success/error boxes */
+    [data-testid="stAlert"] {
+        border-radius: 10px;
+        border: 1px solid #2a2a45;
+    }
+
+    /* Main container spacing */
+    .block-container { padding-top: 2rem; }
+
+    /* Hide default Streamlit footer */
+    footer { visibility: hidden; }
+    footer:after {
+        content: 'Royal Purple CockPit | Powered by Butler Performance Analytics';
+        visibility: visible;
+        display: block;
+        text-align: center;
+        padding: 8px;
+        font-size: 11px;
+        color: #8888a8;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+
 with st.sidebar:
     st.markdown("")
     st.markdown("<div style='text-align:center;padding:12px 0 4px;'><div style='font-size:18px;font-weight:900;color:#4B2D8A;letter-spacing:1px;'>ROYAL PURPLE</div><div style='width:120px;height:2px;background:linear-gradient(90deg,#4B2D8A,#C8A951);margin:6px auto;border-radius:1px;'></div><div style='font-size:11px;font-weight:700;letter-spacing:3px;color:#C8A951;'>COCKPIT</div></div>", unsafe_allow_html=True)
@@ -39,7 +149,7 @@ with st.sidebar:
 
     st.markdown("---")
     if os.path.exists(LOGO_NEVER_SETTLE):
-        st.image(LOGO_NEVER_SETTLE, width="stretch")
+        st.image(LOGO_SIDEBAR_PATH, use_container_width=True) if os.path.exists(LOGO_SIDEBAR_PATH) else None
     st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#94A3B8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
 
 
@@ -127,9 +237,9 @@ if nav == "Home":
     st.markdown("")
 
     card_style = (
-        "background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;"
+        "background:#1a1a2e;border:1px solid #2a2a45;border-radius:12px;"
         "padding:28px 24px 24px;height:100%;"
-        "box-shadow:0 1px 3px rgba(0,0,0,0.06);"
+        ""
     )
     icon_style = (
         "width:44px;height:44px;border-radius:10px;display:flex;"
@@ -142,11 +252,11 @@ if nav == "Home":
         st.markdown(
             f"""
             <div style="{card_style}">
-                <div style="{icon_style}background:#EDE9FE;color:#6B3FA0;">&#9889;</div>
-                <div style="font-size:17px;font-weight:700;color:#1F2937;margin-bottom:6px;">
+                <div style="{icon_style}background:rgba(75,45,138,0.2);color:#C4B5E8;">&#9889;</div>
+                <div style="font-size:17px;font-weight:700;color:#e8e8f0;margin-bottom:6px;">
                     Report Generator
                 </div>
-                <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
+                <div style="font-size:13px;color:#8888a8;line-height:1.6;margin-bottom:16px;">
                     Upload monthly Royal Purple Excel exports and generate fully branded PowerPoint
                     presentations with revenue analytics, Max-Clean attachment metrics, and per-store deep dives.
                 </div>
@@ -164,11 +274,11 @@ if nav == "Home":
         st.markdown(
             f"""
             <div style="{card_style}">
-                <div style="{icon_style}background:#DBEAFE;color:#2563EB;">&#127758;</div>
-                <div style="font-size:17px;font-weight:700;color:#1F2937;margin-bottom:6px;">
+                <div style="{icon_style}background:rgba(37,99,235,0.15);color:#60a5fa;">&#127758;</div>
+                <div style="font-size:17px;font-weight:700;color:#e8e8f0;margin-bottom:6px;">
                     Customer Map
                 </div>
-                <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
+                <div style="font-size:13px;color:#8888a8;line-height:1.6;margin-bottom:16px;">
                     Interactive map of {len(all_locations):,} Royal Purple locations across {len(us_states)} states and {len(unique_countries)} countries.
                     Filter by 8 account types, search by name or address, and export data to branded Excel workbooks.
                 </div>
@@ -186,11 +296,11 @@ if nav == "Home":
         st.markdown(
             f"""
             <div style="{card_style}">
-                <div style="{icon_style}background:#FEF3C7;color:#D97706;">&#128218;</div>
-                <div style="font-size:17px;font-weight:700;color:#1F2937;margin-bottom:6px;">
+                <div style="{icon_style}background:rgba(200,169,81,0.15);color:#C8A951;">&#128218;</div>
+                <div style="font-size:17px;font-weight:700;color:#e8e8f0;margin-bottom:6px;">
                     Product Reference
                 </div>
-                <div style="font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:16px;">
+                <div style="font-size:13px;color:#8888a8;line-height:1.6;margin-bottom:16px;">
                     Complete database of {rp_sku_count} Royal Purple SKUs across {rp_series_count} product lines,
                     plus {comp_brand_count} competitor brands. Operation codes, viscosities, and cross-references.
                 </div>
@@ -229,13 +339,13 @@ if nav == "Home":
         with cols[i % 4]:
             st.markdown(
                 f"""
-                <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;
+                <div style="background:#1a1a2e;border:1px solid #2a2a45;border-radius:8px;
                             padding:14px 16px;margin-bottom:8px;">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
                         <div style="width:10px;height:10px;border-radius:50%;background:{color};"></div>
-                        <span style="font-size:12px;color:#6B7280;font-weight:500;">{ttype}</span>
+                        <span style="font-size:12px;color:#8888a8;font-weight:500;">{ttype}</span>
                     </div>
-                    <div style="font-size:22px;font-weight:700;color:#1F2937;">{count:,}</div>
+                    <div style="font-size:22px;font-weight:700;color:#e8e8f0;">{count:,}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -518,12 +628,12 @@ elif nav == "Report Generator":
     with info_col:
         st.markdown(
             """
-            <div style="background:#F8F5FF;border-left:4px solid #4B2D8A;border-radius:0 8px 8px 0;
+            <div style="background:rgba(75,45,138,0.1);border-left:4px solid #4B2D8A;border-radius:0 8px 8px 0;
                         padding:16px 18px;margin-top:8px;">
-                <div style="font-weight:700;color:#2D1B5E;font-size:13px;margin-bottom:8px;">
+                <div style="font-weight:700;color:#C4B5E8;font-size:13px;margin-bottom:8px;">
                     What this generates
                 </div>
-                <div style="font-size:12px;color:#4B5563;line-height:1.8;">
+                <div style="font-size:12px;color:#8888a8;line-height:1.8;">
                     ✦ &nbsp;Network revenue &amp; invoice summary<br>
                     ✦ &nbsp;Max-Clean attachment analysis<br>
                     ✦ &nbsp;Per-store ranked deep dives<br>
@@ -552,12 +662,12 @@ elif nav == "Report Generator":
             dedup_note = f"  ·  deduplicated from {fmt_number(total_raw)} raw lines" if total_raw > total_inv else ""
             st.markdown(
                 f"""
-                <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;
+                <div style="background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:8px;
                             padding:12px 18px;margin:12px 0 20px;">
-                    <span style="color:#166534;font-weight:700;">
+                    <span style="color:#00c853;font-weight:700;">
                         {len(stores)} locations parsed &nbsp;·&nbsp; {month_year}
                     </span>
-                    <span style="color:#4B7A5E;font-size:13px;">{dedup_note}</span>
+                    <span style="color:#66bb6a;font-size:13px;">{dedup_note}</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
