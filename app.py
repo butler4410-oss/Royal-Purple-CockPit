@@ -25,112 +25,92 @@ st.set_page_config(
     layout="wide",
 )
 
-# ── BPA-style dark theme CSS injection ──────────────────────────────
+# ── Royal Purple CockPit Dark Theme (BPA-style) ─────────────────────
 st.markdown("""
 <style>
-    /* Dark card backgrounds */
-    [data-testid="stMetric"] {
-        background: #1a1a2e;
-        border: 1px solid #2a2a45;
-        border-radius: 12px;
-        padding: 16px 20px;
-    }
-    [data-testid="stMetricValue"] { font-size: 24px; font-weight: 800; }
-    [data-testid="stMetricLabel"] { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #8888a8; }
-    [data-testid="stMetricDelta"] { font-size: 12px; }
+    /* ═══ GLOBAL ═══ */
+    .stApp { background-color: #0f0f1a !important; }
+    .block-container { padding: 2rem 2rem 4rem !important; max-width: 1200px; }
+    header[data-testid="stHeader"] { background: rgba(15,15,26,0.95) !important; backdrop-filter: blur(12px); border-bottom: 1px solid #2a2a45; }
 
-    /* Sidebar */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0a0a18 0%, #1a1a2e 100%);
-        border-right: 1px solid #2a2a45;
-    }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label {
-        font-size: 14px;
-        padding: 10px 16px;
-        border-radius: 8px;
-        transition: background 0.15s;
-    }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
-        background: rgba(75,45,138,0.15);
-    }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label[data-checked="true"] {
-        background: rgba(75,45,138,0.25);
-        border-left: 3px solid #4B2D8A;
-    }
+    /* ═══ SIDEBAR ═══ */
+    section[data-testid="stSidebar"] { background: linear-gradient(180deg, #0a0a15 0%, #12122a 100%) !important; border-right: 1px solid #2a2a45; }
+    section[data-testid="stSidebar"] .stRadio > div { gap: 2px; }
+    section[data-testid="stSidebar"] .stRadio label { padding: 10px 16px !important; border-radius: 8px; transition: all 0.15s; margin: 1px 0; }
+    section[data-testid="stSidebar"] .stRadio label:hover { background: rgba(75,45,138,0.12); }
+    section[data-testid="stSidebar"] hr { border-color: #2a2a45 !important; margin: 12px 0; }
 
-    /* Tabs */
-    [data-testid="stTabs"] button {
-        font-size: 14px;
-        font-weight: 600;
-        padding: 12px 24px;
-        border-bottom: 3px solid transparent;
-    }
-    [data-testid="stTabs"] button[aria-selected="true"] {
-        border-bottom-color: #4B2D8A;
-        color: #4B2D8A;
-    }
+    /* ═══ METRICS ═══ */
+    [data-testid="stMetric"] { background: #1a1a2e !important; border: 1px solid #2a2a45; border-radius: 12px; padding: 18px 20px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    [data-testid="stMetricValue"] { font-size: 24px !important; font-weight: 800 !important; color: #fff !important; }
+    [data-testid="stMetricLabel"] { font-size: 11px !important; text-transform: uppercase; letter-spacing: 0.5px; color: #8888a8 !important; }
+    [data-testid="stMetricDelta"] { font-size: 12px !important; }
 
-    /* Expanders */
-    [data-testid="stExpander"] {
-        background: #1a1a2e;
-        border: 1px solid #2a2a45;
-        border-radius: 12px;
-    }
+    /* ═══ TABS ═══ */
+    .stTabs [data-baseweb="tab-list"] { gap: 0; border-bottom: 2px solid #2a2a45; }
+    .stTabs [data-baseweb="tab"] { font-size: 13px !important; font-weight: 600; padding: 12px 24px !important; color: #8888a8; border-bottom: 3px solid transparent; background: transparent !important; }
+    .stTabs [data-baseweb="tab"]:hover { color: #C4B5E8; background: rgba(75,45,138,0.06) !important; }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] { color: #C4B5E8 !important; border-bottom-color: #4B2D8A !important; background: rgba(75,45,138,0.08) !important; }
+    .stTabs [data-baseweb="tab-highlight"] { background-color: #4B2D8A !important; }
+    .stTabs [data-baseweb="tab-border"] { display: none; }
 
-    /* Dataframes */
-    [data-testid="stDataFrame"] {
-        border-radius: 12px;
-        overflow: hidden;
-    }
+    /* ═══ EXPANDERS ═══ */
+    details[data-testid="stExpander"] { background: #1a1a2e !important; border: 1px solid #2a2a45 !important; border-radius: 12px !important; }
+    .streamlit-expanderHeader { background: transparent !important; font-weight: 600; color: #C4B5E8 !important; }
+    .streamlit-expanderContent { border-top: 1px solid #2a2a45; }
 
-    /* File uploader */
-    [data-testid="stFileUploader"] {
-        background: #1a1a2e;
-        border: 2px dashed #2a2a45;
-        border-radius: 12px;
-        padding: 20px;
-    }
+    /* ═══ DATAFRAMES ═══ */
+    [data-testid="stDataFrame"] { border-radius: 12px !important; overflow: hidden; border: 1px solid #2a2a45; }
 
-    /* Buttons */
-    [data-testid="stButton"] button[kind="primary"] {
-        background: #4B2D8A;
-        border: none;
-        border-radius: 10px;
-        font-weight: 700;
-        padding: 12px 28px;
-    }
-    [data-testid="stButton"] button[kind="primary"]:hover {
-        background: #6B3FA0;
-    }
+    /* ═══ FILE UPLOADER ═══ */
+    [data-testid="stFileUploader"] { background: #1a1a2e !important; border: 2px dashed #2a2a45 !important; border-radius: 14px !important; padding: 24px !important; }
+    [data-testid="stFileUploader"]:hover { border-color: #4B2D8A !important; }
 
-    /* Download buttons */
-    [data-testid="stDownloadButton"] button {
-        background: linear-gradient(135deg, #4B2D8A, #6B3FA0);
-        border: none;
-        border-radius: 10px;
-        font-weight: 700;
-    }
+    /* ═══ BUTTONS ═══ */
+    .stButton > button { border-radius: 10px !important; font-weight: 600 !important; padding: 10px 24px !important; transition: all 0.15s; }
+    .stButton > button[kind="primary"] { background: linear-gradient(135deg, #4B2D8A, #6B3FA0) !important; border: none !important; color: white !important; box-shadow: 0 2px 12px rgba(75,45,138,0.3); }
+    .stButton > button[kind="primary"]:hover { background: linear-gradient(135deg, #5B3D9A, #7B4FB0) !important; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(75,45,138,0.4); }
+    .stButton > button[kind="secondary"]:hover { background: rgba(75,45,138,0.1) !important; border-color: #4B2D8A !important; }
 
-    /* Info/success/error boxes */
-    [data-testid="stAlert"] {
-        border-radius: 10px;
-        border: 1px solid #2a2a45;
-    }
+    /* ═══ DOWNLOAD BUTTONS ═══ */
+    .stDownloadButton > button { background: linear-gradient(135deg, #4B2D8A, #6B3FA0) !important; border: none !important; border-radius: 10px !important; font-weight: 700 !important; color: white !important; }
+    .stDownloadButton > button:hover { background: linear-gradient(135deg, #5B3D9A, #7B4FB0) !important; transform: translateY(-1px); }
 
-    /* Main container spacing */
-    .block-container { padding-top: 2rem; }
+    /* ═══ SELECT / MULTISELECT ═══ */
+    [data-baseweb="select"] > div { background: #1a1a2e !important; border-color: #2a2a45 !important; border-radius: 8px !important; }
+    [data-baseweb="select"] > div:hover { border-color: #4B2D8A !important; }
+    [data-baseweb="popover"] { background: #1a1a2e !important; border: 1px solid #2a2a45 !important; border-radius: 10px !important; }
+    [data-baseweb="menu"] { background: #1a1a2e !important; }
+    [data-baseweb="menu"] li:hover { background: rgba(75,45,138,0.15) !important; }
 
-    /* Hide default Streamlit footer */
+    /* ═══ TEXT / NUMBER INPUTS ═══ */
+    .stTextInput input, .stNumberInput input, .stTextArea textarea { background: #1a1a2e !important; border: 1px solid #2a2a45 !important; border-radius: 8px !important; color: #e8e8f0 !important; }
+    .stTextInput input:focus, .stNumberInput input:focus, .stTextArea textarea:focus { border-color: #4B2D8A !important; box-shadow: 0 0 0 3px rgba(75,45,138,0.15) !important; }
+
+    /* ═══ ALERTS ═══ */
+    [data-testid="stAlert"] { border-radius: 10px !important; border: 1px solid #2a2a45 !important; }
+
+    /* ═══ DIVIDERS ═══ */
+    hr { border-color: #2a2a45 !important; }
+
+    /* ═══ SPINNER ═══ */
+    .stSpinner > div > div { border-top-color: #4B2D8A !important; }
+
+    /* ═══ SCROLLBAR ═══ */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0f0f1a; }
+    ::-webkit-scrollbar-thumb { background: #2a2a45; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4B2D8A; }
+
+    /* ═══ COLUMN GAPS ═══ */
+    [data-testid="stColumn"] { padding: 0 6px; }
+
+    /* ═══ CAPTION ═══ */
+    .stCaption, .stMarkdown small { color: #666 !important; }
+
+    /* ═══ FOOTER ═══ */
     footer { visibility: hidden; }
-    footer:after {
-        content: 'Royal Purple CockPit | Powered by Butler Performance Analytics';
-        visibility: visible;
-        display: block;
-        text-align: center;
-        padding: 8px;
-        font-size: 11px;
-        color: #8888a8;
-    }
+    footer:after { content: 'Royal Purple CockPit  \00B7  Powered by Butler Performance Analytics'; visibility: visible; display: block; text-align: center; padding: 12px; font-size: 11px; color: #555; letter-spacing: 0.5px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -138,25 +118,25 @@ st.markdown("""
 with st.sidebar:
     st.markdown("")
     st.markdown("<div style='text-align:center;padding:12px 0 4px;'><div style='font-size:18px;font-weight:900;color:#4B2D8A;letter-spacing:1px;'>ROYAL PURPLE</div><div style='width:120px;height:2px;background:linear-gradient(90deg,#4B2D8A,#C8A951);margin:6px auto;border-radius:1px;'></div><div style='font-size:11px;font-weight:700;letter-spacing:3px;color:#C8A951;'>COCKPIT</div></div>", unsafe_allow_html=True)
-    st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#94A3B8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#8888a8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
     st.markdown("---")
 
     nav = st.radio(
         "Navigation",
-        ["Home", "Report Generator", "Customer Map", "Product Reference", "Profit Calculator", "Admin"],
+        ["Home", "Report Generator", "Customer Map", "Product Reference", "Installer Incremental Profit Model", "Admin"],
         label_visibility="collapsed",
     )
 
     st.markdown("---")
     if os.path.exists(LOGO_NEVER_SETTLE):
         st.image(LOGO_SIDEBAR_PATH, use_container_width=True) if os.path.exists(LOGO_SIDEBAR_PATH) else None
-    st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#94A3B8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#8888a8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
 
 
 def page_header(title, subtitle):
     st.markdown(
         f"<h1 style='color:#4B2D8A; margin: 0;'>{title}</h1>"
-        f"<p style='color:#94A3B8; margin: 4px 0 0 0;'>{subtitle}</p>",
+        f"<p style='color:#8888a8; margin: 4px 0 0 0;'>{subtitle}</p>",
         unsafe_allow_html=True,
     )
 
@@ -221,7 +201,7 @@ if nav == "Home":
     comp_brand_count = len(_db["competitor_brands"])
 
     st.markdown(
-        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#9CA3AF;
+        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#8888a8;
                     text-transform:uppercase;margin-bottom:4px;">Network at a Glance</div>""",
         unsafe_allow_html=True,
     )
@@ -316,7 +296,7 @@ if nav == "Home":
 
     st.markdown("")
     st.markdown(
-        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#9CA3AF;
+        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#8888a8;
                     text-transform:uppercase;margin-bottom:4px;">Account Type Breakdown</div>""",
         unsafe_allow_html=True,
     )
@@ -570,7 +550,7 @@ elif nav == "Product Reference":
     st.markdown("")
     product_reference.render()
 
-elif nav == "Profit Calculator":
+elif nav == "Installer Incremental Profit Model":
     st.markdown(
         """
         <div style="background:linear-gradient(135deg,#2D1B5E 0%,#4B2D8A 60%,#6B3FA0 100%);
@@ -578,7 +558,7 @@ elif nav == "Profit Calculator":
             <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:#C4B5E8;
                         text-transform:uppercase;margin-bottom:8px;">Royal Purple CockPit</div>
             <div style="font-size:28px;font-weight:800;color:#FFFFFF;line-height:1.2;margin-bottom:8px;">
-                Installer Profit Calculator
+                Installer Installer Incremental Profit Model
             </div>
             <div style="font-size:14px;color:#C4B5E8;max-width:560px;line-height:1.6;">
                 Compare Royal Purple profitability vs. your installer's current top-selling brand.
@@ -675,7 +655,7 @@ elif nav == "Report Generator":
 
             st.markdown(
                 """
-                <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#9CA3AF;
+                <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#8888a8;
                             text-transform:uppercase;margin-bottom:4px;">Network Summary</div>
                 """,
                 unsafe_allow_html=True,
@@ -703,7 +683,7 @@ elif nav == "Report Generator":
 
                 st.markdown(
                     """
-                    <div style="border-top:2px solid #EDE9FE;margin:8px 0 16px;">
+                    <div style="border-top:2px solid #2a2a45;margin:8px 0 16px;">
                         <span style="display:inline-block;background:#4B2D8A;color:white;
                                      font-size:10px;font-weight:700;letter-spacing:2px;
                                      text-transform:uppercase;padding:3px 10px;border-radius:0 0 6px 6px;">
@@ -908,7 +888,7 @@ elif nav == "Report Generator":
                     <div style="color:white;font-size:18px;font-weight:700;margin-bottom:4px;">
                         {len(stores)} stores &nbsp;·&nbsp; {month_year}
                     </div>
-                    <div style="color:#A78BCC;font-size:13px;">
+                    <div style="color:#8888a8;font-size:13px;">
                         Branded PowerPoint with network summary, Max-Clean analysis, and per-store slides
                     </div>
                 </div>
