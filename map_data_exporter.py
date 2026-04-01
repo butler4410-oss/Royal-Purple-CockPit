@@ -102,9 +102,7 @@ EMERALD_FILL = PatternFill(start_color="ECFDF5", end_color="ECFDF5", fill_type="
 def _type_fill(account_type):
     if "Promo Only" in account_type:
         return RED_FILL
-    elif "Both" in account_type:
-        return GREEN_FILL
-    elif "C4C Only" in account_type:
+    elif "C4C List" in account_type:
         return BLUE_FILL
     elif "Rack Installer" in account_type:
         return PURPLE_LIGHT_FILL
@@ -181,8 +179,7 @@ def generate_map_export(output_path, customers=None):
     ca_count = type_counts.get("Canada", 0)
     rack_count = type_counts.get("Rack Installer", 0)
     installer_count = (type_counts.get("Promo Only (Not on C4C)", 0) +
-                       type_counts.get("On Both Lists", 0) +
-                       type_counts.get("C4C Only", 0) +
+                       type_counts.get("C4C List", 0) +
                        rack_count)
 
     metrics = [
@@ -196,8 +193,7 @@ def generate_map_export(output_path, customers=None):
         ("Counties (US)", len(county_counts)),
         ("", ""),
         ("Promo Only (Not on C4C)", type_counts.get("Promo Only (Not on C4C)", 0)),
-        ("On Both Lists", type_counts.get("On Both Lists", 0)),
-        ("C4C Only", type_counts.get("C4C Only", 0)),
+        ("C4C List", type_counts.get("C4C List", 0)),
         ("Rack Installer", rack_count),
     ]
 
@@ -222,9 +218,7 @@ def generate_map_export(output_path, customers=None):
             ws_dash.cell(row=row, column=1).fill = EMERALD_FILL
         elif "Promo Only" in label:
             ws_dash.cell(row=row, column=1).fill = RED_FILL
-        elif "Both" in label:
-            ws_dash.cell(row=row, column=1).fill = GREEN_FILL
-        elif "C4C Only" in label:
+        elif "C4C List" in label:
             ws_dash.cell(row=row, column=1).fill = BLUE_FILL
 
         row += 1
@@ -237,7 +231,7 @@ def generate_map_export(output_path, customers=None):
         ws_dash.cell(row=row, column=c).border = BOTTOM_BORDER
     row += 1
 
-    state_headers = ["State", "Code", "Total", "Counties", "Promo Only", "On Both Lists", "C4C Only", "Gap %"]
+    state_headers = ["State", "Code", "Total", "Counties", "Promo Only", "C4C List", "Gap %"]
     for ci, h in enumerate(state_headers, 1):
         ws_dash.cell(row=row, column=ci, value=h)
     _apply_header_row(ws_dash, row, len(state_headers))
@@ -250,8 +244,7 @@ def generate_map_export(output_path, customers=None):
         state_name = US_STATE_NAMES.get(sc, sc)
         total = len(accts)
         promo = sum(1 for a in accts if a.get("type") == "Promo Only (Not on C4C)")
-        both = sum(1 for a in accts if a.get("type") == "On Both Lists")
-        c4c = sum(1 for a in accts if a.get("type") == "C4C Only")
+        c4c_list = sum(1 for a in accts if a.get("type") == "C4C List")
         counties = len(state_counties.get(sc, set()))
         gap = promo / total * 100 if total > 0 else 0
 
@@ -260,19 +253,18 @@ def generate_map_export(output_path, customers=None):
         ws_dash.cell(row=row, column=3, value=total)
         ws_dash.cell(row=row, column=4, value=counties)
         ws_dash.cell(row=row, column=5, value=promo)
-        ws_dash.cell(row=row, column=6, value=both)
-        ws_dash.cell(row=row, column=7, value=c4c)
-        ws_dash.cell(row=row, column=8, value=f"{gap:.1f}%")
+        ws_dash.cell(row=row, column=6, value=c4c_list)
+        ws_dash.cell(row=row, column=7, value=f"{gap:.1f}%")
 
         _apply_data_row(ws_dash, row, len(state_headers), alt=(row % 2 == 0))
-        for col in [2, 3, 4, 5, 6, 7, 8]:
+        for col in [2, 3, 4, 5, 6, 7]:
             ws_dash.cell(row=row, column=col).alignment = Alignment(horizontal="center")
 
         if gap >= 80:
-            ws_dash.cell(row=row, column=8).fill = RED_FILL
-            ws_dash.cell(row=row, column=8).font = Font(name="Calibri", bold=True, size=10, color=RED_ACCENT)
+            ws_dash.cell(row=row, column=7).fill = RED_FILL
+            ws_dash.cell(row=row, column=7).font = Font(name="Calibri", bold=True, size=10, color=RED_ACCENT)
         elif gap >= 50:
-            ws_dash.cell(row=row, column=8).fill = AMBER_FILL
+            ws_dash.cell(row=row, column=7).fill = AMBER_FILL
 
         row += 1
 
@@ -283,8 +275,7 @@ def generate_map_export(output_path, customers=None):
     ws_dash.cell(row=totals_row, column=3, value=len(customers)).font = Font(name="Calibri", bold=True, size=11)
     ws_dash.cell(row=totals_row, column=4, value=len(county_counts)).font = Font(name="Calibri", bold=True, size=11)
     ws_dash.cell(row=totals_row, column=5, value=type_counts.get("Promo Only (Not on C4C)", 0)).font = Font(name="Calibri", bold=True, size=11)
-    ws_dash.cell(row=totals_row, column=6, value=type_counts.get("On Both Lists", 0)).font = Font(name="Calibri", bold=True, size=11)
-    ws_dash.cell(row=totals_row, column=7, value=type_counts.get("C4C Only", 0)).font = Font(name="Calibri", bold=True, size=11)
+    ws_dash.cell(row=totals_row, column=6, value=type_counts.get("C4C List", 0)).font = Font(name="Calibri", bold=True, size=11)
     for col in range(1, len(state_headers) + 1):
         ws_dash.cell(row=totals_row, column=col).border = Border(top=Side(style="double", color=PURPLE))
         ws_dash.cell(row=totals_row, column=col).alignment = Alignment(horizontal="center")
@@ -298,7 +289,7 @@ def generate_map_export(output_path, customers=None):
         ws_dash.cell(row=row, column=c).border = BOTTOM_BORDER
     row += 1
 
-    county_headers = ["Rank", "County", "State", "Total", "Promo Only", "On Both Lists", "C4C Only"]
+    county_headers = ["Rank", "County", "State", "Total", "Promo Only", "C4C List"]
     for ci, h in enumerate(county_headers, 1):
         ws_dash.cell(row=row, column=ci, value=h)
     _apply_header_row(ws_dash, row, len(county_headers))
@@ -312,15 +303,13 @@ def generate_map_export(output_path, customers=None):
             continue
         key = (co, st)
         if key not in county_details:
-            county_details[key] = {"total": 0, "promo": 0, "both": 0, "c4c": 0}
+            county_details[key] = {"total": 0, "promo": 0, "c4c_list": 0}
         county_details[key]["total"] += 1
         t = c.get("type", "")
         if "Promo Only" in t:
             county_details[key]["promo"] += 1
-        elif "Both" in t:
-            county_details[key]["both"] += 1
-        elif "C4C Only" in t:
-            county_details[key]["c4c"] += 1
+        elif "C4C List" in t:
+            county_details[key]["c4c_list"] += 1
 
     top_counties = sorted(county_details.items(), key=lambda x: -x[1]["total"])[:15]
 
@@ -330,11 +319,10 @@ def generate_map_export(output_path, customers=None):
         ws_dash.cell(row=row, column=3, value=state)
         ws_dash.cell(row=row, column=4, value=stats["total"])
         ws_dash.cell(row=row, column=5, value=stats["promo"])
-        ws_dash.cell(row=row, column=6, value=stats["both"])
-        ws_dash.cell(row=row, column=7, value=stats["c4c"])
+        ws_dash.cell(row=row, column=6, value=stats["c4c_list"])
 
         _apply_data_row(ws_dash, row, len(county_headers), alt=(row % 2 == 0))
-        for col in [1, 3, 4, 5, 6, 7]:
+        for col in [1, 3, 4, 5, 6]:
             ws_dash.cell(row=row, column=col).alignment = Alignment(horizontal="center")
         if rank <= 5:
             ws_dash.cell(row=row, column=4).fill = GOLD_FILL
@@ -396,8 +384,7 @@ def generate_map_export(output_path, customers=None):
 
     TYPE_COLORS_TAB = {
         "Promo Only (Not on C4C)": "DC2626",
-        "On Both Lists": "16A34A",
-        "C4C Only": "2563EB",
+        "C4C List": "2563EB",
     }
 
     used_tabs = set()
@@ -417,7 +404,7 @@ def generate_map_export(output_path, customers=None):
         ws = wb.create_sheet(tab_name)
 
         primary_type = max(
-            ["Promo Only (Not on C4C)", "On Both Lists", "C4C Only"],
+            ["Promo Only (Not on C4C)", "C4C List"],
             key=lambda t: sum(1 for a in accts if a.get("type") == t)
         )
         ws.sheet_properties.tabColor = TYPE_COLORS_TAB.get(primary_type, "64748B")
@@ -428,8 +415,7 @@ def generate_map_export(output_path, customers=None):
         ws.row_dimensions[1].height = 32
 
         promo_ct = sum(1 for a in accts if a.get("type") == "Promo Only (Not on C4C)")
-        both_ct = sum(1 for a in accts if a.get("type") == "On Both Lists")
-        c4c_ct = sum(1 for a in accts if a.get("type") == "C4C Only")
+        c4c_ct = sum(1 for a in accts if a.get("type") == "C4C List")
         counties_in_state = len(set(a.get("county", "") for a in accts if a.get("county")))
 
         ws.cell(row=2, column=1, value="Counties:").font = BOLD_FONT
@@ -437,12 +423,9 @@ def generate_map_export(output_path, customers=None):
         ws.cell(row=2, column=3, value="Promo Only:").font = BOLD_FONT
         ws.cell(row=2, column=3).fill = RED_FILL
         ws.cell(row=2, column=4, value=promo_ct).font = DATA_FONT
-        ws.cell(row=2, column=5, value="Both Lists:").font = BOLD_FONT
-        ws.cell(row=2, column=5).fill = GREEN_FILL
-        ws.cell(row=2, column=6, value=both_ct).font = DATA_FONT
-        ws.cell(row=2, column=7, value="C4C Only:").font = BOLD_FONT
-        ws.cell(row=2, column=7).fill = BLUE_FILL
-        ws.cell(row=2, column=8, value=c4c_ct).font = DATA_FONT
+        ws.cell(row=2, column=5, value="C4C List:").font = BOLD_FONT
+        ws.cell(row=2, column=5).fill = BLUE_FILL
+        ws.cell(row=2, column=6, value=c4c_ct).font = DATA_FONT
 
         row = 4
         for ci, h in enumerate(state_headers_detail, 1):
@@ -484,7 +467,7 @@ def generate_map_export(output_path, customers=None):
     county_ws.row_dimensions[1].height = 32
 
     row = 3
-    c_headers = ["County", "State", "Total", "Promo Only", "On Both Lists", "C4C Only", "Gap %"]
+    c_headers = ["County", "State", "Total", "Promo Only", "C4C List", "Gap %"]
     for ci, h in enumerate(c_headers, 1):
         county_ws.cell(row=row, column=ci, value=h)
     _apply_header_row(county_ws, row, len(c_headers))
@@ -497,19 +480,18 @@ def generate_map_export(output_path, customers=None):
         county_ws.cell(row=row, column=2, value=state)
         county_ws.cell(row=row, column=3, value=stats["total"])
         county_ws.cell(row=row, column=4, value=stats["promo"])
-        county_ws.cell(row=row, column=5, value=stats["both"])
-        county_ws.cell(row=row, column=6, value=stats["c4c"])
-        county_ws.cell(row=row, column=7, value=f"{gap:.1f}%")
+        county_ws.cell(row=row, column=5, value=stats["c4c_list"])
+        county_ws.cell(row=row, column=6, value=f"{gap:.1f}%")
 
         _apply_data_row(county_ws, row, len(c_headers), alt=(row % 2 == 0))
-        for col in [2, 3, 4, 5, 6, 7]:
+        for col in [2, 3, 4, 5, 6]:
             county_ws.cell(row=row, column=col).alignment = Alignment(horizontal="center")
 
         if gap >= 80:
-            county_ws.cell(row=row, column=7).fill = RED_FILL
-            county_ws.cell(row=row, column=7).font = Font(name="Calibri", bold=True, size=10, color=RED_ACCENT)
+            county_ws.cell(row=row, column=6).fill = RED_FILL
+            county_ws.cell(row=row, column=6).font = Font(name="Calibri", bold=True, size=10, color=RED_ACCENT)
         elif gap >= 50:
-            county_ws.cell(row=row, column=7).fill = AMBER_FILL
+            county_ws.cell(row=row, column=6).fill = AMBER_FILL
 
         row += 1
 

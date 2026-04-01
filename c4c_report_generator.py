@@ -74,8 +74,7 @@ THIN_BORDER = Border(
 
 TYPE_FILLS = {
     "Promo Only (Not on C4C)": RED_FILL,
-    "On Both Lists": GREEN_FILL,
-    "C4C Only": BLUE_FILL,
+    "C4C List": BLUE_FILL,
     "Rack Installer": PURPLE_LIGHT_FILL,
     "Distributor": GOLD_FILL,
     "Powersports/Motorsports": ROSE_FILL,
@@ -84,7 +83,7 @@ TYPE_FILLS = {
 }
 
 ALL_TYPES_ORDERED = [
-    "Promo Only (Not on C4C)", "On Both Lists", "C4C Only", "Rack Installer",
+    "Promo Only (Not on C4C)", "C4C List", "Rack Installer",
     "Distributor", "Powersports/Motorsports", "International", "Canada",
 ]
 
@@ -387,11 +386,11 @@ def generate_c4c_report(output_path):
 
     type_counts = Counter(c.get("type", "Unknown") for c in all_accounts)
 
-    c4c_types = {"Promo Only (Not on C4C)", "On Both Lists", "C4C Only"}
-    installer_types = {"Promo Only (Not on C4C)", "On Both Lists", "C4C Only", "Rack Installer"}
+    c4c_types = {"Promo Only (Not on C4C)", "C4C List", "C4C List"}
+    installer_types = {"Promo Only (Not on C4C)", "C4C List", "C4C List", "Rack Installer"}
 
     not_c4c = [c for c in all_accounts if c.get("type") == "Promo Only (Not on C4C)"]
-    c4c_matched = [c for c in all_accounts if c.get("type") in ("On Both Lists", "C4C Only")]
+    c4c_matched = [c for c in all_accounts if c.get("type") in ("C4C List", "C4C List")]
     rack_installers = [c for c in all_accounts if c.get("type") == "Rack Installer"]
     powersports = [c for c in all_accounts if c.get("type") == "Powersports/Motorsports"]
     international = [c for c in all_accounts if c.get("type") == "International"]
@@ -464,8 +463,8 @@ def generate_c4c_report(output_path):
         ("", "", None),
         ("INSTALLER ACCOUNTS", "", None),
         ("  Promo Only (Not on C4C)", type_counts.get("Promo Only (Not on C4C)", 0), RED_FILL),
-        ("  On Both Lists (Promo + C4C)", type_counts.get("On Both Lists", 0), GREEN_FILL),
-        ("  C4C Only (not on Promo)", type_counts.get("C4C Only", 0), BLUE_FILL),
+        ("  On Both Lists (Promo + C4C)", type_counts.get("C4C List", 0), GREEN_FILL),
+        ("  C4C Only (not on Promo)", type_counts.get("C4C List", 0), BLUE_FILL),
         ("  Rack Installer (new, unmatched)", type_counts.get("Rack Installer", 0), PURPLE_LIGHT_FILL),
         ("", "", None),
         ("PARTNER NETWORK", "", None),
@@ -516,9 +515,9 @@ def generate_c4c_report(output_path):
 
     gap_data = [
         ("Not on C4C (Gap — Needs Onboarding)", len(not_c4c), f"{gap_pct:.1f}%"),
-        ("  — On Both Lists (Promo + C4C)", sum(1 for c in c4c_matched if c["type"] == "On Both Lists"),
+        ("  — On Both Lists (Promo + C4C)", sum(1 for c in c4c_matched if c["type"] == "C4C List"),
          f"{sum(1 for c in c4c_matched if c['type'] == 'On Both Lists') / total_installers * 100:.1f}%" if total_installers else "0%"),
-        ("  — C4C Only (not on Promo list)", sum(1 for c in c4c_matched if c["type"] == "C4C Only"),
+        ("  — C4C Only (not on Promo list)", sum(1 for c in c4c_matched if c["type"] == "C4C List"),
          f"{sum(1 for c in c4c_matched if c['type'] == 'C4C Only') / total_installers * 100:.1f}%" if total_installers else "0%"),
         ("On C4C (Matched)", len(c4c_matched), f"{matched_pct:.1f}%"),
         ("TOTAL Installer Accounts", total_installers, "100%"),
@@ -570,7 +569,7 @@ def generate_c4c_report(output_path):
 
     row = 4
     state_headers = ["State", "Code", "Total", "Counties",
-                     "Promo Only", "On Both", "C4C Only", "Rack Inst.",
+                     "Promo Only", "On Both", "C4C List", "Rack Inst.",
                      "Distributor", "Powersports", "Gap %", "C4C Rate"]
     for ci, h in enumerate(state_headers, 1):
         ws3.cell(row=row, column=ci, value=h)
@@ -594,8 +593,8 @@ def generate_c4c_report(output_path):
         d = state_data[sc]
         total = d["_total"]
         promo = d.get("Promo Only (Not on C4C)", 0)
-        both = d.get("On Both Lists", 0)
-        c4c = d.get("C4C Only", 0)
+        both = d.get("C4C List", 0)
+        c4c = d.get("C4C List", 0)
         rack = d.get("Rack Installer", 0)
         dist = d.get("Distributor", 0)
         ps = d.get("Powersports/Motorsports", 0)
@@ -633,22 +632,22 @@ def generate_c4c_report(output_path):
         if promo > 50:
             ws3.cell(row=row, column=5).fill = AMBER_FILL
 
-        for k in ["_total", "Promo Only (Not on C4C)", "On Both Lists", "C4C Only",
+        for k in ["_total", "Promo Only (Not on C4C)", "C4C List", "C4C List",
                    "Rack Installer", "Distributor", "Powersports/Motorsports"]:
             total_row_data[k] += d.get(k, 0)
         total_row_data["counties"] += counties
 
         row += 1
 
-    t_inst = total_row_data.get("Promo Only (Not on C4C)", 0) + total_row_data.get("On Both Lists", 0) + total_row_data.get("C4C Only", 0)
+    t_inst = total_row_data.get("Promo Only (Not on C4C)", 0) + total_row_data.get("C4C List", 0) + total_row_data.get("C4C List", 0)
     t_gap = total_row_data.get("Promo Only (Not on C4C)", 0) / t_inst * 100 if t_inst else 0
-    t_rate = (total_row_data.get("On Both Lists", 0) + total_row_data.get("C4C Only", 0)) / t_inst * 100 if t_inst else 0
+    t_rate = (total_row_data.get("C4C List", 0) + total_row_data.get("C4C List", 0)) / t_inst * 100 if t_inst else 0
     ws3.cell(row=row, column=1, value="TOTAL")
     ws3.cell(row=row, column=3, value=total_row_data["_total"])
     ws3.cell(row=row, column=4, value=len(county_set))
     ws3.cell(row=row, column=5, value=total_row_data.get("Promo Only (Not on C4C)", 0))
-    ws3.cell(row=row, column=6, value=total_row_data.get("On Both Lists", 0))
-    ws3.cell(row=row, column=7, value=total_row_data.get("C4C Only", 0))
+    ws3.cell(row=row, column=6, value=total_row_data.get("C4C List", 0))
+    ws3.cell(row=row, column=7, value=total_row_data.get("C4C List", 0))
     ws3.cell(row=row, column=8, value=total_row_data.get("Rack Installer", 0))
     ws3.cell(row=row, column=9, value=total_row_data.get("Distributor", 0))
     ws3.cell(row=row, column=10, value=total_row_data.get("Powersports/Motorsports", 0))
@@ -677,7 +676,7 @@ def generate_c4c_report(output_path):
 
     row = 4
     county_headers = ["State", "Code", "County", "Total",
-                      "Promo Only", "On Both", "C4C Only", "Rack Inst.",
+                      "Promo Only", "On Both", "C4C List", "Rack Inst.",
                       "Distributor", "Powersports", "Gap %", "C4C Rate"]
     for ci, h in enumerate(county_headers, 1):
         ws4.cell(row=row, column=ci, value=h)
@@ -699,8 +698,8 @@ def generate_c4c_report(output_path):
         d = county_data[key]
         total = d["_total"]
         promo = d.get("Promo Only (Not on C4C)", 0)
-        both = d.get("On Both Lists", 0)
-        c4c = d.get("C4C Only", 0)
+        both = d.get("C4C List", 0)
+        c4c = d.get("C4C List", 0)
         rack = d.get("Rack Installer", 0)
         dist = d.get("Distributor", 0)
         ps = d.get("Powersports/Motorsports", 0)
@@ -738,15 +737,15 @@ def generate_c4c_report(output_path):
             ct_total[k] += d[k]
         row += 1
 
-    ct_inst = ct_total.get("Promo Only (Not on C4C)", 0) + ct_total.get("On Both Lists", 0) + ct_total.get("C4C Only", 0)
+    ct_inst = ct_total.get("Promo Only (Not on C4C)", 0) + ct_total.get("C4C List", 0) + ct_total.get("C4C List", 0)
     ct_gap_pct = ct_total.get("Promo Only (Not on C4C)", 0) / ct_inst * 100 if ct_inst else 0
-    ct_c4c_pct = (ct_total.get("On Both Lists", 0) + ct_total.get("C4C Only", 0)) / ct_inst * 100 if ct_inst else 0
+    ct_c4c_pct = (ct_total.get("C4C List", 0) + ct_total.get("C4C List", 0)) / ct_inst * 100 if ct_inst else 0
     ws4.cell(row=row, column=1, value="TOTAL")
     ws4.cell(row=row, column=3, value=f"{len(county_data)} counties")
     ws4.cell(row=row, column=4, value=ct_total["_total"])
     ws4.cell(row=row, column=5, value=ct_total.get("Promo Only (Not on C4C)", 0))
-    ws4.cell(row=row, column=6, value=ct_total.get("On Both Lists", 0))
-    ws4.cell(row=row, column=7, value=ct_total.get("C4C Only", 0))
+    ws4.cell(row=row, column=6, value=ct_total.get("C4C List", 0))
+    ws4.cell(row=row, column=7, value=ct_total.get("C4C List", 0))
     ws4.cell(row=row, column=8, value=ct_total.get("Rack Installer", 0))
     ws4.cell(row=row, column=9, value=ct_total.get("Distributor", 0))
     ws4.cell(row=row, column=10, value=ct_total.get("Powersports/Motorsports", 0))
@@ -861,8 +860,8 @@ def generate_c4c_report(output_path):
     for sc in sorted(state_data.keys()):
         d = state_data[sc]
         promo = d.get("Promo Only (Not on C4C)", 0)
-        both = d.get("On Both Lists", 0)
-        c4c = d.get("C4C Only", 0)
+        both = d.get("C4C List", 0)
+        c4c = d.get("C4C List", 0)
         rack = d.get("Rack Installer", 0)
         inst_total = promo + both + c4c
         if inst_total == 0:
@@ -923,8 +922,8 @@ def generate_c4c_report(output_path):
     county_priority = []
     for (st, county), d in county_data.items():
         promo = d.get("Promo Only (Not on C4C)", 0)
-        both = d.get("On Both Lists", 0)
-        c4c_only = d.get("C4C Only", 0)
+        both = d.get("C4C List", 0)
+        c4c_only = d.get("C4C List", 0)
         dist = d.get("Distributor", 0)
         inst = promo + both + c4c_only
         if inst == 0:
@@ -1026,7 +1025,7 @@ def generate_c4c_report(output_path):
     row += 1
     for c in rack_sorted:
         t = c.get("type", "")
-        if t in ("On Both Lists", "C4C Only"):
+        if t in ("C4C List", "C4C List"):
             c4c_status = "On C4C"
         elif t == "Promo Only (Not on C4C)":
             c4c_status = "NOT on C4C"
@@ -1188,8 +1187,8 @@ def generate_c4c_report(output_path):
     for sc in sorted(state_data.keys()):
         d = state_data[sc]
         promo = d.get("Promo Only (Not on C4C)", 0)
-        both = d.get("On Both Lists", 0)
-        c4c = d.get("C4C Only", 0)
+        both = d.get("C4C List", 0)
+        c4c = d.get("C4C List", 0)
         rack = d.get("Rack Installer", 0)
         inst_count = promo + both + c4c + rack
         dist_count = dist_by_state.get(sc, 0)

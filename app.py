@@ -222,7 +222,7 @@ if nav == "Home":
             unique_countries.add(country if country != "US" else "United States")
         if county:
             unique_counties.add(county)
-    installer_types = ["Promo Only (Not on C4C)", "On Both Lists", "C4C Only", "Rack Installer"]
+    installer_types = ["Promo Only (Not on C4C)", "C4C List", "Rack Installer"]
     installer_total = sum(type_counts.get(t, 0) for t in installer_types)
 
     import json as _json
@@ -335,8 +335,7 @@ if nav == "Home":
 
     type_colors = {
         "Promo Only (Not on C4C)": "#DC2626",
-        "On Both Lists": "#16A34A",
-        "C4C Only": "#2563EB",
+        "C4C List": "#2563EB",
         "Rack Installer": "#7C3AED",
         "Distributor": "#F59E0B",
         "Powersports/Motorsports": "#F97316",
@@ -402,7 +401,7 @@ elif nav == "Customer Map":
 
         unique_counties = len(set(c.get("county", "") for c in all_map_data if c.get("county")))
 
-        installer_types = ["Promo Only (Not on C4C)", "On Both Lists", "C4C Only", "Rack Installer"]
+        installer_types = ["Promo Only (Not on C4C)", "C4C List", "Rack Installer"]
         installer_total = sum(type_counts.get(t, 0) for t in installer_types)
 
         col1, col2, col3, col4 = st.columns(4)
@@ -411,11 +410,10 @@ elif nav == "Customer Map":
         col3.metric("Distributors", type_counts.get("Distributor", 0))
         col4.metric("Powersports", type_counts.get("Powersports/Motorsports", 0))
 
-        col5, col6, col7, col8 = st.columns(4)
+        col5, col6, col7 = st.columns(3)
         col5.metric("Promo Only", type_counts.get("Promo Only (Not on C4C)", 0))
-        col6.metric("On Both Lists", type_counts.get("On Both Lists", 0))
-        col7.metric("C4C Only", type_counts.get("C4C Only", 0))
-        col8.metric("Rack Installer", type_counts.get("Rack Installer", 0))
+        col6.metric("C4C List", type_counts.get("C4C List", 0))
+        col7.metric("Rack Installer", type_counts.get("Rack Installer", 0))
         st.markdown("")
 
         map_html = build_leaflet_html(all_map_data, height=650)

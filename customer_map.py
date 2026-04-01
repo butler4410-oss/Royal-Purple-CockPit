@@ -484,8 +484,7 @@ const customers = {customers_json};
 
 const TYPE_CONFIG = [
     {{ key: 'Promo Only (Not on C4C)', label: 'Promo Only',          color: '#DC2626' }},
-    {{ key: 'On Both Lists',            label: 'On Both Lists',       color: '#16A34A' }},
-    {{ key: 'C4C Only',                 label: 'C4C Only',            color: '#2563EB' }},
+    {{ key: 'C4C List',                  label: 'C4C List',            color: '#2563EB' }},
     {{ key: 'Rack Installer',           label: 'Rack Installer',      color: '#7C3AED' }},
     {{ key: 'Distributor',              label: 'Distributor',         color: '#F59E0B' }},
     {{ key: 'Powersports/Motorsports',  label: 'Powersports',         color: '#F97316' }},
