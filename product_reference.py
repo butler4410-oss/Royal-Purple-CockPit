@@ -53,7 +53,7 @@ def _build_lookup(db):
     for item in db.get("service_tiers", []):
         lookup[item["code"].upper()] = {
             "brand": "Service Tier",
-            "series": "Duke of Oil Service Package",
+            "series": "Installer Service Package",
             "viscosity": item["name"],
             "notes": item["description"],
             "color": "#64748B",
@@ -113,7 +113,7 @@ def render():
 def _render_code_lookup(db, all_codes, rp_products):
     st.markdown(
         '<div style="font-size:13px;color:#C4B5E8;margin-bottom:12px;">'
-        'Type any operation code from a Duke of Oil report to identify the product, brand, and RP replacement.'
+        'Type any operation code from an installer report to identify the product, brand, and RP replacement.'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -656,7 +656,7 @@ def _render_conversion_guide(db):
 
     st.markdown(
         '<div style="font-size:13px;color:#C4B5E8;margin-bottom:16px;">'
-        'Use this guide when analyzing a Duke of Oil export to identify which Royal Purple product '
+        'Use this guide when analyzing an installer export to identify which Royal Purple product '
         'replaces each competitor viscosity grade.'
         '</div>',
         unsafe_allow_html=True,
@@ -703,7 +703,7 @@ def _render_conversion_guide(db):
             'text-transform:uppercase;margin-bottom:8px;">Conversion Segments</div>',
             unsafe_allow_html=True,
         )
-        st.caption("When classifying a full-code Duke of Oil export, each customer falls into one of these segments.")
+        st.caption("When classifying a full-code installer export, each customer falls into one of these segments.")
         st.markdown("")
 
         for seg in segments:
