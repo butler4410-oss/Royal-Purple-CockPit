@@ -72,11 +72,31 @@ def render():
     total_comp_brands = len(db.get("competitor_brands", []))
     total_comp_codes = sum(len(b.get("codes", [])) for b in db.get("competitor_brands", []))
 
-    s1, s2, s3, s4 = st.columns(4)
-    s1.metric("RP Product Lines", len(rp_products))
-    s2.metric("RP Products", total_rp_skus)
-    s3.metric("Competitor Brands", total_comp_brands)
-    s4.metric("Competitor Codes", total_comp_codes)
+    # ── 2026 RP Catalog download ──
+    _catalog_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "2026_RP_Catalog.pdf")
+    if os.path.exists(_catalog_path):
+        cat_col, metric_col = st.columns([1, 3])
+        with cat_col:
+            with open(_catalog_path, "rb") as _cf:
+                st.download_button(
+                    label="2026 Royal Purple Catalog (PDF)",
+                    data=_cf.read(),
+                    file_name="2026_RP_Catalog.pdf",
+                    mime="application/pdf",
+                    use_container_width=True,
+                )
+        with metric_col:
+            s1, s2, s3, s4 = st.columns(4)
+            s1.metric("RP Product Lines", len(rp_products))
+            s2.metric("RP Products", total_rp_skus)
+            s3.metric("Competitor Brands", total_comp_brands)
+            s4.metric("Competitor Codes", total_comp_codes)
+    else:
+        s1, s2, s3, s4 = st.columns(4)
+        s1.metric("RP Product Lines", len(rp_products))
+        s2.metric("RP Products", total_rp_skus)
+        s3.metric("Competitor Brands", total_comp_brands)
+        s4.metric("Competitor Codes", total_comp_codes)
 
     st.markdown("")
 

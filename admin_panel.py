@@ -42,8 +42,22 @@ def _color_select(label, current_hex, key):
 
 
 def render():
+    import os as _os
+
     st.markdown("### Code Database Editor")
     st.caption("Changes auto-save when you edit any field. Use the forms at the bottom of each section to add new entries.")
+
+    # ── 2026 RP Catalog download ──
+    _catalog_path = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "assets", "2026_RP_Catalog.pdf")
+    if _os.path.exists(_catalog_path):
+        with open(_catalog_path, "rb") as _cf:
+            st.download_button(
+                label="2026 Royal Purple Catalog (PDF)",
+                data=_cf.read(),
+                file_name="2026_RP_Catalog.pdf",
+                mime="application/pdf",
+                key="admin_catalog_dl",
+            )
 
     st.markdown("")
     tab_rp, tab_comp, tab_misc = st.tabs(["Royal Purple Products", "Competitor Brands", "Service Tiers & Spec Flags"])
