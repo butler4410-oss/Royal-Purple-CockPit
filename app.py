@@ -453,7 +453,7 @@ elif nav == "Customer Map":
         st.caption("Use the search bar and filters on the map to find specific locations. Click the List button to see a sidebar of all locations.")
 
         st.markdown("---")
-        exp_col1, exp_col2 = st.columns(2)
+        exp_col1, exp_col2, exp_col3 = st.columns(3)
 
         with exp_col1:
             st.markdown("### Export Map Data")
@@ -510,6 +510,152 @@ elif nav == "Customer Map":
                         label="Download C4C Report",
                         data=report_data,
                         file_name="RP_C4C_Report.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    )
+
+        with exp_col3:
+            st.markdown("### Installer Report")
+            st.caption("Export only the 4 core installer account types: RPO NAPA, C4C List, Promo Only, and Rack Installer — clean Excel with per-state tabs.")
+
+            if st.button("Generate Installer Report", type="primary", key="installer_export"):
+                with st.spinner("Building installer report..."):
+                    import pandas as pd
+                    _installer_types = {"Promo Only (Not on C4C)", "C4C List", "Rack Installer", "RPO NAPA"}
+                    _inst_data = [c for c in all_map_data if c.get("type") in _installer_types]
+
+                    with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
+                        _inst_path = tmp.name
+
+                    from openpyxl import Workbook
+                    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+                    from openpyxl.utils import get_column_letter
+
+                    wb = Workbook()
+                    _hdr_fill = PatternFill(start_color="1B1464", end_color="1B1464", fill_type="solid")
+                    _hdr_font = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
+                    _data_font = Font(name="Calibri", size=10)
+                    _bold_font = Font(name="Calibri", bold=True, size=10)
+                    _title_font = Font(name="Calibri", bold=True, size=16, color="1B1464")
+                    _border = Border(
+                        left=Side(style="thin", color="E2E8F0"), right=Side(style="thin", color="E2E8F0"),
+                        top=Side(style="thin", color="E2E8F0"), bottom=Side(style="thin", color="E2E8F0"),
+                    )
+                    _type_colors = {
+                        "Promo Only (Not on C4C)": "FEE2E2",
+                        "C4C List": "DBEAFE",
+                        "Rack Installer": "F3E8FF",
+                        "RPO NAPA": "E5E5E5",
+                    }
+
+                    # ── Summary sheet ──
+                    ws = wb.active
+                    ws.title = "Summary"
+                    ws.merge_cells("A1:F1")
+                    ws["A1"] = f"Royal Purple Installer Report — {len(_inst_data):,} Accounts"
+                    ws["A1"].font = _title_font
+                    ws.row_dimensions[1].height = 32
+
+                    row = 3
+                    for t in ["Promo Only (Not on C4C)", "C4C List", "Rack Installer", "RPO NAPA"]:
+                        ct = sum(1 for c in _inst_data if c.get("type") == t)
+                        ws.cell(row=row, column=1, value=t).font = _bold_font
+                        ws.cell(row=row, column=2, value=ct).font = _bold_font
+                        row += 1
+                    ws.cell(row=row, column=1, value="TOTAL").font = Font(name="Calibri", bold=True, size=11)
+                    ws.cell(row=row, column=2, value=len(_inst_data)).font = Font(name="Calibri", bold=True, size=11)
+
+                    # ── All Installers sheet ──
+                    headers = ["Store Name", "Address", "City", "State", "County", "Zip", "Account Type"]
+                    ws_all = wb.create_sheet("All Installers")
+                    ws_all.merge_cells(f"A1:{get_column_letter(len(headers))}1")
+                    ws_all["A1"] = f"All Installer Accounts ({len(_inst_data):,})"
+                    ws_all["A1"].font = _title_font
+
+                    for ci, h in enumerate(headers, 1):
+                        cell = ws_all.cell(row=3, column=ci, value=h)
+                        cell.font = _hdr_font
+                        cell.fill = _hdr_fill
+                        cell.alignment = Alignment(horizontal="center", vertical="center")
+                        cell.border = _border
+                    ws_all.row_dimensions[3].height = 28
+
+                    for ri, c in enumerate(sorted(_inst_data, key=lambda x: (x.get("state",""), x.get("store_name",""))), 4):
+                        vals = [c.get("store_name",""), c.get("address",""), c.get("city",""),
+                                c.get("state",""), c.get("county",""), c.get("zip",""), c.get("type","")]
+                        for ci, v in enumerate(vals, 1):
+                            cell = ws_all.cell(row=ri, column=ci, value=v)
+                            cell.font = _data_font
+                            cell.border = _border
+                        tf = _type_colors.get(c.get("type",""))
+                        if tf:
+                            ws_all.cell(row=ri, column=7).fill = PatternFill(start_color=tf, end_color=tf, fill_type="solid")
+
+                    ws_all.auto_filter.ref = f"A3:{get_column_letter(len(headers))}{3+len(_inst_data)}"
+                    for ci in range(1, len(headers)+1):
+                        ws_all.column_dimensions[get_column_letter(ci)].width = 20
+                    ws_all.column_dimensions["A"].width = 35
+                    ws_all.column_dimensions["B"].width = 30
+                    ws_all.freeze_panes = "A4"
+
+                    # ── Per-state sheets ──
+                    by_state = {}
+                    for c in _inst_data:
+                        s = c.get("state", "Other")
+                        by_state.setdefault(s, []).append(c)
+
+                    for st_code in sorted(by_state.keys()):
+                        accts = by_state[st_code]
+                        ws_st = wb.create_sheet(st_code[:31])
+                        ws_st.merge_cells(f"A1:{get_column_letter(len(headers))}1")
+                        ws_st["A1"] = f"{st_code} — {len(accts)} Installer Accounts"
+                        ws_st["A1"].font = _title_font
+
+                        # Type counts in row 2
+                        col = 1
+                        for t in ["Promo Only (Not on C4C)", "C4C List", "Rack Installer", "RPO NAPA"]:
+                            ct = sum(1 for a in accts if a.get("type") == t)
+                            if ct:
+                                ws_st.cell(row=2, column=col, value=f"{t}: {ct}").font = _bold_font
+                                col += 1
+
+                        for ci, h in enumerate(headers, 1):
+                            cell = ws_st.cell(row=4, column=ci, value=h)
+                            cell.font = _hdr_font
+                            cell.fill = _hdr_fill
+                            cell.alignment = Alignment(horizontal="center")
+                            cell.border = _border
+
+                        for ri, c in enumerate(sorted(accts, key=lambda x: x.get("store_name","")), 5):
+                            vals = [c.get("store_name",""), c.get("address",""), c.get("city",""),
+                                    c.get("state",""), c.get("county",""), c.get("zip",""), c.get("type","")]
+                            for ci, v in enumerate(vals, 1):
+                                cell = ws_st.cell(row=ri, column=ci, value=v)
+                                cell.font = _data_font
+                                cell.border = _border
+                            tf = _type_colors.get(c.get("type",""))
+                            if tf:
+                                ws_st.cell(row=ri, column=7).fill = PatternFill(start_color=tf, end_color=tf, fill_type="solid")
+
+                        ws_st.auto_filter.ref = f"A4:{get_column_letter(len(headers))}{4+len(accts)}"
+                        for ci in range(1, len(headers)+1):
+                            ws_st.column_dimensions[get_column_letter(ci)].width = 20
+                        ws_st.column_dimensions["A"].width = 35
+                        ws_st.freeze_panes = "A5"
+
+                    wb.save(_inst_path)
+
+                    with open(_inst_path, "rb") as f:
+                        _inst_bytes = f.read()
+                    os.unlink(_inst_path)
+
+                    st.success(
+                        f"Installer Report ready — {len(by_state)} state tabs, "
+                        f"{len(_inst_data):,} accounts across 4 types."
+                    )
+                    st.download_button(
+                        label="Download Installer Report",
+                        data=_inst_bytes,
+                        file_name="RP_Installer_Report.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     )
 
