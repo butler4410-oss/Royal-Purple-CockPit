@@ -145,35 +145,36 @@ def page_header(title, subtitle):
 if nav == "Home":
     import base64 as _b64
 
-    _logo_b64 = ""
-    if os.path.exists(LOGO_SIDEBAR_PATH):
-        with open(LOGO_SIDEBAR_PATH, "rb") as _lf:
-            _logo_b64 = _b64.b64encode(_lf.read()).decode()
+    _cockpit_b64 = ""
+    if os.path.exists(COCKPIT_HERO_PATH):
+        with open(COCKPIT_HERO_PATH, "rb") as _hf:
+            _cockpit_b64 = _b64.b64encode(_hf.read()).decode()
 
-    _logo_html = ""
-    if _logo_b64:
-        _logo_html = (
-            f'<img src="data:image/png;base64,{_logo_b64}" '
-            f'style="width:140px;flex-shrink:0;" />'
+    _cockpit_html = ""
+    if _cockpit_b64:
+        _cockpit_html = (
+            f'<img src="data:image/png;base64,{_cockpit_b64}" '
+            f'style="width:120px;height:120px;object-fit:cover;border-radius:10px;'
+            f'border:1px solid #2a2a45;flex-shrink:0;" />'
         )
 
     st.markdown(
         f"""
-        <div style="background:linear-gradient(135deg,#1E0F3C 0%,#2D1B5E 40%,#4B2D8A 80%,#6B3FA0 100%);
-                    border-radius:14px;padding:40px 42px 36px;margin-bottom:28px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;right:0;width:300px;height:100%;
-                        background:radial-gradient(circle at 80% 30%,rgba(107,63,160,0.4) 0%,transparent 70%);"></div>
-            <div style="display:flex;align-items:center;gap:32px;position:relative;">
-                {_logo_html}
-                <div>
-                    <div style="font-size:44px;font-weight:900;color:#C8A951;line-height:1.1;
-                                letter-spacing:-0.5px;">Royal Purple CockPit</div>
-                    <div style="font-size:13px;font-weight:700;letter-spacing:2.5px;color:#FFFFFF;
-                                text-transform:uppercase;margin-top:6px;">Powered by Butler Performance Analytics</div>
-                    <div style="font-size:14px;color:#C4B5E8;max-width:560px;line-height:1.7;margin-top:12px;">
-                        Your centralized command center for Royal Purple installer analytics,
-                        customer mapping, and product intelligence.
-                    </div>
+        <div style="background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 50%,#12122a 100%);
+                    border-radius:14px;padding:36px 42px 32px;margin-bottom:28px;position:relative;overflow:hidden;">
+            <div style="display:flex;align-items:flex-start;gap:28px;">
+                {_cockpit_html}
+                <div style="text-align:center;flex:1;">
+                    <div style="font-size:36px;font-weight:900;color:#4B2D8A;letter-spacing:1px;
+                                line-height:1.1;">ROYAL PURPLE</div>
+                    <div style="width:140px;height:2px;background:linear-gradient(90deg,#4B2D8A,#C8A951);
+                                margin:10px auto;border-radius:1px;"></div>
+                    <div style="font-size:16px;font-weight:700;letter-spacing:5px;color:#C4B5E8;
+                                text-transform:uppercase;margin-bottom:14px;">COCKPIT</div>
+                    <div style="font-size:10px;letter-spacing:2.5px;color:#8888a8;
+                                text-transform:uppercase;margin-bottom:2px;">Powered by</div>
+                    <div style="font-size:15px;font-weight:700;color:#C8A951;letter-spacing:0.5px;">
+                        Butler Performance Analytics</div>
                 </div>
             </div>
         </div>
