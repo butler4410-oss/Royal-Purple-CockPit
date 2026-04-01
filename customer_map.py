@@ -490,7 +490,7 @@ const TYPE_CONFIG = [
     {{ key: 'Powersports/Motorsports',  label: 'Powersports',         color: '#F97316' }},
     {{ key: 'International',            label: 'International',       color: '#4F46E5' }},
     {{ key: 'Canada',                   label: 'Canada',              color: '#059669' }},
-    {{ key: 'RPO NAPA',                 label: 'RPO NAPA',           color: '#F97316' }},
+    {{ key: 'RPO NAPA',                 label: 'RPO NAPA',           color: '#111111' }},
 ];
 
 const TYPE_COLOR_MAP = {{}};

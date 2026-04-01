@@ -340,7 +340,7 @@ if nav == "Home":
         "Powersports/Motorsports": "#F5A623",
         "International": "#60a5fa",
         "Canada": "#3DDC97",
-        "RPO NAPA": "#F97316",
+        "RPO NAPA": "#111111",
     }
 
     sorted_types = sorted(type_counts.items(), key=lambda x: -x[1])
