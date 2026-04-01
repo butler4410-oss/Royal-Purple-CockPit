@@ -382,11 +382,11 @@ if nav == "Home":
                             text-transform:uppercase;margin-bottom:4px;">RPO NAPA Accounts</div>""",
                 unsafe_allow_html=True,
             )
-            st.caption("RPO Autocare installer accounts with $1,000+ CYTD sales.")
+            st.caption("RPO Autocare installer accounts with $1,000+ PYTD sales.")
 
             r1, r2, r3, r4, r5 = st.columns(5)
             r1.metric("RPO Accounts", f"{rpo_total:,}")
-            r2.metric("CYTD Revenue", f"${rpo_sales:,.0f}")
+            r2.metric("PYTD Revenue", f"${rpo_sales:,.0f}")
             r3.metric("On C4C", f"{rpo_c4c:,}")
             r4.metric("Not on C4C", f"{rpo_not_c4c:,}")
             r5.metric("Gold Flag", f"{rpo_gold:,}")
@@ -545,7 +545,7 @@ elif nav == "Customer Map":
             )
             rpo_sort = st.selectbox(
                 "Sort by",
-                ["CYTD Sales (High to Low)", "CYTD Sales (Low to High)", "Name (A-Z)", "Name (Z-A)", "District", "Region"],
+                ["PYTD Sales (High to Low)", "PYTD Sales (Low to High)", "Name (A-Z)", "Name (Z-A)", "District", "Region"],
                 key="rpo_sort",
             )
 
@@ -561,9 +561,9 @@ elif nav == "Customer Map":
             elif rpo_filter == "Not in System":
                 filtered = [a for a in rpo_data if a['c4c_status'] == 'Not in System']
 
-            if rpo_sort == "CYTD Sales (High to Low)":
+            if rpo_sort == "PYTD Sales (High to Low)":
                 filtered.sort(key=lambda x: -x['cytd_sales'])
-            elif rpo_sort == "CYTD Sales (Low to High)":
+            elif rpo_sort == "PYTD Sales (Low to High)":
                 filtered.sort(key=lambda x: x['cytd_sales'])
             elif rpo_sort == "Name (A-Z)":
                 filtered.sort(key=lambda x: x['name'].upper())
@@ -579,7 +579,7 @@ elif nav == "Customer Map":
             df = pd.DataFrame([{
                 "Installer Name": a['name'],
                 "C4C Status": a['c4c_status'],
-                "CYTD Sales": a['cytd_sales'],
+                "PYTD Sales": a['cytd_sales'],
                 "Gold Flag": a['gold_flag'],
                 "District": a['district'],
                 "Region": a['region'],
@@ -588,7 +588,7 @@ elif nav == "Customer Map":
             } for a in filtered])
 
             if not df.empty:
-                df["CYTD Sales"] = df["CYTD Sales"].apply(lambda x: f"${x:,.2f}")
+                df["PYTD Sales"] = df["PYTD Sales"].apply(lambda x: f"${x:,.2f}")
                 st.dataframe(df, use_container_width=True, height=500, hide_index=True)
 
                 csv_export = df.to_csv(index=False)

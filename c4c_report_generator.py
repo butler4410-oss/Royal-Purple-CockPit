@@ -1434,14 +1434,14 @@ def generate_c4c_report(output_path):
             f"{len(rpo_data):,} total accounts  |  "
             f"{rpo_on_c4c:,} on C4C ({rpo_on_c4c/len(rpo_data)*100:.1f}%)  |  "
             f"{rpo_not_c4c:,} NOT on C4C  |  "
-            f"Non-C4C CYTD Revenue: ${rpo_not_c4c_sales:,.0f}"
+            f"Non-C4C PYTD Revenue: ${rpo_not_c4c_sales:,.0f}"
         )
         ws20["A2"].font = Font(name="Calibri", italic=True, size=10, color="64748B")
         ws20.row_dimensions[2].height = 20
         ws20.row_dimensions[3].height = 6
 
         rpo_all_headers = [
-            "Installer Name", "C4C Status", "CYTD Sales", "Gold Flag",
+            "Installer Name", "C4C Status", "PYTD Sales", "Gold Flag",
             "District", "Region", "Company Owned", "City",
         ]
 
@@ -1484,7 +1484,7 @@ def generate_c4c_report(output_path):
         _add_auto_filter(ws20, 4, len(rpo_all_headers))
 
         # ═══════════════════════════════════════════════════════════════
-        # SHEET 21: RPO AUTOCARE — NOT ON C4C (by CYTD Sales)
+        # SHEET 21: RPO AUTOCARE — NOT ON C4C (by PYTD Sales)
         # ═══════════════════════════════════════════════════════════════
         ws21 = wb.create_sheet("RPO — Not on C4C")
         ws21.sheet_properties.tabColor = "DC2626"
@@ -1498,7 +1498,7 @@ def generate_c4c_report(output_path):
         ws21.merge_cells("A2:H2")
         ws21["A2"] = (
             f"{rpo_not_c4c:,} accounts not on C4C  |  "
-            f"CYTD Revenue at Risk: ${rpo_not_c4c_sales:,.0f}  |  "
+            f"PYTD Revenue at Risk: ${rpo_not_c4c_sales:,.0f}  |  "
             f"Sorted by sales volume — highest priority targets at top"
         )
         ws21["A2"].font = Font(name="Calibri", italic=True, size=10, color="64748B")
@@ -1506,7 +1506,7 @@ def generate_c4c_report(output_path):
         ws21.row_dimensions[3].height = 6
 
         rpo_notc4c_headers = [
-            "Installer Name", "C4C Status", "CYTD Sales", "Gold Flag",
+            "Installer Name", "C4C Status", "PYTD Sales", "Gold Flag",
             "District", "Region", "Company Owned", "City",
         ]
 
