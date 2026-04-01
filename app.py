@@ -234,7 +234,7 @@ if nav == "Home":
             unique_countries.add(country if country != "US" else "United States")
         if county:
             unique_counties.add(county)
-    installer_types = ["Promo Only (Not on C4C)", "C4C List", "Rack Installer"]
+    installer_types = ["Promo Only (Not on C4C)", "C4C List", "Rack Installer", "RPO NAPA"]
     installer_total = sum(type_counts.get(t, 0) for t in installer_types)
 
     import json as _json
@@ -340,6 +340,7 @@ if nav == "Home":
         "Powersports/Motorsports": "#F5A623",
         "International": "#60a5fa",
         "Canada": "#3DDC97",
+        "RPO NAPA": "#F97316",
     }
 
     sorted_types = sorted(type_counts.items(), key=lambda x: -x[1])
@@ -430,7 +431,7 @@ elif nav == "Customer Map":
 
         unique_counties = len(set(c.get("county", "") for c in all_map_data if c.get("county")))
 
-        installer_types = ["Promo Only (Not on C4C)", "C4C List", "Rack Installer"]
+        installer_types = ["Promo Only (Not on C4C)", "C4C List", "Rack Installer", "RPO NAPA"]
         installer_total = sum(type_counts.get(t, 0) for t in installer_types)
 
         col1, col2, col3, col4 = st.columns(4)
