@@ -31,9 +31,7 @@ def _save_db(db):
 
 def _get_all_known_codes(db):
     known = set()
-    for series in db.get("rp_products", {}).values():
-        for sku in series.get("skus", []):
-            known.add(sku.get("code", "").upper())
+    # RP products no longer have codes — only competitor/service/spec codes tracked
     for brand in db.get("competitor_brands", []):
         for c in brand.get("codes", []):
             known.add(c.get("code", "").upper())
@@ -174,22 +172,8 @@ def add_new_codes_to_db(confirmed_items, db=None):
         override_brand = item.get("override_brand")
 
         if cl["type"] == "rp":
-            series_name = override_series or cl.get("series")
-            if not series_name or series_name not in db.get("rp_products", {}):
-                series_name = next(iter(db.get("rp_products", {})), None)
-            if series_name:
-                skus = db["rp_products"][series_name].setdefault("skus", [])
-                if not any(s.get("code", "").upper() == code.upper() for s in skus):
-                    skus.append({
-                        "code": code,
-                        "viscosity": cl.get("viscosity", ""),
-                        "notes": "Auto-detected from report",
-                    })
-                    added_rp += 1
-                else:
-                    skipped += 1
-            else:
-                skipped += 1
+            # RP products no longer store codes — skip adding
+            skipped += 1
 
         elif cl["type"] == "competitor":
             brand_name = override_brand or cl.get("brand") or cl.get("label")

@@ -30,16 +30,7 @@ def save_codes_db(db: dict):
 
 def _build_lookup(db):
     lookup = {}
-    for series_name, series in db.get("rp_products", {}).items():
-        for sku in series.get("skus", []):
-            lookup[sku["code"].upper()] = {
-                "brand": "Royal Purple",
-                "series": series_name,
-                "viscosity": sku["viscosity"],
-                "notes": sku.get("notes", ""),
-                "color": series.get("color", "#4B2D8A"),
-                "category": "rp",
-            }
+    # RP products no longer have codes — lookup is competitor/service/spec only
     for brand_data in db.get("competitor_brands", []):
         for sku in brand_data.get("codes", []):
             lookup[sku["code"].upper()] = {
@@ -83,7 +74,7 @@ def render():
 
     s1, s2, s3, s4 = st.columns(4)
     s1.metric("RP Product Lines", len(rp_products))
-    s2.metric("RP SKUs", total_rp_skus)
+    s2.metric("RP Products", total_rp_skus)
     s3.metric("Competitor Brands", total_comp_brands)
     s4.metric("Competitor Codes", total_comp_codes)
 
@@ -164,11 +155,12 @@ def _render_quick_reference(rp_products):
 
         sku_pills = " ".join(
             f'<span style="background:rgba(255,255,255,0.06);border:1px solid #2a2a45;'
-            f'padding:4px 10px;border-radius:6px;font-size:12px;color:#e8e8f0;'
-            f'font-weight:600;white-space:nowrap;">'
-            f'<span style="color:{color};">{s["code"]}</span>'
-            f' <span style="color:#8888a8;">{s["viscosity"]}</span></span>'
-            for s in skus
+            f'padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;'
+            f'white-space:nowrap;">'
+            f'<span style="color:{color};">{s["viscosity"]}</span>'
+            f'{" <span style=color:#8888a8;>" + s["notes"] + "</span>" if s.get("notes") else ""}'
+            f'</span>'
+            for s in skus if s.get("viscosity")
         )
 
         short_name = series_name.split("\u2014")[0].strip() if "\u2014" in series_name else series_name
@@ -180,7 +172,7 @@ def _render_quick_reference(rp_products):
             f'<span style="background:{color};color:white;padding:3px 10px;border-radius:6px;'
             f'font-size:12px;font-weight:700;">{badge}</span>'
             f'<span style="font-size:14px;font-weight:700;color:#e8e8f0;">{short_name}</span>'
-            f'<span style="font-size:12px;color:#8888a8;margin-left:auto;">{len(skus)} SKUs</span>'
+            f'<span style="font-size:12px;color:#8888a8;margin-left:auto;">{len(skus)} products</span>'
             f'</div>'
             f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{sku_pills}</div>'
             f'</div>',
@@ -189,29 +181,24 @@ def _render_quick_reference(rp_products):
 
 
 def _render_rp_result(code_upper, result, rp_products):
-    """Display a Royal Purple product match."""
+    """Display a Royal Purple product match — shows series info, no codes."""
     color = result["color"]
+    series_name = result.get("series", "")
 
     # Find full series data
-    series_data = None
-    sku_data = None
-    for sname, sdata in rp_products.items():
-        for sku in sdata.get("skus", []):
-            if sku["code"].upper() == code_upper:
-                series_data = {**sdata, "_name": sname}
-                sku_data = sku
-                break
-        if sku_data:
-            break
+    series_data = rp_products.get(series_name)
+    if series_data:
+        series_data = {**series_data, "_name": series_name}
+    short_name = series_name.split("\u2014")[0].strip() if "\u2014" in series_name else series_name
 
     st.markdown(
         f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:24px;">'
         f'<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">'
         f'<span style="background:{color};color:white;padding:8px 18px;border-radius:8px;'
-        f'font-size:22px;font-weight:800;">{code_upper}</span>'
+        f'font-size:18px;font-weight:800;">{series_data.get("badge", "RP") if series_data else "RP"}</span>'
         f'<div>'
         f'<div style="font-size:16px;font-weight:700;color:#e8e8f0;">Royal Purple</div>'
-        f'<div style="font-size:13px;color:#8888a8;">{result["series"]}</div>'
+        f'<div style="font-size:13px;color:#8888a8;">{series_name}</div>'
         f'</div>'
         f'<div style="margin-left:auto;background:rgba(5,150,105,0.15);color:#10B981;'
         f'padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;">RP PRODUCT</div>'
@@ -219,13 +206,9 @@ def _render_rp_result(code_upper, result, rp_products):
         unsafe_allow_html=True,
     )
 
-    if series_data and sku_data:
+    if series_data:
         rows = ""
         rows += _detail_row("Product Line", series_data["_name"])
-        if sku_data.get("viscosity"):
-            rows += _detail_row("Viscosity", sku_data["viscosity"])
-        if sku_data.get("notes"):
-            rows += _detail_row("Application", sku_data["notes"])
         if series_data.get("description"):
             rows += _detail_row("Description", series_data["description"])
         if series_data.get("application"):
@@ -236,19 +219,19 @@ def _render_rp_result(code_upper, result, rp_products):
             unsafe_allow_html=True,
         )
 
-        # Show other SKUs in same line
-        other_skus = [s for s in series_data.get("skus", []) if s["code"].upper() != code_upper]
-        if other_skus:
+        # Show available viscosities
+        skus = series_data.get("skus", [])
+        if skus:
             pills = " ".join(
                 f'<span style="background:rgba(255,255,255,0.06);border:1px solid #2a2a45;'
                 f'padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#e8e8f0;">'
-                f'{s["code"]} {s["viscosity"]}</span>'
-                for s in other_skus
+                f'{s["viscosity"]}</span>'
+                for s in skus if s.get("viscosity")
             )
             st.markdown(
                 f'<div style="margin-top:14px;padding-top:14px;border-top:1px solid #2a2a45;">'
                 f'<div style="font-size:11px;font-weight:600;color:#8888a8;text-transform:uppercase;'
-                f'letter-spacing:1.5px;margin-bottom:6px;">Other SKUs in {series_data.get("badge", "this")} Series</div>'
+                f'letter-spacing:1.5px;margin-bottom:6px;">Available Viscosities</div>'
                 f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{pills}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
@@ -305,15 +288,14 @@ def _render_competitor_result(code_upper, result, rp_products):
             f'letter-spacing:1.5px;margin-bottom:8px;">Royal Purple Replacements</div>',
             unsafe_allow_html=True,
         )
-        for code, series_name, rp_color, visc in rp_replacements:
+        for series_name, rp_color, visc in rp_replacements:
             short_name = series_name.split("\u2014")[0].strip() if "\u2014" in series_name else series_name
             st.markdown(
                 f'<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(16,185,129,0.08);'
                 f'border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:8px 14px;margin-right:8px;margin-bottom:6px;">'
                 f'<span style="background:{rp_color};color:white;padding:2px 8px;border-radius:4px;'
-                f'font-size:12px;font-weight:700;">{code}</span>'
+                f'font-size:12px;font-weight:700;">{visc}</span>'
                 f'<span style="color:#e8e8f0;font-size:13px;font-weight:600;">{short_name}</span>'
-                f'<span style="color:#8888a8;font-size:12px;">{visc}</span>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
@@ -374,7 +356,8 @@ def _detail_row(label, value):
 
 
 def _find_rp_replacements(product_text, rp_products):
-    """Find RP products matching the viscosity in a competitor product string."""
+    """Find RP products matching the viscosity in a competitor product string.
+    Returns list of (series_name, color, viscosity) tuples."""
     viscosity_raw = product_text.replace("-", "").replace(" ", "").upper()
     viscosity_grades = [
         ("0W16", "0W-16"), ("0W20", "0W-20"), ("5W20", "5W-20"), ("5W30", "5W-30"),
@@ -387,7 +370,7 @@ def _find_rp_replacements(product_text, rp_products):
             for sname, sdata in rp_products.items():
                 for sku in sdata.get("skus", []):
                     if sku.get("viscosity", "").replace("-", "").replace(" ", "").upper() == v_str:
-                        replacements.append((sku["code"], sname, sdata.get("color", "#4B2D8A"), sku["viscosity"]))
+                        replacements.append((sname, sdata.get("color", "#4B2D8A"), sku["viscosity"]))
             break
     return replacements
 
@@ -460,14 +443,14 @@ def _try_prefix_lookup(code, rp_products):
                     'text-transform:uppercase;letter-spacing:1.5px;">Possible RP Replacements</div>',
                     unsafe_allow_html=True,
                 )
-                for rp_code, sname, rp_color, visc in rp_replacements:
+                for sname, rp_color, visc in rp_replacements:
                     short = sname.split("\u2014")[0].strip() if "\u2014" in sname else sname
                     st.markdown(
                         f'<span style="display:inline-block;background:rgba(16,185,129,0.08);'
                         f'border:1px solid rgba(16,185,129,0.2);border-radius:6px;padding:4px 10px;'
                         f'margin-right:6px;font-size:12px;">'
-                        f'<span style="color:{rp_color};font-weight:700;">{rp_code}</span> '
-                        f'<span style="color:#8888a8;">{short} {visc}</span></span>',
+                        f'<span style="color:{rp_color};font-weight:700;">{visc}</span> '
+                        f'<span style="color:#8888a8;">{short}</span></span>',
                         unsafe_allow_html=True,
                     )
             return
@@ -531,12 +514,11 @@ def _render_rp_catalog(db):
                 unsafe_allow_html=True,
             )
 
-        # SKU table
+        # Product table
         if skus:
             header = (
-                '<div style="display:grid;grid-template-columns:100px 80px 1fr;gap:8px;'
+                '<div style="display:grid;grid-template-columns:100px 1fr;gap:8px;'
                 'padding:6px 0;border-bottom:1px solid #2a2a45;margin-bottom:4px;">'
-                '<span style="font-size:10px;font-weight:700;color:#8888a8;text-transform:uppercase;letter-spacing:1px;">Code</span>'
                 '<span style="font-size:10px;font-weight:700;color:#8888a8;text-transform:uppercase;letter-spacing:1px;">Viscosity</span>'
                 '<span style="font-size:10px;font-weight:700;color:#8888a8;text-transform:uppercase;letter-spacing:1px;">Application</span>'
                 '</div>'
@@ -544,10 +526,9 @@ def _render_rp_catalog(db):
             rows = ""
             for sku in skus:
                 rows += (
-                    f'<div style="display:grid;grid-template-columns:100px 80px 1fr;gap:8px;'
+                    f'<div style="display:grid;grid-template-columns:100px 1fr;gap:8px;'
                     f'padding:8px 0;border-bottom:1px solid rgba(42,42,69,0.5);">'
-                    f'<span style="font-size:13px;font-weight:700;color:{badge_color};">{sku["code"]}</span>'
-                    f'<span style="font-size:13px;color:#e8e8f0;">{sku["viscosity"]}</span>'
+                    f'<span style="font-size:13px;font-weight:700;color:{badge_color};">{sku.get("viscosity", "")}</span>'
                     f'<span style="font-size:12px;color:#8888a8;">{sku.get("notes", "")}</span>'
                     f'</div>'
                 )

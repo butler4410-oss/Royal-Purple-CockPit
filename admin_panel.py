@@ -207,23 +207,19 @@ def _edit_rp_series(db, series_name, series):
                 st.session_state.pop(f"confirm_del_series_{series_name}", None)
                 st.rerun()
 
-    # ── SKUs (auto-save per row) ──
+    # ── Products (auto-save per row) ──
     st.markdown("---")
-    st.markdown("**SKUs**")
+    st.markdown("**Products**")
     if not skus:
-        st.caption("No SKUs in this series yet.")
+        st.caption("No products in this series yet.")
     else:
         # Column headers
-        hc, hv, hn, ha = st.columns([1.5, 1.5, 4, 0.6])
-        hc.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Code</span>', unsafe_allow_html=True)
+        hv, hn, ha = st.columns([2, 5, 0.6])
         hv.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Viscosity</span>', unsafe_allow_html=True)
-        hn.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Notes</span>', unsafe_allow_html=True)
+        hn.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Notes / Application</span>', unsafe_allow_html=True)
 
         for i, sku in enumerate(skus):
-            col_code, col_visc, col_notes, col_act = st.columns([1.5, 1.5, 4, 0.6])
-            with col_code:
-                new_code = st.text_input("Code", value=sku["code"],
-                                          key=f"sku_code_{series_name}_{i}", label_visibility="collapsed")
+            col_visc, col_notes, col_act = st.columns([2, 5, 0.6])
             with col_visc:
                 new_visc = st.text_input("Viscosity", value=sku.get("viscosity", ""),
                                           key=f"sku_visc_{series_name}_{i}", label_visibility="collapsed")
@@ -231,51 +227,42 @@ def _edit_rp_series(db, series_name, series):
                 new_notes = st.text_input("Notes", value=sku.get("notes", ""),
                                            key=f"sku_notes_{series_name}_{i}", label_visibility="collapsed")
 
-            # Auto-save SKU changes
+            # Auto-save changes
             updated_sku = {
-                "code": new_code.strip().upper(),
                 "viscosity": new_visc.strip(),
                 "notes": new_notes.strip(),
             }
-            if (updated_sku["code"] != sku["code"] or
-                    updated_sku["viscosity"] != sku.get("viscosity", "") or
+            if (updated_sku["viscosity"] != sku.get("viscosity", "") or
                     updated_sku["notes"] != sku.get("notes", "")):
                 db["rp_products"][series_name]["skus"][i] = updated_sku
                 save_codes_db(db)
 
             with col_act:
-                if st.button("Del", key=f"del_sku_{series_name}_{i}", help="Delete SKU"):
+                if st.button("Del", key=f"del_sku_{series_name}_{i}", help="Delete product"):
                     db["rp_products"][series_name]["skus"].pop(i)
                     save_codes_db(db)
                     st.rerun()
 
-    # ── Add SKU (form — needs submit) ──
+    # ── Add product (form — needs submit) ──
     st.markdown("")
     with st.form(f"add_sku_{series_name}"):
-        st.markdown("**Add SKU**")
-        c1, c2, c3 = st.columns([1.5, 1.5, 4])
+        st.markdown("**Add Product**")
+        c1, c2 = st.columns([2, 5])
         with c1:
-            add_code = st.text_input("Code", placeholder="RS5W30")
-        with c2:
             add_visc = st.text_input("Viscosity", placeholder="5W-30")
-        with c3:
+        with c2:
             add_notes = st.text_input("Notes", placeholder="e.g. Most common viscosity across all platforms")
-        if st.form_submit_button("Add SKU"):
-            if not add_code.strip():
-                st.error("Code is required.")
+        if st.form_submit_button("Add Product"):
+            if not add_visc.strip():
+                st.error("Viscosity is required.")
             else:
-                existing_codes = [s["code"].upper() for s in db["rp_products"][series_name]["skus"]]
-                if add_code.strip().upper() in existing_codes:
-                    st.error(f"Code {add_code.strip().upper()} already exists in this series.")
-                else:
-                    db["rp_products"][series_name]["skus"].append({
-                        "code": add_code.strip().upper(),
-                        "viscosity": add_visc.strip(),
-                        "notes": add_notes.strip(),
-                    })
-                    save_codes_db(db)
-                    st.success(f"SKU {add_code.strip().upper()} added.")
-                    st.rerun()
+                db["rp_products"][series_name]["skus"].append({
+                    "viscosity": add_visc.strip(),
+                    "notes": add_notes.strip(),
+                })
+                save_codes_db(db)
+                st.success(f"{add_visc.strip()} added.")
+                st.rerun()
 
 
 # ═══════════════════════════════════════════════════════════════════════
