@@ -83,23 +83,37 @@ def _admin_rp_products():
         for pos, series_name in enumerate(series_names):
             series = rp_products[series_name]
             skus = series.get("skus", [])
+            color = series.get("color", "#4B2D8A")
+            badge = series.get("badge", "RP")
+            short = series_name.split("\u2014")[0].strip() if "\u2014" in series_name else series_name
 
-            # Reorder controls + expander
-            order_col, expand_col = st.columns([0.4, 10])
-            with order_col:
-                st.markdown('<div style="padding-top:6px;">', unsafe_allow_html=True)
+            # ── Reorder bar ──
+            bar_cols = st.columns([0.5, 0.5, 8])
+            with bar_cols[0]:
                 if pos > 0:
-                    if st.button("Up", key=f"up_{series_name}", help="Move up"):
+                    if st.button("\u25B2", key=f"up_{series_name}", help="Move up",
+                                  use_container_width=True):
                         _reorder_series(db, series_names, pos, pos - 1)
                         st.rerun()
+            with bar_cols[1]:
                 if pos < len(series_names) - 1:
-                    if st.button("Dn", key=f"dn_{series_name}", help="Move down"):
+                    if st.button("\u25BC", key=f"dn_{series_name}", help="Move down",
+                                  use_container_width=True):
                         _reorder_series(db, series_names, pos, pos + 1)
                         st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
-            with expand_col:
-                with st.expander(f"**{series_name}** — {len(skus)} SKU{'s' if len(skus) != 1 else ''}"):
-                    _edit_rp_series(db, series_name, series)
+            with bar_cols[2]:
+                st.markdown(
+                    f'<div style="display:flex;align-items:center;gap:10px;padding:4px 0;">'
+                    f'<span style="background:{color};color:white;padding:2px 10px;border-radius:5px;'
+                    f'font-size:12px;font-weight:700;">{badge}</span>'
+                    f'<span style="font-size:14px;font-weight:600;color:#e8e8f0;">{short}</span>'
+                    f'<span style="font-size:12px;color:#8888a8;">{len(skus)} SKUs</span>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+
+            with st.expander(f"Edit {short}", expanded=False):
+                _edit_rp_series(db, series_name, series)
 
     st.markdown("---")
     st.markdown("##### Add New Series")
