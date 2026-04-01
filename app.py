@@ -129,8 +129,8 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    if os.path.exists(LOGO_SIDEBAR_PATH):
-        st.image(LOGO_SIDEBAR_PATH, use_container_width=True)
+    if os.path.exists(COCKPIT_HERO_PATH):
+        st.image(COCKPIT_HERO_PATH, use_container_width=True)
     st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#8888a8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
 
 
@@ -145,17 +145,16 @@ def page_header(title, subtitle):
 if nav == "Home":
     import base64 as _b64
 
-    _hero_b64 = ""
-    if os.path.exists(COCKPIT_HERO_PATH):
-        with open(COCKPIT_HERO_PATH, "rb") as _hf:
-            _hero_b64 = _b64.b64encode(_hf.read()).decode()
+    _logo_b64 = ""
+    if os.path.exists(LOGO_SIDEBAR_PATH):
+        with open(LOGO_SIDEBAR_PATH, "rb") as _lf:
+            _logo_b64 = _b64.b64encode(_lf.read()).decode()
 
-    _img_html = ""
-    if _hero_b64:
-        _img_html = (
-            f'<img src="data:image/png;base64,{_hero_b64}" '
-            f'style="width:130px;height:130px;object-fit:cover;border-radius:12px;'
-            f'border:2px solid rgba(200,169,81,0.3);flex-shrink:0;" />'
+    _logo_html = ""
+    if _logo_b64:
+        _logo_html = (
+            f'<img src="data:image/png;base64,{_logo_b64}" '
+            f'style="width:140px;flex-shrink:0;" />'
         )
 
     st.markdown(
@@ -164,8 +163,8 @@ if nav == "Home":
                     border-radius:14px;padding:40px 42px 36px;margin-bottom:28px;position:relative;overflow:hidden;">
             <div style="position:absolute;top:0;right:0;width:300px;height:100%;
                         background:radial-gradient(circle at 80% 30%,rgba(107,63,160,0.4) 0%,transparent 70%);"></div>
-            <div style="display:flex;align-items:center;gap:28px;position:relative;">
-                {_img_html}
+            <div style="display:flex;align-items:center;gap:32px;position:relative;">
+                {_logo_html}
                 <div>
                     <div style="font-size:44px;font-weight:900;color:#C8A951;line-height:1.1;
                                 letter-spacing:-0.5px;">Royal Purple CockPit</div>
