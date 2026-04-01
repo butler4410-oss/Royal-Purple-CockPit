@@ -363,7 +363,36 @@ if nav == "Home":
             )
 
     st.markdown("")
-    st.caption("Use the sidebar to navigate between pages. Select Report Generator to upload Excel files, Customer Map to explore locations, or Product Reference to browse the code database.")
+
+    # ── RPO NAPA Accounts ──
+    rpo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rpo_autocare_processed.json")
+    if os.path.exists(rpo_path):
+        with open(rpo_path) as _rpf:
+            rpo_data = json.load(_rpf)
+
+        if rpo_data:
+            rpo_total = len(rpo_data)
+            rpo_sales = sum(a.get("cytd_sales", 0) for a in rpo_data)
+            rpo_c4c = sum(1 for a in rpo_data if a.get("c4c_status") == "On C4C")
+            rpo_not_c4c = rpo_total - rpo_c4c
+            rpo_gold = sum(1 for a in rpo_data if a.get("gold_flag"))
+
+            st.markdown(
+                """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#8888a8;
+                            text-transform:uppercase;margin-bottom:4px;">RPO NAPA Accounts</div>""",
+                unsafe_allow_html=True,
+            )
+            st.caption("RPO Autocare installer accounts with $1,000+ CYTD sales.")
+
+            r1, r2, r3, r4, r5 = st.columns(5)
+            r1.metric("RPO Accounts", f"{rpo_total:,}")
+            r2.metric("CYTD Revenue", f"${rpo_sales:,.0f}")
+            r3.metric("On C4C", f"{rpo_c4c:,}")
+            r4.metric("Not on C4C", f"{rpo_not_c4c:,}")
+            r5.metric("Gold Flag", f"{rpo_gold:,}")
+
+    st.markdown("")
+    st.caption("Use the sidebar to navigate between pages. Select Report Generator to upload Excel files, Customer Map to explore locations, or Product Reference to browse the product database.")
 
 elif nav == "Customer Map":
     page_header("Customer Map", "Interactive map of Royal Purple customer locations across the United States.")
