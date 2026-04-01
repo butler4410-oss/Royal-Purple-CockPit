@@ -175,7 +175,7 @@ if nav == "Home":
         <div style="background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 50%,#12122a 100%);
                     border-radius:14px;padding:32px 36px;margin-bottom:28px;">
             <div style="display:flex;align-items:center;gap:24px;">
-                {_cockpit_html}
+                {_logo_html}
                 <div style="text-align:center;flex:1;">
                     <div style="font-size:36px;font-weight:900;color:#4B2D8A;letter-spacing:1px;
                                 line-height:1.1;">ROYAL PURPLE</div>
