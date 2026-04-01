@@ -221,7 +221,7 @@ def _edit_rp_series(db, series_name, series):
                 st.session_state.pop(f"confirm_del_series_{series_name}", None)
                 st.rerun()
 
-    # ── Products (auto-save per row) ──
+    # ── Products ──
     st.markdown("---")
     st.markdown("**Products**")
     if not skus:
@@ -232,6 +232,9 @@ def _edit_rp_series(db, series_name, series):
         hv.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Viscosity</span>', unsafe_allow_html=True)
         hn.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Notes / Application</span>', unsafe_allow_html=True)
 
+        # Collect all widget values first, then check deletes, then auto-save
+        row_data = []
+        delete_idx = None
         for i, sku in enumerate(skus):
             col_visc, col_notes, col_act = st.columns([2, 5, 0.6])
             with col_visc:
@@ -240,22 +243,22 @@ def _edit_rp_series(db, series_name, series):
             with col_notes:
                 new_notes = st.text_input("Notes", value=sku.get("notes", ""),
                                            key=f"sku_notes_{series_name}_{i}", label_visibility="collapsed")
-
-            # Auto-save changes
-            updated_sku = {
-                "viscosity": new_visc.strip(),
-                "notes": new_notes.strip(),
-            }
-            if (updated_sku["viscosity"] != sku.get("viscosity", "") or
-                    updated_sku["notes"] != sku.get("notes", "")):
-                db["rp_products"][series_name]["skus"][i] = updated_sku
-                save_codes_db(db)
-
             with col_act:
                 if st.button("Del", key=f"del_sku_{series_name}_{i}", help="Delete product"):
-                    db["rp_products"][series_name]["skus"].pop(i)
-                    save_codes_db(db)
-                    st.rerun()
+                    delete_idx = i
+            row_data.append((i, sku, new_visc.strip(), new_notes.strip()))
+
+        # Handle delete first — takes priority over auto-save
+        if delete_idx is not None:
+            db["rp_products"][series_name]["skus"].pop(delete_idx)
+            save_codes_db(db)
+            st.rerun()
+
+        # Auto-save any edits (only runs if no delete happened)
+        for i, sku, visc, notes in row_data:
+            if visc != sku.get("viscosity", "") or notes != sku.get("notes", ""):
+                db["rp_products"][series_name]["skus"][i] = {"viscosity": visc, "notes": notes}
+                save_codes_db(db)
 
     # ── Add product (form — needs submit) ──
     st.markdown("")
@@ -387,6 +390,8 @@ def _edit_competitor_brand(db, idx, brand_data):
         hc.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Code</span>', unsafe_allow_html=True)
         hp.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Product Name</span>', unsafe_allow_html=True)
 
+        row_data = []
+        delete_idx = None
         for i, sku in enumerate(codes):
             col_code, col_product, col_act = st.columns([2, 5, 0.6])
             with col_code:
@@ -395,22 +400,20 @@ def _edit_competitor_brand(db, idx, brand_data):
             with col_product:
                 new_product = st.text_input("Product Name", value=sku.get("product", ""),
                                              key=f"comp_prod_{idx}_{i}", label_visibility="collapsed")
-
-            # Auto-save
-            updated_code = new_code.strip().upper()
-            updated_product = new_product.strip()
-            if updated_code != sku["code"] or updated_product != sku.get("product", ""):
-                db["competitor_brands"][idx]["codes"][i] = {
-                    "code": updated_code,
-                    "product": updated_product,
-                }
-                save_codes_db(db)
-
             with col_act:
                 if st.button("Del", key=f"del_comp_{idx}_{i}", help="Delete"):
-                    db["competitor_brands"][idx]["codes"].pop(i)
-                    save_codes_db(db)
-                    st.rerun()
+                    delete_idx = i
+            row_data.append((i, sku, new_code.strip().upper(), new_product.strip()))
+
+        if delete_idx is not None:
+            db["competitor_brands"][idx]["codes"].pop(delete_idx)
+            save_codes_db(db)
+            st.rerun()
+
+        for i, sku, code_val, prod_val in row_data:
+            if code_val != sku["code"] or prod_val != sku.get("product", ""):
+                db["competitor_brands"][idx]["codes"][i] = {"code": code_val, "product": prod_val}
+                save_codes_db(db)
 
     # ── Add code (form) ──
     st.markdown("")
@@ -455,6 +458,8 @@ def _admin_misc():
         hn.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Name</span>', unsafe_allow_html=True)
         hd.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Description</span>', unsafe_allow_html=True)
 
+    st_rows = []
+    st_delete = None
     for i, item in enumerate(service_tiers):
         col_code, col_name, col_desc, col_act = st.columns([1, 2, 4, 0.6])
         with col_code:
@@ -463,20 +468,21 @@ def _admin_misc():
             new_name = st.text_input("Name", value=item.get("name", ""), key=f"st_name_{i}", label_visibility="collapsed")
         with col_desc:
             new_desc = st.text_input("Description", value=item.get("description", ""), key=f"st_desc_{i}", label_visibility="collapsed")
-
-        # Auto-save
-        updated_st = {"code": new_code.strip().upper(), "name": new_name.strip(), "description": new_desc.strip()}
-        if (updated_st["code"] != item["code"] or
-                updated_st["name"] != item.get("name", "") or
-                updated_st["description"] != item.get("description", "")):
-            db["service_tiers"][i] = updated_st
-            save_codes_db(db)
-
         with col_act:
             if st.button("Del", key=f"del_st_{i}", help="Delete"):
-                db["service_tiers"].pop(i)
-                save_codes_db(db)
-                st.rerun()
+                st_delete = i
+        st_rows.append((i, item, new_code.strip().upper(), new_name.strip(), new_desc.strip()))
+
+    if st_delete is not None:
+        db["service_tiers"].pop(st_delete)
+        save_codes_db(db)
+        st.rerun()
+
+    for i, item, code_v, name_v, desc_v in st_rows:
+        updated = {"code": code_v, "name": name_v, "description": desc_v}
+        if code_v != item["code"] or name_v != item.get("name", "") or desc_v != item.get("description", ""):
+            db["service_tiers"][i] = updated
+            save_codes_db(db)
 
     with st.form("add_service_tier"):
         c1, c2, c3 = st.columns([1, 2, 4])
@@ -503,6 +509,8 @@ def _admin_misc():
         hn.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Name</span>', unsafe_allow_html=True)
         hd.markdown('<span style="font-size:11px;font-weight:700;color:#8888a8;text-transform:uppercase;">Description</span>', unsafe_allow_html=True)
 
+    sf_rows = []
+    sf_delete = None
     for i, item in enumerate(spec_flags):
         col_code, col_name, col_desc, col_act = st.columns([1, 2, 4, 0.6])
         with col_code:
@@ -511,20 +519,21 @@ def _admin_misc():
             new_name = st.text_input("Name", value=item.get("name", ""), key=f"sf_name_{i}", label_visibility="collapsed")
         with col_desc:
             new_desc = st.text_input("Description", value=item.get("description", ""), key=f"sf_desc_{i}", label_visibility="collapsed")
-
-        # Auto-save
-        updated_sf = {"code": new_code.strip().upper(), "name": new_name.strip(), "description": new_desc.strip()}
-        if (updated_sf["code"] != item["code"] or
-                updated_sf["name"] != item.get("name", "") or
-                updated_sf["description"] != item.get("description", "")):
-            db["spec_flags"][i] = updated_sf
-            save_codes_db(db)
-
         with col_act:
             if st.button("Del", key=f"del_sf_{i}", help="Delete"):
-                db["spec_flags"].pop(i)
-                save_codes_db(db)
-                st.rerun()
+                sf_delete = i
+        sf_rows.append((i, item, new_code.strip().upper(), new_name.strip(), new_desc.strip()))
+
+    if sf_delete is not None:
+        db["spec_flags"].pop(sf_delete)
+        save_codes_db(db)
+        st.rerun()
+
+    for i, item, code_v, name_v, desc_v in sf_rows:
+        updated = {"code": code_v, "name": name_v, "description": desc_v}
+        if code_v != item["code"] or name_v != item.get("name", "") or desc_v != item.get("description", ""):
+            db["spec_flags"][i] = updated
+            save_codes_db(db)
 
     with st.form("add_spec_flag"):
         c1, c2, c3 = st.columns([1, 2, 4])

@@ -28,6 +28,18 @@ def save_codes_db(db: dict):
     load_codes_db.clear()
 
 
+def _visc_sort_key(sku):
+    """Sort viscosities numerically: 0W-16 < 0W-20 < 5W-20 < 5W-30 < 10W-30 < 10W-40 etc.
+    Non-viscosity products (chemicals, etc.) sort to the end."""
+    import re
+    v = sku.get("viscosity", "")
+    m = re.match(r"(\d+)[Ww]-?(\d+)", v)
+    if m:
+        return (0, int(m.group(1)), int(m.group(2)))
+    # Non-viscosity items sort after all viscosities
+    return (1, 0, v)
+
+
 def _build_lookup(db):
     lookup = {}
     # RP products no longer have codes — lookup is competitor/service/spec only
@@ -124,14 +136,14 @@ def render():
 def _render_code_lookup(db, all_codes, rp_products):
     st.markdown(
         '<div style="font-size:13px;color:#C4B5E8;margin-bottom:12px;">'
-        'Type any operation code from an installer report to identify the product, brand, and RP replacement.'
+        'Search any competitor or service code to identify the brand and find the Royal Purple alternative.'
         '</div>',
         unsafe_allow_html=True,
     )
 
     search = st.text_input(
-        "Enter an operation code",
-        placeholder="e.g. RS5W30, VS0W20, HMX0W20, M5W30, 01320...",
+        "Search codes",
+        placeholder="e.g. VS0W20, M5W30, CS5W30, PU0W20...",
         label_visibility="collapsed",
     )
 
@@ -169,7 +181,7 @@ def _render_quick_reference(rp_products):
     for series_name, series in rp_products.items():
         color = series.get("color", "#4B2D8A")
         badge = series.get("badge", "RP")
-        skus = series.get("skus", [])
+        skus = sorted(series.get("skus", []), key=_visc_sort_key)
         if not skus:
             continue
 
@@ -240,7 +252,7 @@ def _render_rp_result(code_upper, result, rp_products):
         )
 
         # Show available viscosities
-        skus = series_data.get("skus", [])
+        skus = sorted(series_data.get("skus", []), key=_visc_sort_key)
         if skus:
             pills = " ".join(
                 f'<span style="background:rgba(255,255,255,0.06);border:1px solid #2a2a45;'
@@ -505,7 +517,7 @@ def _render_rp_catalog(db):
     for series_name, series in rp_products.items():
         badge_color = series.get("color", "#4B2D8A")
         badge_label = series.get("badge", "RP")
-        skus = series.get("skus", [])
+        skus = sorted(series.get("skus", []), key=_visc_sort_key)
         description = series.get("description", "")
         application = series.get("application", "")
         short_name = series_name.split("\u2014")[0].strip() if "\u2014" in series_name else series_name

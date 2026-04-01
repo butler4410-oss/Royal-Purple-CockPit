@@ -546,7 +546,7 @@ elif nav == "Customer Map":
         st.info("No customer data available. Upload a CSV file to get started.")
 
 elif nav == "Product Reference":
-    page_header("Product Reference", "Look up any operation code, browse the full RP catalog, and see competitor cross-references.")
+    page_header("Product Reference", "Browse the full Royal Purple product catalog, identify competitor brands, and find the right RP alternative.")
     st.markdown("")
     product_reference.render()
 
