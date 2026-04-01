@@ -26,92 +26,99 @@ st.set_page_config(
     layout="wide",
 )
 
-# ── Royal Purple CockPit Dark Theme (BPA-style) ─────────────────────
+# ── Royal Purple CockPit — Glassmorphism Skin ─────────────────────
 st.markdown("""
 <style>
     /* ═══ GLOBAL ═══ */
-    .stApp { background-color: #0f0f1a !important; }
-    .block-container { padding: 2rem 2rem 4rem !important; max-width: 1200px; }
-    header[data-testid="stHeader"] { background: rgba(15,15,26,0.95) !important; backdrop-filter: blur(12px); border-bottom: 1px solid #2a2a45; }
+    .stApp {
+        background:
+            radial-gradient(circle at top left, rgba(111,45,189,0.22), transparent 28%),
+            radial-gradient(circle at top right, rgba(255,212,71,0.10), transparent 20%),
+            linear-gradient(180deg, #0B0712 0%, #110A1B 45%, #0B0712 100%) !important;
+        color: #F4F1FF;
+    }
+    .block-container { padding: 1.4rem 2rem 2rem !important; max-width: 1380px; }
+    header[data-testid="stHeader"] { background: rgba(11,7,18,0.85) !important; backdrop-filter: blur(14px); border-bottom: 1px solid rgba(157,107,255,0.18); }
 
     /* ═══ SIDEBAR ═══ */
-    section[data-testid="stSidebar"] { background: linear-gradient(180deg, #0a0a15 0%, #12122a 100%) !important; border-right: 1px solid #2a2a45; }
+    section[data-testid="stSidebar"] { background: linear-gradient(180deg, #0B0712 0%, #151022 100%) !important; border-right: 1px solid rgba(157,107,255,0.18); }
     section[data-testid="stSidebar"] .stRadio > div { gap: 2px; }
-    section[data-testid="stSidebar"] .stRadio label { padding: 10px 16px !important; border-radius: 8px; transition: all 0.15s; margin: 1px 0; }
-    section[data-testid="stSidebar"] .stRadio label:hover { background: rgba(75,45,138,0.12); }
-    section[data-testid="stSidebar"] hr { border-color: #2a2a45 !important; margin: 12px 0; }
+    section[data-testid="stSidebar"] .stRadio label { padding: 10px 16px !important; border-radius: 12px; transition: all 0.15s; margin: 1px 0; }
+    section[data-testid="stSidebar"] .stRadio label:hover { background: rgba(111,45,189,0.15); }
+    section[data-testid="stSidebar"] hr { border-color: rgba(157,107,255,0.18) !important; margin: 12px 0; }
 
     /* ═══ METRICS ═══ */
-    [data-testid="stMetric"] { background: #1a1a2e !important; border: 1px solid #2a2a45; border-radius: 12px; padding: 18px 20px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    [data-testid="stMetricValue"] { font-size: 24px !important; font-weight: 800 !important; color: #fff !important; }
-    [data-testid="stMetricLabel"] { font-size: 11px !important; text-transform: uppercase; letter-spacing: 0.5px; color: #8888a8 !important; }
+    [data-testid="stMetric"] { background: linear-gradient(180deg, rgba(28,20,48,0.90), rgba(16,10,27,0.96)) !important; border: 1px solid rgba(157,107,255,0.18); border-radius: 20px; padding: 16px 18px !important; box-shadow: 0 10px 28px rgba(0,0,0,0.28); }
+    [data-testid="stMetricValue"] { font-size: 24px !important; font-weight: 800 !important; color: #F4F1FF !important; }
+    [data-testid="stMetricLabel"] { font-size: 0.82rem !important; text-transform: uppercase; letter-spacing: 0.02em; color: #B7A8DB !important; }
     [data-testid="stMetricDelta"] { font-size: 12px !important; }
+    [data-testid="stMetricDelta"] svg { display: none; }
 
     /* ═══ TABS ═══ */
-    .stTabs [data-baseweb="tab-list"] { gap: 0; border-bottom: 2px solid #2a2a45; }
-    .stTabs [data-baseweb="tab"] { font-size: 13px !important; font-weight: 600; padding: 12px 24px !important; color: #8888a8; border-bottom: 3px solid transparent; background: transparent !important; }
-    .stTabs [data-baseweb="tab"]:hover { color: #C4B5E8; background: rgba(75,45,138,0.06) !important; }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] { color: #C4B5E8 !important; border-bottom-color: #4B2D8A !important; background: rgba(75,45,138,0.08) !important; }
-    .stTabs [data-baseweb="tab-highlight"] { background-color: #4B2D8A !important; }
+    .stTabs [data-baseweb="tab-list"] { gap: 0; border-bottom: 2px solid rgba(157,107,255,0.18); }
+    .stTabs [data-baseweb="tab"] { font-size: 13px !important; font-weight: 600; padding: 12px 24px !important; color: #B7A8DB; border-bottom: 3px solid transparent; background: transparent !important; }
+    .stTabs [data-baseweb="tab"]:hover { color: #F4F1FF; background: rgba(111,45,189,0.08) !important; }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] { color: #FFD447 !important; border-bottom-color: #FFD447 !important; background: rgba(111,45,189,0.10) !important; }
+    .stTabs [data-baseweb="tab-highlight"] { background-color: #FFD447 !important; }
     .stTabs [data-baseweb="tab-border"] { display: none; }
 
     /* ═══ EXPANDERS ═══ */
-    details[data-testid="stExpander"] { background: #1a1a2e !important; border: 1px solid #2a2a45 !important; border-radius: 12px !important; }
-    .streamlit-expanderHeader { background: transparent !important; font-weight: 600; color: #C4B5E8 !important; }
-    .streamlit-expanderContent { border-top: 1px solid #2a2a45; }
+    details[data-testid="stExpander"] { background: linear-gradient(180deg, rgba(28,20,48,0.90), rgba(16,10,27,0.96)) !important; border: 1px solid rgba(157,107,255,0.18) !important; border-radius: 20px !important; }
+    .streamlit-expanderHeader { background: transparent !important; font-weight: 600; color: #B7A8DB !important; }
+    .streamlit-expanderContent { border-top: 1px solid rgba(157,107,255,0.18); }
 
     /* ═══ DATAFRAMES ═══ */
-    [data-testid="stDataFrame"] { border-radius: 12px !important; overflow: hidden; border: 1px solid #2a2a45; }
+    [data-testid="stDataFrame"] { border-radius: 16px !important; overflow: hidden; border: 1px solid rgba(157,107,255,0.18); }
 
     /* ═══ FILE UPLOADER ═══ */
-    [data-testid="stFileUploader"] { background: #1a1a2e !important; border: 2px dashed #2a2a45 !important; border-radius: 14px !important; padding: 24px !important; }
-    [data-testid="stFileUploader"]:hover { border-color: #4B2D8A !important; }
+    [data-testid="stFileUploader"] { background: rgba(255,255,255,0.03) !important; border: 2px dashed rgba(157,107,255,0.25) !important; border-radius: 20px !important; padding: 24px !important; }
+    [data-testid="stFileUploader"]:hover { border-color: #9D6BFF !important; }
 
     /* ═══ BUTTONS ═══ */
-    .stButton > button { border-radius: 10px !important; font-weight: 600 !important; padding: 10px 24px !important; transition: all 0.15s; }
-    .stButton > button[kind="primary"] { background: linear-gradient(135deg, #4B2D8A, #6B3FA0) !important; border: none !important; color: white !important; box-shadow: 0 2px 12px rgba(75,45,138,0.3); }
-    .stButton > button[kind="primary"]:hover { background: linear-gradient(135deg, #5B3D9A, #7B4FB0) !important; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(75,45,138,0.4); }
-    .stButton > button[kind="secondary"]:hover { background: rgba(75,45,138,0.1) !important; border-color: #4B2D8A !important; }
+    .stButton > button { border-radius: 14px !important; font-weight: 700 !important; padding: 10px 24px !important; transition: all 0.15s; border: 1px solid rgba(157,107,255,0.24) !important; }
+    .stButton > button[kind="primary"] { background: linear-gradient(180deg, #7B35D5, #5A1FA8) !important; border: none !important; color: white !important; box-shadow: 0 10px 22px rgba(79,25,143,0.35); }
+    .stButton > button[kind="primary"]:hover { background: linear-gradient(180deg, #8B45E5, #6A2FB8) !important; transform: translateY(-1px); box-shadow: 0 14px 28px rgba(79,25,143,0.45); border-color: rgba(255,212,71,0.45) !important; }
+    .stButton > button[kind="secondary"]:hover { background: rgba(111,45,189,0.12) !important; border-color: #9D6BFF !important; }
 
     /* ═══ DOWNLOAD BUTTONS ═══ */
-    .stDownloadButton > button { background: linear-gradient(135deg, #4B2D8A, #6B3FA0) !important; border: none !important; border-radius: 10px !important; font-weight: 700 !important; color: white !important; }
-    .stDownloadButton > button:hover { background: linear-gradient(135deg, #5B3D9A, #7B4FB0) !important; transform: translateY(-1px); }
+    .stDownloadButton > button { background: linear-gradient(180deg, #7B35D5, #5A1FA8) !important; border: none !important; border-radius: 14px !important; font-weight: 700 !important; color: white !important; box-shadow: 0 10px 22px rgba(79,25,143,0.35); }
+    .stDownloadButton > button:hover { background: linear-gradient(180deg, #8B45E5, #6A2FB8) !important; transform: translateY(-1px); border-color: rgba(255,212,71,0.45) !important; }
 
     /* ═══ SELECT / MULTISELECT ═══ */
-    [data-baseweb="select"] > div { background: #1a1a2e !important; border-color: #2a2a45 !important; border-radius: 8px !important; }
-    [data-baseweb="select"] > div:hover { border-color: #4B2D8A !important; }
-    [data-baseweb="popover"] { background: #1a1a2e !important; border: 1px solid #2a2a45 !important; border-radius: 10px !important; }
-    [data-baseweb="menu"] { background: #1a1a2e !important; }
-    [data-baseweb="menu"] li:hover { background: rgba(75,45,138,0.15) !important; }
+    [data-baseweb="select"] > div { background: rgba(255,255,255,0.03) !important; border-color: rgba(157,107,255,0.18) !important; border-radius: 14px !important; }
+    [data-baseweb="select"] > div:hover { border-color: #9D6BFF !important; }
+    [data-baseweb="popover"] { background: #151022 !important; border: 1px solid rgba(157,107,255,0.18) !important; border-radius: 16px !important; }
+    [data-baseweb="menu"] { background: #151022 !important; }
+    [data-baseweb="menu"] li:hover { background: rgba(111,45,189,0.15) !important; }
 
     /* ═══ TEXT / NUMBER INPUTS ═══ */
-    .stTextInput input, .stNumberInput input, .stTextArea textarea { background: #1a1a2e !important; border: 1px solid #2a2a45 !important; border-radius: 8px !important; color: #e8e8f0 !important; }
-    .stTextInput input:focus, .stNumberInput input:focus, .stTextArea textarea:focus { border-color: #4B2D8A !important; box-shadow: 0 0 0 3px rgba(75,45,138,0.15) !important; }
+    .stTextInput input, .stNumberInput input, .stTextArea textarea { background: rgba(255,255,255,0.03) !important; border: 1px solid rgba(157,107,255,0.18) !important; border-radius: 14px !important; color: #F4F1FF !important; }
+    .stTextInput input:focus, .stNumberInput input:focus, .stTextArea textarea:focus { border-color: #9D6BFF !important; box-shadow: 0 0 0 3px rgba(157,107,255,0.15) !important; }
 
     /* ═══ ALERTS ═══ */
-    [data-testid="stAlert"] { border-radius: 10px !important; border: 1px solid #2a2a45 !important; }
+    [data-testid="stAlert"] { border-radius: 16px !important; border: 1px solid rgba(157,107,255,0.18) !important; }
 
     /* ═══ DIVIDERS ═══ */
-    hr { border-color: #2a2a45 !important; }
+    hr { border-color: rgba(157,107,255,0.18) !important; }
 
     /* ═══ SPINNER ═══ */
-    .stSpinner > div > div { border-top-color: #4B2D8A !important; }
+    .stSpinner > div > div { border-top-color: #9D6BFF !important; }
 
     /* ═══ SCROLLBAR ═══ */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #0f0f1a; }
-    ::-webkit-scrollbar-thumb { background: #2a2a45; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #4B2D8A; }
+    ::-webkit-scrollbar-track { background: #0B0712; }
+    ::-webkit-scrollbar-thumb { background: rgba(157,107,255,0.25); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #9D6BFF; }
 
     /* ═══ COLUMN GAPS ═══ */
     [data-testid="stColumn"] { padding: 0 6px; }
 
     /* ═══ CAPTION ═══ */
-    .stCaption, .stMarkdown small { color: #666 !important; }
+    .stCaption, .stMarkdown small { color: #B7A8DB !important; }
 
     /* ═══ FOOTER ═══ */
     footer { visibility: hidden; }
-    footer:after { content: 'Royal Purple CockPit  \00B7  Powered by Butler Performance Analytics'; visibility: visible; display: block; text-align: center; padding: 12px; font-size: 11px; color: #555; letter-spacing: 0.5px; }
+    footer:after { content: 'Royal Purple CockPit  ·  Powered by Butler Performance Analytics'; visibility: visible; display: block; text-align: center; padding: 12px; font-size: 11px; color: #B7A8DB; letter-spacing: 0.5px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -170,22 +177,27 @@ if nav == "Home":
             f'style="width:150px;flex-shrink:0;" />'
         )
 
+    # ── Hero banner with logos ──
     st.markdown(
         f"""
-        <div style="background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 50%,#12122a 100%);
-                    border-radius:14px;padding:32px 36px;margin-bottom:28px;">
-            <div style="display:flex;align-items:center;gap:24px;">
+        <div style="background:linear-gradient(120deg, rgba(111,45,189,0.30), rgba(255,212,71,0.08)),
+                    linear-gradient(180deg, rgba(21,16,34,0.96), rgba(11,7,18,0.96));
+                    border:1px solid rgba(157,107,255,0.22);border-radius:28px;padding:28px 36px;
+                    margin-bottom:24px;position:relative;overflow:hidden;
+                    box-shadow:0 20px 52px rgba(0,0,0,0.34);">
+            <div style="position:absolute;inset:0;background:radial-gradient(circle at 75% 25%,rgba(157,107,255,0.20),transparent 26%);pointer-events:none;"></div>
+            <div style="display:flex;align-items:center;gap:28px;position:relative;">
                 {_logo_html}
                 <div style="text-align:center;flex:1;">
-                    <div style="font-size:36px;font-weight:900;color:#4B2D8A;letter-spacing:1px;
+                    <div style="font-size:36px;font-weight:900;color:#9D6BFF;letter-spacing:1px;
                                 line-height:1.1;">ROYAL PURPLE</div>
-                    <div style="width:140px;height:2px;background:linear-gradient(90deg,#4B2D8A,#C8A951);
+                    <div style="width:140px;height:2px;background:linear-gradient(90deg,#9D6BFF,#FFD447);
                                 margin:10px auto;border-radius:1px;"></div>
-                    <div style="font-size:16px;font-weight:700;letter-spacing:5px;color:#C4B5E8;
+                    <div style="font-size:16px;font-weight:700;letter-spacing:5px;color:#B7A8DB;
                                 text-transform:uppercase;margin-bottom:14px;">COCKPIT</div>
-                    <div style="font-size:10px;letter-spacing:2.5px;color:#8888a8;
+                    <div style="font-size:10px;letter-spacing:2.5px;color:#B7A8DB;
                                 text-transform:uppercase;margin-bottom:2px;">Powered by</div>
-                    <div style="font-size:15px;font-weight:700;color:#C8A951;letter-spacing:0.5px;">
+                    <div style="font-size:15px;font-weight:700;color:#FFD447;letter-spacing:0.5px;">
                         Butler Performance Analytics</div>
                 </div>
                 {_logo_html}
@@ -232,9 +244,9 @@ if nav == "Home":
     rp_sku_count = sum(len(s["skus"]) for s in _db["rp_products"].values())
     comp_brand_count = len(_db["competitor_brands"])
 
+    # ── Network at a Glance ──
     st.markdown(
-        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#8888a8;
-                    text-transform:uppercase;margin-bottom:4px;">Network at a Glance</div>""",
+        '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.18em;color:#FFD447;font-weight:700;margin-bottom:6px;">Network at a Glance</div>',
         unsafe_allow_html=True,
     )
 
@@ -248,13 +260,14 @@ if nav == "Home":
 
     st.markdown("")
 
+    # ── Feature cards ──
     card_style = (
-        "background:#1a1a2e;border:1px solid #2a2a45;border-radius:12px;"
-        "padding:28px 24px 24px;height:100%;"
-        ""
+        "background:linear-gradient(180deg, rgba(28,20,48,0.92), rgba(16,10,27,0.98));"
+        "border:1px solid rgba(157,107,255,0.18);border-radius:22px;"
+        "padding:22px 20px 20px;height:100%;box-shadow:0 12px 30px rgba(0,0,0,0.24);"
     )
     icon_style = (
-        "width:44px;height:44px;border-radius:10px;display:flex;"
+        "width:44px;height:44px;border-radius:12px;display:flex;"
         "align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;"
     )
 
@@ -264,99 +277,86 @@ if nav == "Home":
         st.markdown(
             f"""
             <div style="{card_style}">
-                <div style="{icon_style}background:rgba(75,45,138,0.2);color:#C4B5E8;">&#9889;</div>
-                <div style="font-size:17px;font-weight:700;color:#e8e8f0;margin-bottom:6px;">
-                    Report Generator
-                </div>
-                <div style="font-size:13px;color:#8888a8;line-height:1.6;margin-bottom:16px;">
+                <div style="{icon_style}background:rgba(111,45,189,0.2);color:#9D6BFF;">&#9889;</div>
+                <div style="font-size:17px;font-weight:700;color:#F4F1FF;margin-bottom:6px;">
+                    Report Generator</div>
+                <div style="font-size:13px;color:#B7A8DB;line-height:1.6;margin-bottom:16px;">
                     Upload monthly Royal Purple Excel exports and generate fully branded PowerPoint
-                    presentations with revenue analytics, Max-Clean attachment metrics, and per-store deep dives.
+                    presentations with revenue analytics, Max-Clean attachment metrics, and per-store deep dives.</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">Auto-parse</span>
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">Deduplication</span>
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">Branded PPTX</span>
                 </div>
-                <div style="display:flex;gap:16px;flex-wrap:wrap;">
-                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Auto-parse</span>
-                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Deduplication</span>
-                    <span style="font-size:11px;color:#4B2D8A;font-weight:600;">&#10003; Branded PPTX</span>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            </div>""", unsafe_allow_html=True)
 
     with col2:
         st.markdown(
             f"""
             <div style="{card_style}">
                 <div style="{icon_style}background:rgba(37,99,235,0.15);color:#60a5fa;">&#127758;</div>
-                <div style="font-size:17px;font-weight:700;color:#e8e8f0;margin-bottom:6px;">
-                    Customer Map
-                </div>
-                <div style="font-size:13px;color:#8888a8;line-height:1.6;margin-bottom:16px;">
+                <div style="font-size:17px;font-weight:700;color:#F4F1FF;margin-bottom:6px;">
+                    Customer Map</div>
+                <div style="font-size:13px;color:#B7A8DB;line-height:1.6;margin-bottom:16px;">
                     Interactive map of {len(all_locations):,} Royal Purple locations across {len(us_states)} states and {len(unique_countries)} countries.
-                    Filter by 8 account types, search by name or address, and export data to branded Excel workbooks.
+                    Filter by account type, search by name, and export to branded Excel workbooks.</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">{len(all_locations):,} pins</span>
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">7 account types</span>
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">Excel export</span>
                 </div>
-                <div style="display:flex;gap:16px;flex-wrap:wrap;">
-                    <span style="font-size:11px;color:#2563EB;font-weight:600;">&#10003; {len(all_locations):,} pins</span>
-                    <span style="font-size:11px;color:#2563EB;font-weight:600;">&#10003; 8 account types</span>
-                    <span style="font-size:11px;color:#2563EB;font-weight:600;">&#10003; Excel export</span>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            </div>""", unsafe_allow_html=True)
 
     with col3:
         st.markdown(
             f"""
             <div style="{card_style}">
-                <div style="{icon_style}background:rgba(200,169,81,0.15);color:#C8A951;">&#128218;</div>
-                <div style="font-size:17px;font-weight:700;color:#e8e8f0;margin-bottom:6px;">
-                    Product Reference
+                <div style="{icon_style}background:rgba(255,212,71,0.12);color:#FFD447;">&#128218;</div>
+                <div style="font-size:17px;font-weight:700;color:#F4F1FF;margin-bottom:6px;">
+                    Product Reference</div>
+                <div style="font-size:13px;color:#B7A8DB;line-height:1.6;margin-bottom:16px;">
+                    Complete database of {rp_sku_count} Royal Purple products across {rp_series_count} product lines,
+                    plus {comp_brand_count} competitor brands. Viscosities and cross-references.</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">{rp_sku_count} RP products</span>
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">{comp_brand_count} competitors</span>
+                    <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:4px 10px;font-size:11px;color:#F4F1FF;">Admin editable</span>
                 </div>
-                <div style="font-size:13px;color:#8888a8;line-height:1.6;margin-bottom:16px;">
-                    Complete database of {rp_sku_count} Royal Purple SKUs across {rp_series_count} product lines,
-                    plus {comp_brand_count} competitor brands. Operation codes, viscosities, and cross-references.
-                </div>
-                <div style="display:flex;gap:16px;flex-wrap:wrap;">
-                    <span style="font-size:11px;color:#D97706;font-weight:600;">&#10003; {rp_sku_count} RP SKUs</span>
-                    <span style="font-size:11px;color:#D97706;font-weight:600;">&#10003; {comp_brand_count} competitors</span>
-                    <span style="font-size:11px;color:#D97706;font-weight:600;">&#10003; Admin editable</span>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            </div>""", unsafe_allow_html=True)
 
     st.markdown("")
+
+    # ── Account Type Breakdown ──
     st.markdown(
-        """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#8888a8;
-                    text-transform:uppercase;margin-bottom:4px;">Account Type Breakdown</div>""",
+        '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.18em;color:#FFD447;font-weight:700;margin-bottom:6px;">Account Type Breakdown</div>',
         unsafe_allow_html=True,
     )
 
     type_colors = {
-        "Promo Only (Not on C4C)": "#DC2626",
-        "C4C List": "#2563EB",
-        "Rack Installer": "#7C3AED",
-        "Distributor": "#F59E0B",
-        "Powersports/Motorsports": "#F97316",
-        "International": "#4F46E5",
-        "Canada": "#059669",
+        "Promo Only (Not on C4C)": "#FF5C7A",
+        "C4C List": "#3DDC97",
+        "Rack Installer": "#9D6BFF",
+        "Distributor": "#FFD447",
+        "Powersports/Motorsports": "#F5A623",
+        "International": "#60a5fa",
+        "Canada": "#3DDC97",
     }
 
     sorted_types = sorted(type_counts.items(), key=lambda x: -x[1])
     cols = st.columns(min(len(sorted_types), 4))
     for i, (ttype, count) in enumerate(sorted_types):
-        color = type_colors.get(ttype, "#6B7280")
+        color = type_colors.get(ttype, "#B7A8DB")
         with cols[i % 4]:
             st.markdown(
                 f"""
-                <div style="background:#1a1a2e;border:1px solid #2a2a45;border-radius:8px;
-                            padding:14px 16px;margin-bottom:8px;">
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <div style="background:linear-gradient(180deg, rgba(28,20,48,0.94), rgba(15,10,25,0.98));
+                            border:1px solid rgba(157,107,255,0.18);border-radius:20px;
+                            padding:16px;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
                         <div style="width:10px;height:10px;border-radius:50%;background:{color};"></div>
-                        <span style="font-size:12px;color:#8888a8;font-weight:500;">{ttype}</span>
+                        <span style="font-size:12px;color:#B7A8DB;font-weight:500;">{ttype}</span>
                     </div>
-                    <div style="font-size:22px;font-weight:700;color:#e8e8f0;">{count:,}</div>
+                    <div style="font-size:1.8rem;font-weight:800;color:#F4F1FF;line-height:1;">{count:,}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -378,8 +378,7 @@ if nav == "Home":
             rpo_gold = sum(1 for a in rpo_data if a.get("gold_flag"))
 
             st.markdown(
-                """<div style="font-size:10px;font-weight:700;letter-spacing:2.5px;color:#8888a8;
-                            text-transform:uppercase;margin-bottom:4px;">RPO NAPA Accounts</div>""",
+                '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.18em;color:#FFD447;font-weight:700;margin-bottom:6px;">RPO NAPA Accounts</div>',
                 unsafe_allow_html=True,
             )
             st.caption("RPO Autocare installer accounts with $1,000+ PYTD sales.")
@@ -391,8 +390,9 @@ if nav == "Home":
             r4.metric("Not on C4C", f"{rpo_not_c4c:,}")
             r5.metric("Gold Flag", f"{rpo_gold:,}")
 
-    st.markdown("")
-    st.caption("Use the sidebar to navigate between pages. Select Report Generator to upload Excel files, Customer Map to explore locations, or Product Reference to browse the product database.")
+    # ── Divider ──
+    st.markdown('<div style="height:1px;background:linear-gradient(90deg,transparent,rgba(157,107,255,0.35),transparent);margin:14px 0 16px 0;"></div>', unsafe_allow_html=True)
+    st.caption("Use the sidebar to navigate between pages.")
 
 elif nav == "Customer Map":
     page_header("Customer Map", "Interactive map of Royal Purple customer locations across the United States.")

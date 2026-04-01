@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from product_reference import load_codes_db, save_codes_db
 
 _COLOR_PRESETS = {
@@ -60,7 +61,7 @@ def render():
             )
 
     st.markdown("")
-    tab_rp, tab_comp, tab_misc = st.tabs(["Royal Purple Products", "Competitor Brands", "Service Tiers & Spec Flags"])
+    tab_rp, tab_comp, tab_misc, tab_accounts = st.tabs(["Royal Purple Products", "Competitor Brands", "Service Tiers & Spec Flags", "Account Lists"])
 
     with tab_rp:
         _admin_rp_products()
@@ -68,6 +69,8 @@ def render():
         _admin_competitor_brands()
     with tab_misc:
         _admin_misc()
+    with tab_accounts:
+        _admin_account_upload()
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -566,3 +569,147 @@ def _admin_misc():
                 db["spec_flags"].append({"code": add_code.strip().upper(), "name": add_name.strip(), "description": add_desc.strip()})
                 save_codes_db(db)
                 st.rerun()
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# ACCOUNT LIST UPLOAD
+# ═══════════════════════════════════════════════════════════════════════
+
+CUSTOMERS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "customers.json")
+
+ACCOUNT_TYPES = [
+    "Promo Only (Not on C4C)",
+    "C4C List",
+    "Rack Installer",
+    "Distributor",
+    "Powersports/Motorsports",
+    "International",
+    "Canada",
+]
+
+
+def _load_customers():
+    import json
+    if os.path.exists(CUSTOMERS_PATH):
+        with open(CUSTOMERS_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+
+def _save_customers(data):
+    import json
+    with open(CUSTOMERS_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def _normalize(s):
+    """Normalize a string for matching: lowercase, strip, collapse whitespace."""
+    import re
+    return re.sub(r"\s+", " ", str(s).strip().lower())
+
+
+def _admin_account_upload():
+    import pandas as pd
+
+    st.markdown("#### Upload Account Lists")
+    st.caption(
+        "Upload a CSV with updated accounts for any account type. "
+        "The system will identify new accounts not already in the database and add them. "
+        "Expected columns: **store_name**, **address**, **city**, **state**, **zip** (latitude, longitude, county optional)."
+    )
+
+    account_type = st.selectbox("Account Type for this upload", ACCOUNT_TYPES, key="upload_acct_type")
+
+    uploaded = st.file_uploader(
+        "Upload CSV",
+        type=["csv"],
+        key="account_csv_upload",
+        help="CSV with at minimum: store_name, city, state columns.",
+    )
+
+    if uploaded is None:
+        # Show current counts
+        customers = _load_customers()
+        st.markdown("---")
+        st.markdown("**Current Account Counts**")
+        type_counts = {}
+        for c in customers:
+            t = c.get("type", "Unknown")
+            type_counts[t] = type_counts.get(t, 0) + 1
+        for t in ACCOUNT_TYPES:
+            ct = type_counts.get(t, 0)
+            st.markdown(f"- **{t}**: {ct:,}")
+        st.markdown(f"- **Total**: {len(customers):,}")
+        return
+
+    try:
+        df = pd.read_csv(uploaded)
+    except Exception as e:
+        st.error(f"Error reading CSV: {e}")
+        return
+
+    # Normalize column names
+    df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+
+    if "store_name" not in df.columns:
+        # Try common alternatives
+        for alt in ["name", "store", "location", "account_name", "account"]:
+            if alt in df.columns:
+                df = df.rename(columns={alt: "store_name"})
+                break
+
+    if "store_name" not in df.columns:
+        st.error("CSV must have a **store_name** (or name/store/location) column.")
+        return
+
+    st.success(f"Parsed {len(df)} rows from CSV.")
+
+    # Load existing customers and build match set
+    customers = _load_customers()
+    existing_keys = set()
+    for c in customers:
+        key = (_normalize(c.get("store_name", "")), _normalize(c.get("state", "")))
+        existing_keys.add(key)
+
+    # Identify new accounts
+    new_rows = []
+    for _, row in df.iterrows():
+        name = str(row.get("store_name", "")).strip()
+        state = str(row.get("state", "")).strip()
+        if not name:
+            continue
+        key = (_normalize(name), _normalize(state))
+        if key not in existing_keys:
+            new_rows.append({
+                "store_name": name,
+                "address": str(row.get("address", "")).strip(),
+                "city": str(row.get("city", "")).strip(),
+                "state": state,
+                "zip": str(row.get("zip", "")).strip(),
+                "country": str(row.get("country", "US")).strip() or "US",
+                "latitude": float(row["latitude"]) if "latitude" in row and pd.notna(row.get("latitude")) else "",
+                "longitude": float(row["longitude"]) if "longitude" in row and pd.notna(row.get("longitude")) else "",
+                "type": account_type,
+                "county": str(row.get("county", "")).strip(),
+            })
+            existing_keys.add(key)
+
+    duplicate_count = len(df) - len(new_rows)
+
+    if not new_rows:
+        st.info(f"No new accounts found. All {len(df)} rows already exist in the database.")
+        return
+
+    st.markdown(f"**{len(new_rows)} new accounts** identified ({duplicate_count} already in database).")
+    st.markdown(f"Account type: **{account_type}**")
+
+    # Preview
+    preview_df = pd.DataFrame(new_rows)
+    display_cols = [c for c in ["store_name", "city", "state", "county", "zip"] if c in preview_df.columns]
+    st.dataframe(preview_df[display_cols], use_container_width=True, hide_index=True, height=300)
+
+    if st.button(f"Add {len(new_rows)} new accounts as {account_type}", type="primary", key="confirm_add_accounts"):
+        customers.extend(new_rows)
+        _save_customers(customers)
+        st.success(f"Added {len(new_rows)} new {account_type} accounts. Total is now {len(customers):,}.")
+        st.rerun()
