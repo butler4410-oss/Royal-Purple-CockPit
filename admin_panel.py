@@ -164,6 +164,10 @@ def _edit_rp_series(db, series_name, series):
 
     # ── Series metadata (auto-save) ──
     st.markdown("**Series Details**")
+
+    new_series_name = st.text_input("Series Name", value=series_name,
+                                     key=f"sname_{series_name}")
+
     c1, c2, c3 = st.columns([2, 2, 2])
     with c1:
         new_badge = st.text_input("Badge", value=series.get("badge", ""), max_chars=6,
@@ -198,10 +202,24 @@ def _edit_rp_series(db, series_name, series):
         "description": series.get("description", ""),
         "application": series.get("application", ""),
     }
-    if updated_meta != current_meta:
+
+    # Handle rename
+    trimmed_new_name = new_series_name.strip()
+    if trimmed_new_name and trimmed_new_name != series_name:
+        if trimmed_new_name in db["rp_products"]:
+            st.error(f"A series named '{trimmed_new_name}' already exists.")
+        else:
+            # Rebuild dict preserving order with new key
+            db["rp_products"] = {
+                (trimmed_new_name if k == series_name else k): v
+                for k, v in db["rp_products"].items()
+            }
+            db["rp_products"][trimmed_new_name].update(updated_meta)
+            save_codes_db(db)
+            st.rerun()
+    elif updated_meta != current_meta:
         db["rp_products"][series_name].update(updated_meta)
         save_codes_db(db)
-        changed = True
 
     # ── Delete series ──
     if st.button("Delete Series", key=f"del_series_{series_name}", type="secondary"):
