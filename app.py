@@ -154,15 +154,27 @@ if nav == "Home":
     if _cockpit_b64:
         _cockpit_html = (
             f'<img src="data:image/png;base64,{_cockpit_b64}" '
-            f'style="width:120px;height:120px;object-fit:cover;border-radius:10px;'
+            f'style="width:150px;height:150px;object-fit:cover;border-radius:12px;'
             f'border:1px solid #2a2a45;flex-shrink:0;" />'
+        )
+
+    _logo_b64 = ""
+    if os.path.exists(LOGO_SIDEBAR_PATH):
+        with open(LOGO_SIDEBAR_PATH, "rb") as _lf:
+            _logo_b64 = _b64.b64encode(_lf.read()).decode()
+
+    _logo_html = ""
+    if _logo_b64:
+        _logo_html = (
+            f'<img src="data:image/png;base64,{_logo_b64}" '
+            f'style="width:150px;flex-shrink:0;" />'
         )
 
     st.markdown(
         f"""
         <div style="background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 50%,#12122a 100%);
-                    border-radius:14px;padding:36px 42px 32px;margin-bottom:28px;position:relative;overflow:hidden;">
-            <div style="display:flex;align-items:flex-start;gap:28px;">
+                    border-radius:14px;padding:32px 36px;margin-bottom:28px;">
+            <div style="display:flex;align-items:center;gap:24px;">
                 {_cockpit_html}
                 <div style="text-align:center;flex:1;">
                     <div style="font-size:36px;font-weight:900;color:#4B2D8A;letter-spacing:1px;
@@ -176,6 +188,7 @@ if nav == "Home":
                     <div style="font-size:15px;font-weight:700;color:#C8A951;letter-spacing:0.5px;">
                         Butler Performance Analytics</div>
                 </div>
+                {_logo_html}
             </div>
         </div>
         """,
