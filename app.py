@@ -145,15 +145,14 @@ if nav == "Home":
     st.markdown(
         """
         <div style="background:linear-gradient(135deg,#1E0F3C 0%,#2D1B5E 40%,#4B2D8A 80%,#6B3FA0 100%);
-                    border-radius:14px;padding:44px 42px 36px;margin-bottom:28px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;right:0;width:260px;height:100%;
+                    border-radius:14px;padding:48px 42px 40px;margin-bottom:28px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;right:0;width:300px;height:100%;
                         background:radial-gradient(circle at 80% 30%,rgba(107,63,160,0.5) 0%,transparent 70%);"></div>
-            <div style="font-size:11px;font-weight:700;letter-spacing:3.5px;color:#C4B5E8;
-                        text-transform:uppercase;margin-bottom:12px;">Royal Purple CockPit</div>
-            <div style="font-size:34px;font-weight:800;color:#FFFFFF;line-height:1.15;margin-bottom:6px;">
-                Powered by Butler Performance Analytics
-            </div>
-            <div style="font-size:15px;color:#C4B5E8;max-width:620px;line-height:1.7;margin-top:12px;">
+            <div style="font-size:42px;font-weight:900;color:#FFFFFF;line-height:1.1;margin-bottom:4px;
+                        letter-spacing:-0.5px;">Royal Purple CockPit</div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:2px;color:#C4B5E8;
+                        text-transform:uppercase;margin-bottom:16px;">Powered by Butler Performance Analytics</div>
+            <div style="font-size:15px;color:#C4B5E8;max-width:620px;line-height:1.7;">
                 Your centralized command center for Royal Purple installer analytics,
                 customer mapping, and product intelligence.
                 Upload reports, explore your network, and manage your product database — all in one place.
