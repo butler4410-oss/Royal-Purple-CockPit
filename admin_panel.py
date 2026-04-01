@@ -3,8 +3,6 @@ import os
 import copy
 from product_reference import load_codes_db, save_codes_db
 
-ADMIN_USERNAME = "admin"
-
 _COLOR_PRESETS = {
     "Purple (RP default)": "#4B2D8A",
     "Deep Purple": "#7C3AED",
@@ -21,50 +19,9 @@ _COLOR_PRESETS = {
 }
 
 
-def _check_password():
-    if st.session_state.get("admin_authenticated"):
-        return True
-
-    st.markdown(
-        '<div style="max-width:400px;margin:60px auto 0;">'
-        '<div style="background:#4B2D8A;color:white;padding:20px 24px;border-radius:10px 10px 0 0;">'
-        '<h3 style="margin:0;font-size:18px;">Admin Login</h3>'
-        '<p style="margin:6px 0 0;font-size:13px;opacity:0.8;">Royal Purple Partnership Hub</p>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    with st.form("admin_login_form"):
-        st.markdown('<div style="background:#1a1a2e;border:1px solid #E2E8F0;border-top:none;padding:20px 24px;border-radius:0 0 10px 10px;">', unsafe_allow_html=True)
-        username = st.text_input("Username", placeholder="admin")
-        password = st.text_input("Password", type="password", placeholder="••••••••")
-        submitted = st.form_submit_button("Sign In", use_container_width=True, type="primary")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    if submitted:
-        expected_pw = os.environ.get("ADMIN_PASSWORD", "")
-        if username == ADMIN_USERNAME and password == expected_pw and expected_pw:
-            st.session_state["admin_authenticated"] = True
-            st.rerun()
-        else:
-            st.error("Incorrect username or password.")
-
-    return False
-
-
 def render():
-    if not _check_password():
-        return
-
-    col_title, col_logout = st.columns([5, 1])
-    with col_title:
-        st.markdown("### Code Database Editor")
-        st.caption("Add, edit, or remove Royal Purple and competitor operation codes. Changes save immediately to the live database.")
-    with col_logout:
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Sign Out", type="secondary"):
-            st.session_state.pop("admin_authenticated", None)
-            st.rerun()
+    st.markdown("### Code Database Editor")
+    st.caption("Add, edit, or remove Royal Purple and competitor operation codes. Changes save immediately to the live database.")
 
     st.markdown("")
     tab_rp, tab_comp, tab_misc = st.tabs(["Royal Purple Products", "Competitor Brands", "Service Tiers & Spec Flags"])
@@ -179,7 +136,7 @@ def _edit_rp_series(db, series_name, series):
 
     with col_del:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🗑 Delete Series", key=f"del_series_{series_name}", type="secondary"):
+        if st.button("Delete Series", key=f"del_series_{series_name}", type="secondary"):
             st.session_state[f"confirm_del_series_{series_name}"] = True
 
     if st.session_state.get(f"confirm_del_series_{series_name}"):
@@ -212,7 +169,7 @@ def _edit_rp_series(db, series_name, series):
             with col_act:
                 save_col, del_col = st.columns(2)
                 with save_col:
-                    if st.button("💾", key=f"save_sku_{series_name}_{i}", help="Save"):
+                    if st.button("Save", key=f"save_sku_{series_name}_{i}", help="Save"):
                         db["rp_products"][series_name]["skus"][i] = {
                             "code": new_code.strip().upper(),
                             "viscosity": new_visc.strip(),
@@ -222,7 +179,7 @@ def _edit_rp_series(db, series_name, series):
                         st.success(f"{new_code.strip().upper()} saved.")
                         st.rerun()
                 with del_col:
-                    if st.button("🗑", key=f"del_sku_{series_name}_{i}", help="Delete"):
+                    if st.button("Del", key=f"del_sku_{series_name}_{i}", help="Delete"):
                         db["rp_products"][series_name]["skus"].pop(i)
                         save_codes_db(db)
                         st.rerun()
@@ -323,7 +280,7 @@ def _edit_competitor_brand(db, idx, brand_data):
 
     with col_del:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🗑 Delete Brand", key=f"del_brand_{idx}", type="secondary"):
+        if st.button("Delete Brand", key=f"del_brand_{idx}", type="secondary"):
             st.session_state[f"confirm_del_brand_{idx}"] = True
 
     if st.session_state.get(f"confirm_del_brand_{idx}"):
@@ -355,7 +312,7 @@ def _edit_competitor_brand(db, idx, brand_data):
             with col_act:
                 save_col, del_col = st.columns(2)
                 with save_col:
-                    if st.button("💾", key=f"save_comp_{idx}_{i}", help="Save"):
+                    if st.button("Save", key=f"save_comp_{idx}_{i}", help="Save"):
                         db["competitor_brands"][idx]["codes"][i] = {
                             "code": new_code.strip().upper(),
                             "product": new_product.strip(),
@@ -364,7 +321,7 @@ def _edit_competitor_brand(db, idx, brand_data):
                         st.success(f"{new_code.strip().upper()} saved.")
                         st.rerun()
                 with del_col:
-                    if st.button("🗑", key=f"del_comp_{idx}_{i}", help="Delete"):
+                    if st.button("Del", key=f"del_comp_{idx}_{i}", help="Delete"):
                         db["competitor_brands"][idx]["codes"].pop(i)
                         save_codes_db(db)
                         st.rerun()
@@ -398,7 +355,7 @@ def _admin_misc():
     db = load_codes_db()
 
     st.markdown("#### Service Tier Codes")
-    st.caption("Codes like S1–S6, B7–B10 that appear on invoices but do not represent oil products.")
+    st.caption("Codes like S1-S6, B7-B10 that appear on invoices but do not represent oil products.")
 
     service_tiers = db.get("service_tiers", [])
     for i, item in enumerate(service_tiers):
@@ -412,12 +369,12 @@ def _admin_misc():
         with col_act:
             save_col, del_col = st.columns(2)
             with save_col:
-                if st.button("💾", key=f"save_st_{i}", help="Save"):
+                if st.button("Save", key=f"save_st_{i}", help="Save"):
                     db["service_tiers"][i] = {"code": new_code.strip().upper(), "name": new_name.strip(), "description": new_desc.strip()}
                     save_codes_db(db)
                     st.rerun()
             with del_col:
-                if st.button("🗑", key=f"del_st_{i}", help="Delete"):
+                if st.button("Del", key=f"del_st_{i}", help="Delete"):
                     db["service_tiers"].pop(i)
                     save_codes_db(db)
                     st.rerun()
@@ -452,12 +409,12 @@ def _admin_misc():
         with col_act:
             save_col, del_col = st.columns(2)
             with save_col:
-                if st.button("💾", key=f"save_sf_{i}", help="Save"):
+                if st.button("Save", key=f"save_sf_{i}", help="Save"):
                     db["spec_flags"][i] = {"code": new_code.strip().upper(), "name": new_name.strip(), "description": new_desc.strip()}
                     save_codes_db(db)
                     st.rerun()
             with del_col:
-                if st.button("🗑", key=f"del_sf_{i}", help="Delete"):
+                if st.button("Del", key=f"del_sf_{i}", help="Delete"):
                     db["spec_flags"].pop(i)
                     save_codes_db(db)
                     st.rerun()

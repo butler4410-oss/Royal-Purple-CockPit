@@ -128,8 +128,8 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    if os.path.exists(LOGO_NEVER_SETTLE):
-        st.image(LOGO_SIDEBAR_PATH, use_container_width=True) if os.path.exists(LOGO_SIDEBAR_PATH) else None
+    if os.path.exists(LOGO_SIDEBAR_PATH):
+        st.image(LOGO_SIDEBAR_PATH, use_container_width=True)
     st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#8888a8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
 
 
@@ -546,7 +546,7 @@ elif nav == "Customer Map":
         st.info("No customer data available. Upload a CSV file to get started.")
 
 elif nav == "Product Reference":
-    page_header("Product Reference", "Royal Purple operation codes, product catalog, competitor reference & conversion guide")
+    page_header("Product Reference", "Look up any operation code, browse the full RP catalog, and see competitor cross-references.")
     st.markdown("")
     product_reference.render()
 
@@ -572,7 +572,7 @@ elif nav == "Installer Incremental Profit Model":
     profit_calculator.render()
 
 elif nav == "Admin":
-    page_header("Admin", "Manage operation codes and product database")
+    page_header("Database Editor", "Add, edit, or remove product codes and competitor brands. Changes save immediately.")
     st.markdown("")
     admin_panel.render()
 

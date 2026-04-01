@@ -74,456 +74,678 @@ def _build_lookup(db):
 def render():
     db = load_codes_db()
     all_codes = _build_lookup(db)
+    rp_products = db.get("rp_products", {})
 
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "RP Product Catalog",
-        "SKU Lookup",
-        "Competitor Brands",
+    # ── Stats bar ──
+    total_rp_skus = sum(len(s.get("skus", [])) for s in rp_products.values())
+    total_comp_brands = len(db.get("competitor_brands", []))
+    total_comp_codes = sum(len(b.get("codes", [])) for b in db.get("competitor_brands", []))
+
+    s1, s2, s3, s4 = st.columns(4)
+    s1.metric("RP Product Lines", len(rp_products))
+    s2.metric("RP SKUs", total_rp_skus)
+    s3.metric("Competitor Brands", total_comp_brands)
+    s4.metric("Competitor Codes", total_comp_codes)
+
+    st.markdown("")
+
+    tab_lookup, tab_catalog, tab_competitor, tab_crosswalk = st.tabs([
+        "Code Lookup",
+        "Royal Purple Catalog",
+        "Competitor Reference",
         "Conversion Guide",
     ])
 
-    with tab1:
+    with tab_lookup:
+        _render_code_lookup(db, all_codes, rp_products)
+    with tab_catalog:
         _render_rp_catalog(db)
-    with tab2:
-        _render_code_lookup(db, all_codes)
-    with tab3:
+    with tab_competitor:
         _render_competitor_brands(db)
-    with tab4:
+    with tab_crosswalk:
         _render_conversion_guide(db)
 
 
-def _badge(text, bg_color, text_color="#FFFFFF", size=11):
+# ═══════════════════════════════════════════════════════════════════════
+# CODE LOOKUP — the main tool Brian will use day-to-day
+# ═══════════════════════════════════════════════════════════════════════
+
+def _render_code_lookup(db, all_codes, rp_products):
+    st.markdown(
+        '<div style="font-size:13px;color:#C4B5E8;margin-bottom:12px;">'
+        'Type any operation code from a Duke of Oil report to identify the product, brand, and RP replacement.'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    search = st.text_input(
+        "Enter an operation code",
+        placeholder="e.g. RS5W30, VS0W20, HMX0W20, M5W30, 01320...",
+        label_visibility="collapsed",
+    )
+
+    if not search:
+        _render_quick_reference(rp_products)
+        return
+
+    code_upper = search.strip().upper()
+    result = all_codes.get(code_upper)
+
+    if not result:
+        _try_prefix_lookup(code_upper, rp_products)
+        return
+
+    cat = result["category"]
+    color = result["color"]
+
+    if cat == "rp":
+        _render_rp_result(code_upper, result, rp_products)
+    elif cat == "competitor":
+        _render_competitor_result(code_upper, result, rp_products)
+    else:
+        _render_misc_result(code_upper, result, cat)
+
+
+def _render_quick_reference(rp_products):
+    """Show a clean grid of all RP product lines when no search is active."""
+    st.markdown("")
+    st.markdown(
+        '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#8888a8;'
+        'text-transform:uppercase;margin-bottom:8px;">Royal Purple Product Lines</div>',
+        unsafe_allow_html=True,
+    )
+
+    for series_name, series in rp_products.items():
+        color = series.get("color", "#4B2D8A")
+        badge = series.get("badge", "RP")
+        skus = series.get("skus", [])
+        if not skus:
+            continue
+
+        sku_pills = " ".join(
+            f'<span style="background:rgba(255,255,255,0.06);border:1px solid #2a2a45;'
+            f'padding:4px 10px;border-radius:6px;font-size:12px;color:#e8e8f0;'
+            f'font-weight:600;white-space:nowrap;">'
+            f'<span style="color:{color};">{s["code"]}</span>'
+            f' <span style="color:#8888a8;">{s["viscosity"]}</span></span>'
+            for s in skus
+        )
+
+        short_name = series_name.split("\u2014")[0].strip() if "\u2014" in series_name else series_name
+
+        st.markdown(
+            f'<div style="background:#1a1a2e;border:1px solid #2a2a45;border-radius:10px;'
+            f'padding:16px 20px;margin-bottom:10px;">'
+            f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
+            f'<span style="background:{color};color:white;padding:3px 10px;border-radius:6px;'
+            f'font-size:12px;font-weight:700;">{badge}</span>'
+            f'<span style="font-size:14px;font-weight:700;color:#e8e8f0;">{short_name}</span>'
+            f'<span style="font-size:12px;color:#8888a8;margin-left:auto;">{len(skus)} SKUs</span>'
+            f'</div>'
+            f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{sku_pills}</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+
+def _render_rp_result(code_upper, result, rp_products):
+    """Display a Royal Purple product match."""
+    color = result["color"]
+
+    # Find full series data
+    series_data = None
+    sku_data = None
+    for sname, sdata in rp_products.items():
+        for sku in sdata.get("skus", []):
+            if sku["code"].upper() == code_upper:
+                series_data = {**sdata, "_name": sname}
+                sku_data = sku
+                break
+        if sku_data:
+            break
+
+    st.markdown(
+        f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:24px;">'
+        f'<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">'
+        f'<span style="background:{color};color:white;padding:8px 18px;border-radius:8px;'
+        f'font-size:22px;font-weight:800;">{code_upper}</span>'
+        f'<div>'
+        f'<div style="font-size:16px;font-weight:700;color:#e8e8f0;">Royal Purple</div>'
+        f'<div style="font-size:13px;color:#8888a8;">{result["series"]}</div>'
+        f'</div>'
+        f'<div style="margin-left:auto;background:rgba(5,150,105,0.15);color:#10B981;'
+        f'padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;">RP PRODUCT</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    if series_data and sku_data:
+        rows = ""
+        rows += _detail_row("Product Line", series_data["_name"])
+        if sku_data.get("viscosity"):
+            rows += _detail_row("Viscosity", sku_data["viscosity"])
+        if sku_data.get("notes"):
+            rows += _detail_row("Application", sku_data["notes"])
+        if series_data.get("description"):
+            rows += _detail_row("Description", series_data["description"])
+        if series_data.get("application"):
+            rows += _detail_row("Best For", series_data["application"])
+
+        st.markdown(
+            f'<table style="font-size:13px;border-collapse:collapse;width:100%;">{rows}</table>',
+            unsafe_allow_html=True,
+        )
+
+        # Show other SKUs in same line
+        other_skus = [s for s in series_data.get("skus", []) if s["code"].upper() != code_upper]
+        if other_skus:
+            pills = " ".join(
+                f'<span style="background:rgba(255,255,255,0.06);border:1px solid #2a2a45;'
+                f'padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;color:#e8e8f0;">'
+                f'{s["code"]} {s["viscosity"]}</span>'
+                for s in other_skus
+            )
+            st.markdown(
+                f'<div style="margin-top:14px;padding-top:14px;border-top:1px solid #2a2a45;">'
+                f'<div style="font-size:11px;font-weight:600;color:#8888a8;text-transform:uppercase;'
+                f'letter-spacing:1.5px;margin-bottom:6px;">Other SKUs in {series_data.get("badge", "this")} Series</div>'
+                f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{pills}</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+def _render_competitor_result(code_upper, result, rp_products):
+    """Display a competitor product match with RP replacement suggestions."""
+    color = result["color"]
+
+    st.markdown(
+        f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:24px;">'
+        f'<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">'
+        f'<span style="background:{color};color:white;padding:8px 18px;border-radius:8px;'
+        f'font-size:22px;font-weight:800;">{code_upper}</span>'
+        f'<div>'
+        f'<div style="font-size:16px;font-weight:700;color:{color};">{result["brand"]}</div>'
+        f'<div style="font-size:13px;color:#8888a8;">{result["series"]}</div>'
+        f'</div>'
+        f'<div style="margin-left:auto;background:rgba(220,38,38,0.15);color:#F87171;'
+        f'padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;">COMPETITOR</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    rows = ""
+    rows += _detail_row("Brand", result["brand"])
+    rows += _detail_row("Type", result["series"])
+    rows += _detail_row("Product", result["viscosity"])
+    st.markdown(
+        f'<table style="font-size:13px;border-collapse:collapse;width:100%;">{rows}</table>',
+        unsafe_allow_html=True,
+    )
+
+    if result.get("notes"):
+        st.markdown(
+            f'<div style="margin-top:14px;background:rgba(75,45,138,0.08);border-left:3px solid #4B2D8A;'
+            f'padding:10px 14px;border-radius:0 8px 8px 0;">'
+            f'<span style="font-size:11px;font-weight:700;color:#C4B5E8;text-transform:uppercase;'
+            f'letter-spacing:1px;">Conversion Strategy</span><br>'
+            f'<span style="font-size:13px;color:#e8e8f0;">{result["notes"]}</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+    # Find RP replacements by viscosity match
+    rp_replacements = _find_rp_replacements(result["viscosity"], rp_products)
+    if rp_replacements:
+        st.markdown(
+            f'<div style="margin-top:14px;padding-top:14px;border-top:1px solid #2a2a45;">'
+            f'<div style="font-size:11px;font-weight:700;color:#10B981;text-transform:uppercase;'
+            f'letter-spacing:1.5px;margin-bottom:8px;">Royal Purple Replacements</div>',
+            unsafe_allow_html=True,
+        )
+        for code, series_name, rp_color, visc in rp_replacements:
+            short_name = series_name.split("\u2014")[0].strip() if "\u2014" in series_name else series_name
+            st.markdown(
+                f'<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(16,185,129,0.08);'
+                f'border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:8px 14px;margin-right:8px;margin-bottom:6px;">'
+                f'<span style="background:{rp_color};color:white;padding:2px 8px;border-radius:4px;'
+                f'font-size:12px;font-weight:700;">{code}</span>'
+                f'<span style="color:#e8e8f0;font-size:13px;font-weight:600;">{short_name}</span>'
+                f'<span style="color:#8888a8;font-size:12px;">{visc}</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+def _render_misc_result(code_upper, result, cat):
+    """Display a service tier or spec flag match."""
+    color = result["color"]
+    label = "Service Tier" if cat == "service_tier" else "Spec Flag"
+    tag_color = "#64748B" if cat == "service_tier" else "#94A3B8"
+
+    st.markdown(
+        f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:24px;">'
+        f'<div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">'
+        f'<span style="background:{color};color:white;padding:8px 18px;border-radius:8px;'
+        f'font-size:22px;font-weight:800;">{code_upper}</span>'
+        f'<div>'
+        f'<div style="font-size:16px;font-weight:700;color:#e8e8f0;">{label}</div>'
+        f'<div style="font-size:13px;color:#8888a8;">Not an oil product</div>'
+        f'</div>'
+        f'<div style="margin-left:auto;background:rgba(100,116,139,0.15);color:{tag_color};'
+        f'padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700;">{label.upper()}</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    rows = ""
+    rows += _detail_row("Type", result["series"])
+    rows += _detail_row("Name", result["viscosity"])
+    if result.get("notes"):
+        rows += _detail_row("Details", result["notes"])
+    st.markdown(
+        f'<table style="font-size:13px;border-collapse:collapse;width:100%;">{rows}</table>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div style="margin-top:12px;font-size:12px;color:#8888a8;">'
+        'This code appears on invoices alongside oil codes but does not represent an oil product. '
+        'It can be safely ignored when classifying oil brand usage.'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+def _detail_row(label, value):
     return (
-        f'<span style="background:{bg_color};color:{text_color};padding:2px 9px;'
-        f'border-radius:10px;font-size:{size}px;font-weight:700;'
-        f'white-space:nowrap;display:inline-block;">{text}</span>'
+        f'<tr>'
+        f'<td style="padding:8px 16px 8px 0;color:#8888a8;font-weight:600;white-space:nowrap;'
+        f'vertical-align:top;width:120px;">{label}</td>'
+        f'<td style="padding:8px 0;color:#e8e8f0;">{value}</td>'
+        f'</tr>'
     )
 
 
+def _find_rp_replacements(product_text, rp_products):
+    """Find RP products matching the viscosity in a competitor product string."""
+    viscosity_raw = product_text.replace("-", "").replace(" ", "").upper()
+    viscosity_grades = [
+        ("0W16", "0W-16"), ("0W20", "0W-20"), ("5W20", "5W-20"), ("5W30", "5W-30"),
+        ("5W40", "5W-40"), ("0W40", "0W-40"), ("10W30", "10W-30"), ("10W40", "10W-40"),
+        ("15W40", "15W-40"), ("20W50", "20W-50"),
+    ]
+    replacements = []
+    for v_str, v_display in viscosity_grades:
+        if v_str in viscosity_raw:
+            for sname, sdata in rp_products.items():
+                for sku in sdata.get("skus", []):
+                    if sku.get("viscosity", "").replace("-", "").replace(" ", "").upper() == v_str:
+                        replacements.append((sku["code"], sname, sdata.get("color", "#4B2D8A"), sku["viscosity"]))
+            break
+    return replacements
+
+
+def _try_prefix_lookup(code, rp_products):
+    """Attempt prefix-based identification for unknown codes."""
+    RP_PREFIXES = [
+        ("XPR", "Royal Purple", "XPR Series — Extreme Performance Racing", "#B91C1C"),
+        ("HPS", "Royal Purple", "HPS Series — High Performance Street", "#7C3AED"),
+        ("HMX", "Royal Purple", "HMX Series — High Mileage Synthetic", "#7C3AED"),
+        ("RMS", "Royal Purple", "HMX Series — High Mileage Synthetic", "#7C3AED"),
+        ("RSD", "Royal Purple", "Duralec — Diesel Synthetic", "#1D4ED8"),
+        ("RS", "Royal Purple", "HP API Series — High Performance Synthetic", "#4B2D8A"),
+        ("RP", "Royal Purple", "RP Synthetic", "#059669"),
+    ]
+    COMP_PREFIXES = [
+        ("S0W", "CAM2", "Full Synthetic", "#DC2626"),
+        ("S5W", "CAM2", "Full Synthetic", "#DC2626"),
+        ("VS", "Valvoline", "Full Synthetic", "#EA580C"),
+        ("VM", "Valvoline", "MaxLife", "#EA580C"),
+        ("VB", "Valvoline", "Conventional", "#EA580C"),
+        ("VE", "Valvoline", "Conventional", "#EA580C"),
+        ("M0W", "Mobil 1", "Full Synthetic", "#B91C1C"),
+        ("M5W", "Mobil 1", "Full Synthetic", "#B91C1C"),
+        ("CS", "Castrol", "Edge Synthetic", "#16A34A"),
+        ("PS", "Pennzoil", "Platinum Syn", "#CA8A04"),
+        ("PU", "Pennzoil", "Ultra Platinum", "#CA8A04"),
+        ("PB", "Pennzoil", "Conventional", "#CA8A04"),
+    ]
+
+    for prefix, brand, series, color in RP_PREFIXES:
+        if code.startswith(prefix) and any(c.isdigit() for c in code):
+            st.markdown(
+                f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
+                f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+                f'<span style="background:rgba(5,150,105,0.15);color:#10B981;padding:4px 10px;'
+                f'border-radius:6px;font-size:12px;font-weight:700;">LIKELY RP</span>'
+                f'<span style="font-weight:700;color:#e8e8f0;font-size:15px;">{series}</span>'
+                f'</div>'
+                f'<p style="font-size:13px;color:#8888a8;margin:0;">Code <strong style="color:#e8e8f0;">{code}</strong> '
+                f'matches the <strong style="color:#e8e8f0;">{prefix}*</strong> prefix pattern. '
+                f'Not yet in the database — add it via the Admin page to confirm.</p>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+            return
+
+    for prefix, brand, series, color in COMP_PREFIXES:
+        if code.startswith(prefix):
+            st.markdown(
+                f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
+                f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+                f'<span style="background:rgba(220,38,38,0.15);color:#F87171;padding:4px 10px;'
+                f'border-radius:6px;font-size:12px;font-weight:700;">LIKELY COMPETITOR</span>'
+                f'<span style="font-weight:700;color:#e8e8f0;font-size:15px;">{brand} — {series}</span>'
+                f'</div>'
+                f'<p style="font-size:13px;color:#8888a8;margin:0;">Code <strong style="color:#e8e8f0;">{code}</strong> '
+                f'matches the <strong style="color:#e8e8f0;">{prefix}*</strong> prefix for '
+                f'<strong style="color:#e8e8f0;">{brand} {series}</strong>. '
+                f'Not yet in the database — add it via the Admin page to confirm.</p>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+            # Still show RP replacements
+            rp_replacements = _find_rp_replacements(code, {k: v for k, v in rp_products.items()})
+            if rp_replacements:
+                st.markdown(
+                    '<div style="margin-top:10px;font-size:11px;font-weight:700;color:#10B981;'
+                    'text-transform:uppercase;letter-spacing:1.5px;">Possible RP Replacements</div>',
+                    unsafe_allow_html=True,
+                )
+                for rp_code, sname, rp_color, visc in rp_replacements:
+                    short = sname.split("\u2014")[0].strip() if "\u2014" in sname else sname
+                    st.markdown(
+                        f'<span style="display:inline-block;background:rgba(16,185,129,0.08);'
+                        f'border:1px solid rgba(16,185,129,0.2);border-radius:6px;padding:4px 10px;'
+                        f'margin-right:6px;font-size:12px;">'
+                        f'<span style="color:{rp_color};font-weight:700;">{rp_code}</span> '
+                        f'<span style="color:#8888a8;">{short} {visc}</span></span>',
+                        unsafe_allow_html=True,
+                    )
+            return
+
+    st.markdown(
+        f'<div style="background:#1a1a2e;border:2px solid #64748B;border-radius:12px;padding:20px 24px;">'
+        f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+        f'<span style="background:rgba(100,116,139,0.15);color:#94A3B8;padding:4px 10px;'
+        f'border-radius:6px;font-size:12px;font-weight:700;">NOT RECOGNIZED</span>'
+        f'<span style="font-weight:700;color:#e8e8f0;font-size:15px;">{code}</span>'
+        f'</div>'
+        f'<p style="font-size:13px;color:#8888a8;margin:0;">'
+        f'This code doesn\'t match any known brand prefix. '
+        f'It may be an ancillary item (filter, wiper, air freshener), a spec flag, or a new SKU. '
+        f'You can add it via the Admin page.</p>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# RP CATALOG — clean card-based view of all Royal Purple products
+# ═══════════════════════════════════════════════════════════════════════
+
 def _render_rp_catalog(db):
     rp_products = db.get("rp_products", {})
-    st.markdown("### Royal Purple Product Catalog")
-    st.caption("Complete Royal Purple product reference — all SKUs, viscosities, and application details from the 2025 product guide.")
-    st.markdown("")
 
     if not rp_products:
-        st.info("No RP products defined. Add them in the Admin panel.")
+        st.info("No RP products defined. Add them in the Admin page.")
         return
 
     for series_name, series in rp_products.items():
         badge_color = series.get("color", "#4B2D8A")
         badge_label = series.get("badge", "RP")
         skus = series.get("skus", [])
+        description = series.get("description", "")
+        application = series.get("application", "")
+        short_name = series_name.split("\u2014")[0].strip() if "\u2014" in series_name else series_name
 
-        with st.expander(f"**{series_name}** — {len(skus)} SKU{'s' if len(skus) != 1 else ''}", expanded=True):
-            col_info, col_skus = st.columns([2, 3])
-            with col_info:
-                st.markdown(
-                    f'{_badge(badge_label, badge_color, size=12)}&nbsp;&nbsp;'
-                    f'<span style="color:#4B2D8A;font-weight:600;font-size:14px;">{series_name}</span>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown(
-                    f'<p style="color:#475569;font-size:13px;margin-top:6px;">{series.get("description","")}</p>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown(
-                    f'<p style="color:#94A3B8;font-size:12px;"><strong>Best for:</strong> {series.get("application","")}</p>',
-                    unsafe_allow_html=True,
-                )
-            with col_skus:
-                for sku in skus:
-                    cols = st.columns([1, 2, 3])
-                    with cols[0]:
-                        st.markdown(
-                            f'<div style="background:{badge_color};color:white;padding:4px 8px;border-radius:6px;'
-                            f'font-size:12px;font-weight:700;text-align:center;">{sku["code"]}</div>',
-                            unsafe_allow_html=True,
-                        )
-                    with cols[1]:
-                        st.markdown(
-                            f'<div style="font-size:13px;font-weight:600;color:#1E293B;padding-top:4px;">{sku["viscosity"]}</div>',
-                            unsafe_allow_html=True,
-                        )
-                    with cols[2]:
-                        st.markdown(
-                            f'<div style="font-size:12px;color:#64748B;padding-top:5px;">{sku.get("notes","")}</div>',
-                            unsafe_allow_html=True,
-                        )
-            st.markdown("")
-
-
-def _render_code_lookup(db, all_codes):
-    st.markdown("### SKU Lookup")
-    st.caption("Search any Royal Purple or competitor SKU to see full product details from the product reference guide.")
-    st.markdown("")
-
-    search = st.text_input(
-        "SKU search",
-        placeholder="e.g. RS5W30, HMX0W20, HPS10W40, VS0W20, 01320...",
-        label_visibility="collapsed",
-    )
-
-    rp_products = db.get("rp_products", {})
-
-    if search:
-        code_upper = search.strip().upper()
-        result = all_codes.get(code_upper)
-
-        if result:
-            cat = result["category"]
-            color = result["color"]
-
-            if cat == "rp":
-                series_data = None
-                sku_data = None
-                for sname, sdata in rp_products.items():
-                    for sku in sdata.get("skus", []):
-                        if sku["code"].upper() == code_upper:
-                            series_data = sdata
-                            series_data["_name"] = sname
-                            sku_data = sku
-                            break
-                    if sku_data:
-                        break
-
-                st.markdown(
-                    f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
-                    f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
-                    f'<span style="background:{color};color:white;padding:6px 16px;border-radius:8px;font-size:20px;font-weight:700;">{code_upper}</span>'
-                    f'<div>'
-                    f'<div style="font-size:15px;font-weight:700;color:#e8e8f0;">Royal Purple</div>'
-                    f'<div style="font-size:12px;color:#8888a8;">{result["series"]}</div>'
-                    f'</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-
-                if series_data and sku_data:
-                    badge_label = series_data.get("badge", "RP")
-                    visc = sku_data.get("viscosity", "")
-                    notes = sku_data.get("notes", "")
-                    desc = series_data.get("description", "")
-                    application = series_data.get("application", "")
-
-                    detail_rows = f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Product Line</td><td style="padding:6px 0;color:#e8e8f0;font-weight:600;">{series_data["_name"]}</td></tr>'
-                    if visc:
-                        detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Viscosity</td><td style="padding:6px 0;color:#e8e8f0;">{visc}</td></tr>'
-                    if notes:
-                        detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Application</td><td style="padding:6px 0;color:#C4B5E8;">{notes}</td></tr>'
-                    if desc:
-                        detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Description</td><td style="padding:6px 0;color:#475569;font-size:12px;line-height:1.6;">{desc}</td></tr>'
-                    if application:
-                        detail_rows += f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;vertical-align:top;">Best For</td><td style="padding:6px 0;color:#475569;font-size:12px;">{application}</td></tr>'
-
-                    st.markdown(
-                        f'<table style="font-size:13px;color:#C4B5E8;border-collapse:collapse;width:100%;margin-top:4px;">'
-                        f'{detail_rows}'
-                        f'</table>',
-                        unsafe_allow_html=True,
-                    )
-
-                    other_skus = [s for s in series_data.get("skus", []) if s["code"].upper() != code_upper]
-                    if other_skus:
-                        pills = " ".join(
-                            f'<span style="background:{color}18;color:{color};padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;">{s["code"]} {s["viscosity"]}</span>'
-                            for s in other_skus
-                        )
-                        st.markdown(
-                            f'<div style="margin-top:12px;padding-top:12px;border-top:1px solid #E5E7EB;">'
-                            f'<div style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Other SKUs in this line</div>'
-                            f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{pills}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True,
-                        )
-
-                st.markdown('</div>', unsafe_allow_html=True)
-
-            elif cat == "competitor":
-                st.markdown(
-                    f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
-                    f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
-                    f'<span style="background:{color};color:white;padding:6px 16px;border-radius:8px;font-size:20px;font-weight:700;">{code_upper}</span>'
-                    f'<div>'
-                    f'<div style="font-size:15px;font-weight:700;color:{color};">Competitor SKU</div>'
-                    f'<div style="font-size:12px;color:#8888a8;">{result["brand"]}</div>'
-                    f'</div>'
-                    f'</div>'
-                    f'<table style="font-size:13px;color:#C4B5E8;border-collapse:collapse;width:100%">'
-                    f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;">Brand</td><td style="padding:6px 0;font-weight:600;color:#e8e8f0;">{result["brand"]}</td></tr>'
-                    f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;">Type</td><td style="padding:6px 0;">{result["series"]}</td></tr>'
-                    f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;white-space:nowrap;">Product</td><td style="padding:6px 0;">{result["viscosity"]}</td></tr>'
-                    f'</table>',
-                    unsafe_allow_html=True,
-                )
-
-                if result.get("notes"):
-                    st.markdown(
-                        f'<div style="margin-top:12px;padding-top:12px;border-top:1px solid #E5E7EB;">'
-                        f'<div style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Conversion Note</div>'
-                        f'<div style="font-size:12px;color:#475569;">{result["notes"]}</div>'
-                        f'</div>',
-                        unsafe_allow_html=True,
-                    )
-
-                viscosity_raw = result["viscosity"].replace("-", "").replace(" ", "").upper()
-                rp_replacements = []
-                for v_str, v_display in [("0W16","0W-16"),("0W20","0W-20"),("5W20","5W-20"),("5W30","5W-30"),("5W40","5W-40"),("0W40","0W-40"),("10W30","10W-30"),("10W40","10W-40"),("15W40","15W-40"),("20W50","20W-50")]:
-                    if v_str in viscosity_raw:
-                        for sname, sdata in rp_products.items():
-                            for sku in sdata.get("skus", []):
-                                if sku.get("viscosity","").replace("-","").replace(" ","").upper() == v_str:
-                                    rp_replacements.append((sku["code"], sname, sdata.get("color","#4B2D8A"), sku["viscosity"]))
-                        break
-
-                if rp_replacements:
-                    pills = " ".join(
-                        f'<span style="background:{c}18;color:{c};padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;">{code} — {sn.split("—")[0].strip()}</span>'
-                        for code, sn, c, v in rp_replacements
-                    )
-                    st.markdown(
-                        f'<div style="margin-top:12px;padding-top:12px;border-top:1px solid #E5E7EB;">'
-                        f'<div style="font-size:11px;font-weight:600;color:#16A34A;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Royal Purple Replacements</div>'
-                        f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{pills}</div>'
-                        f'</div>',
-                        unsafe_allow_html=True,
-                    )
-                st.markdown('</div>', unsafe_allow_html=True)
-
-            else:
-                st.markdown(
-                    f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:12px;padding:20px 24px;">'
-                    f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">'
-                    f'<span style="background:{color};color:white;padding:6px 16px;border-radius:8px;font-size:20px;font-weight:700;">{code_upper}</span>'
-                    f'<span style="font-size:14px;font-weight:700;color:{color};">{"Service Tier" if cat == "service_tier" else "Spec Flag"}</span>'
-                    f'</div>'
-                    f'<table style="font-size:13px;color:#C4B5E8;border-collapse:collapse;width:100%">'
-                    f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;">Type</td><td style="padding:6px 0;">{result["series"]}</td></tr>'
-                    f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;">Description</td><td style="padding:6px 0;">{result["viscosity"]}</td></tr>'
-                    f'<tr><td style="padding:6px 16px 6px 0;color:#94A3B8;font-weight:600;">Notes</td><td style="padding:6px 0;">{result["notes"]}</td></tr>'
-                    f'</table>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-        else:
-            _try_prefix_lookup(code_upper)
-    else:
-        st.markdown("")
         st.markdown(
-            '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#666;text-transform:uppercase;margin-bottom:8px;">Quick Reference</div>',
+            f'<div style="background:#1a1a2e;border:1px solid #2a2a45;border-radius:12px;'
+            f'padding:20px 24px;margin-bottom:12px;">'
+            f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">'
+            f'<span style="background:{badge_color};color:white;padding:4px 12px;border-radius:6px;'
+            f'font-size:13px;font-weight:700;">{badge_label}</span>'
+            f'<span style="font-size:16px;font-weight:700;color:#e8e8f0;">{series_name}</span>'
+            f'<span style="font-size:12px;color:#8888a8;margin-left:auto;">{len(skus)} SKUs</span>'
+            f'</div>',
             unsafe_allow_html=True,
         )
-        quick_ref = []
-        for sname, sdata in rp_products.items():
-            color = sdata.get("color", "#4B2D8A")
-            badge = sdata.get("badge", "RP")
-            skus = sdata.get("skus", [])
-            if skus:
-                viscosities = ", ".join(s["viscosity"] for s in skus[:4] if s.get("viscosity"))
-                extra = f" +{len(skus)-4} more" if len(skus) > 4 else ""
-                quick_ref.append((sname, badge, color, viscosities + extra, len(skus)))
 
-        cols = st.columns(min(len(quick_ref), 3))
-        for i, (sname, badge, color, visc_list, count) in enumerate(quick_ref):
-            with cols[i % 3]:
-                short_name = sname.split("—")[0].strip() if "—" in sname else sname
-                st.markdown(
-                    f'<div style="border:1px solid #2a2a45;border-radius:10px;padding:14px 16px;margin-bottom:10px;">'
-                    f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
-                    f'<span style="background:{color};color:white;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;">{badge}</span>'
-                    f'<span style="font-size:13px;font-weight:600;color:#e8e8f0;">{short_name}</span>'
+        if description:
+            st.markdown(
+                f'<p style="font-size:13px;color:#8888a8;line-height:1.6;margin:0 0 8px;">{description}</p>',
+                unsafe_allow_html=True,
+            )
+        if application:
+            st.markdown(
+                f'<p style="font-size:12px;color:#C4B5E8;margin:0 0 14px;">'
+                f'<strong>Best for:</strong> {application}</p>',
+                unsafe_allow_html=True,
+            )
+
+        # SKU table
+        if skus:
+            header = (
+                '<div style="display:grid;grid-template-columns:100px 80px 1fr;gap:8px;'
+                'padding:6px 0;border-bottom:1px solid #2a2a45;margin-bottom:4px;">'
+                '<span style="font-size:10px;font-weight:700;color:#8888a8;text-transform:uppercase;letter-spacing:1px;">Code</span>'
+                '<span style="font-size:10px;font-weight:700;color:#8888a8;text-transform:uppercase;letter-spacing:1px;">Viscosity</span>'
+                '<span style="font-size:10px;font-weight:700;color:#8888a8;text-transform:uppercase;letter-spacing:1px;">Application</span>'
+                '</div>'
+            )
+            rows = ""
+            for sku in skus:
+                rows += (
+                    f'<div style="display:grid;grid-template-columns:100px 80px 1fr;gap:8px;'
+                    f'padding:8px 0;border-bottom:1px solid rgba(42,42,69,0.5);">'
+                    f'<span style="font-size:13px;font-weight:700;color:{badge_color};">{sku["code"]}</span>'
+                    f'<span style="font-size:13px;color:#e8e8f0;">{sku["viscosity"]}</span>'
+                    f'<span style="font-size:12px;color:#8888a8;">{sku.get("notes", "")}</span>'
                     f'</div>'
-                    f'<div style="font-size:11px;color:#8888a8;">{count} SKUs: {visc_list}</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
                 )
+            st.markdown(header + rows, unsafe_allow_html=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
-def _try_prefix_lookup(code):
-    RP_PREFIXES = [
-        ("XPR", "Royal Purple", "XPR Series — Extreme Performance Racing", "#B91C1C"),
-        ("HPS", "Royal Purple", "HPS Series — High Performance Street",    "#7C3AED"),
-        ("HMX", "Royal Purple", "HMX Series — High Mileage Synthetic",    "#7C3AED"),
-        ("RMS", "Royal Purple", "HMX Series — High Mileage Synthetic",    "#7C3AED"),
-        ("RSD", "Royal Purple", "Duralec — Diesel Synthetic",              "#1D4ED8"),
-        ("RS",  "Royal Purple", "HP API Series — High Performance Synthetic", "#4B2D8A"),
-        ("RP",  "Royal Purple", "RP Synthetic",                            "#059669"),
-    ]
-    COMP_PREFIXES = [
-        ("S0W", "CAM2",      "Full Synthetic",  "#DC2626"),
-        ("S5W", "CAM2",      "Full Synthetic",  "#DC2626"),
-        ("VS",  "Valvoline", "Full Synthetic",  "#EA580C"),
-        ("VM",  "Valvoline", "MaxLife",         "#EA580C"),
-        ("VB",  "Valvoline", "Conventional",    "#EA580C"),
-        ("VE",  "Valvoline", "Conventional",    "#EA580C"),
-        ("M0W", "Mobil 1",   "Full Synthetic",  "#B91C1C"),
-        ("M5W", "Mobil 1",   "Full Synthetic",  "#B91C1C"),
-        ("CS",  "Castrol",   "Edge Synthetic",  "#16A34A"),
-        ("PS",  "Pennzoil",  "Platinum Syn",    "#CA8A04"),
-        ("PU",  "Pennzoil",  "Ultra Platinum",  "#CA8A04"),
-        ("PB",  "Pennzoil",  "Conventional",    "#CA8A04"),
-    ]
-    for prefix, brand, series, color in RP_PREFIXES:
-        if code.startswith(prefix) and any(c.isdigit() for c in code):
-            st.markdown(
-                f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:10px;padding:16px 20px;">'
-                f'<div style="font-weight:700;color:{color};font-size:15px;margin-bottom:8px;">✅ Likely Royal Purple — {series}</div>'
-                f'<p style="font-size:13px;color:#475569;">Code <strong>{code}</strong> matches the <strong>{prefix}*</strong> prefix pattern. '
-                f'Not in the known SKU list — add it in the Admin panel if confirmed.</p>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-            return
-    for prefix, brand, series, color in COMP_PREFIXES:
-        if code.startswith(prefix):
-            st.markdown(
-                f'<div style="background:#1a1a2e;border:2px solid {color};border-radius:10px;padding:16px 20px;">'
-                f'<div style="font-weight:700;color:{color};font-size:15px;margin-bottom:8px;">⚠️ Likely Competitor — {brand} {series}</div>'
-                f'<p style="font-size:13px;color:#475569;">Code <strong>{code}</strong> matches the <strong>{prefix}*</strong> prefix pattern for <strong>{brand} {series}</strong>. '
-                f'Not in the known SKU list — add it in the Admin panel if confirmed.</p>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-            return
-    st.warning(
-        f'**"{code}"** is not in the known SKU list and doesn\'t match any known brand prefix. '
-        f'It may be an ancillary item (filter, wiper, air freshener), a spec flag, or a new SKU. '
-        f'Add it in the Admin panel if needed.'
-    )
-
+# ═══════════════════════════════════════════════════════════════════════
+# COMPETITOR REFERENCE — grouped by brand with conversion notes
+# ═══════════════════════════════════════════════════════════════════════
 
 def _render_competitor_brands(db):
     competitor_brands = db.get("competitor_brands", [])
     service_tiers = db.get("service_tiers", [])
     spec_flags = db.get("spec_flags", [])
 
-    st.markdown("### Competitor Brand Reference")
-    st.caption("All known competitor oil SKUs grouped by brand, with conversion strategies for each.")
-    st.markdown("")
-
     if not competitor_brands:
-        st.info("No competitor brands defined. Add them in the Admin panel.")
+        st.info("No competitor brands defined. Add them in the Admin page.")
     else:
         for brand_data in competitor_brands:
             color = brand_data.get("color", "#DC2626")
             codes = brand_data.get("codes", [])
-            with st.expander(f"**{brand_data['brand']}** — {brand_data.get('type','')} — {len(codes)} known codes"):
-                note = brand_data.get("conversion_note", "")
-                if note:
+            note = brand_data.get("conversion_note", "")
+
+            st.markdown(
+                f'<div style="background:#1a1a2e;border:1px solid #2a2a45;border-radius:12px;'
+                f'padding:20px 24px;margin-bottom:12px;">'
+                f'<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">'
+                f'<span style="background:{color};color:white;padding:4px 12px;border-radius:6px;'
+                f'font-size:13px;font-weight:700;">{brand_data["brand"]}</span>'
+                f'<span style="font-size:13px;color:#8888a8;">{brand_data.get("type", "")}</span>'
+                f'<span style="font-size:12px;color:#8888a8;margin-left:auto;">{len(codes)} codes</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+            if note:
+                st.markdown(
+                    f'<div style="background:rgba(75,45,138,0.06);border-left:3px solid {color};'
+                    f'padding:8px 14px;border-radius:0 8px 8px 0;margin-bottom:12px;">'
+                    f'<span style="font-size:11px;font-weight:700;color:{color};text-transform:uppercase;'
+                    f'letter-spacing:1px;">Conversion Strategy</span><br>'
+                    f'<span style="font-size:13px;color:#e8e8f0;">{note}</span>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+
+            if codes:
+                pills = " ".join(
+                    f'<span style="display:inline-block;background:rgba(255,255,255,0.04);'
+                    f'border:1px solid #2a2a45;border-radius:6px;padding:6px 12px;margin-bottom:6px;">'
+                    f'<span style="font-weight:700;color:{color};font-size:12px;">{sku["code"]}</span> '
+                    f'<span style="color:#8888a8;font-size:12px;">'
+                    f'{sku.get("product", sku.get("name", ""))}</span></span>'
+                    for sku in codes
+                )
+                st.markdown(
+                    f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{pills}</div>',
+                    unsafe_allow_html=True,
+                )
+
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    # Service tiers & spec flags
+    if service_tiers or spec_flags:
+        st.markdown("---")
+        st.markdown(
+            '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#8888a8;'
+            'text-transform:uppercase;margin-bottom:8px;">Non-Product Codes (ignore when classifying)</div>',
+            unsafe_allow_html=True,
+        )
+
+        col_tier, col_spec = st.columns(2)
+        with col_tier:
+            if service_tiers:
+                st.markdown("**Service Tiers**")
+                for item in service_tiers:
                     st.markdown(
-                        f'<div style="background:{color}11;border-left:4px solid {color};padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:12px;">'
-                        f'<span style="font-size:12px;color:{color};font-weight:600;">Conversion Strategy:</span>'
-                        f'<span style="font-size:13px;color:#C4B5E8;"> {note}</span>'
+                        f'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">'
+                        f'<span style="font-weight:700;color:#64748B;font-size:13px;min-width:40px;">{item["code"]}</span>'
+                        f'<span style="font-size:12px;color:#8888a8;">{item.get("name", "")}</span>'
                         f'</div>',
                         unsafe_allow_html=True,
                     )
-                if codes:
-                    cols = st.columns(3)
-                    for i, sku in enumerate(codes):
-                        with cols[i % 3]:
-                            st.markdown(
-                                f'<div style="border:1px solid #E2E8F0;border-radius:6px;padding:8px 10px;margin-bottom:6px;">'
-                                f'<div style="font-weight:700;font-size:13px;color:{color};">{sku["code"]}</div>'
-                                f'<div style="font-size:12px;color:#64748B;">{sku.get("product", sku.get("name", sku["code"]))}</div>'
-                                f'</div>',
-                                unsafe_allow_html=True,
-                            )
-            st.markdown("")
+        with col_spec:
+            if spec_flags:
+                st.markdown("**Spec Flags**")
+                for item in spec_flags:
+                    st.markdown(
+                        f'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">'
+                        f'<span style="font-weight:700;color:#94A3B8;font-size:13px;min-width:60px;">{item["code"]}</span>'
+                        f'<span style="font-size:12px;color:#8888a8;">{item.get("name", "")}: {item.get("description", "")}</span>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
 
-    st.markdown("---")
-    st.markdown("#### Service Tiers & Spec Flags")
-    st.caption("These codes appear on invoices alongside oil codes but do not represent oil products.")
 
-    col_tier, col_spec = st.columns(2)
-    with col_tier:
-        st.markdown("**Service Tier Codes**")
-        for item in service_tiers:
-            st.markdown(
-                f'<div style="border:1px solid #E2E8F0;border-radius:6px;padding:6px 10px;margin-bottom:4px;">'
-                f'<span style="font-weight:700;color:#64748B;font-size:13px;">{item["code"]}</span>'
-                f' <span style="font-size:12px;color:#94A3B8;"> — {item.get("name","")}</span>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-    with col_spec:
-        st.markdown("**Spec Flags**")
-        for item in spec_flags:
-            st.markdown(
-                f'<div style="border:1px solid #E2E8F0;border-radius:6px;padding:6px 10px;margin-bottom:4px;">'
-                f'<span style="font-weight:700;color:#94A3B8;font-size:13px;">{item["code"]}</span>'
-                f' <span style="font-size:12px;color:#94A3B8;"> — {item.get("name","")}: {item.get("description","")}</span>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-
+# ═══════════════════════════════════════════════════════════════════════
+# CONVERSION GUIDE — viscosity crosswalk + segments
+# ═══════════════════════════════════════════════════════════════════════
 
 def _render_conversion_guide(db):
     crosswalk = db.get("viscosity_crosswalk", [])
     segments = db.get("conversion_segments", [])
 
-    st.markdown("### Conversion Guide")
-    st.caption("How to identify and target each conversion segment when analyzing a full-code Duke of Oil export.")
-    st.markdown("")
-
-    st.markdown("#### Viscosity Crosswalk")
-    st.caption("The correct Royal Purple SKU for every viscosity grade a competitor customer might be using.")
+    st.markdown(
+        '<div style="font-size:13px;color:#C4B5E8;margin-bottom:16px;">'
+        'Use this guide when analyzing a Duke of Oil export to identify which Royal Purple product '
+        'replaces each competitor viscosity grade.'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
     if crosswalk:
-        header_cols = st.columns([3, 2, 2, 2])
-        labels = [("CUSTOMER'S CURRENT OIL", "#94A3B8", "#E2E8F0"),
-                  ("→ RS Series", "#4B2D8A", "#4B2D8A"),
-                  ("→ HMX (High Mileage)", "#7C3AED", "#7C3AED"),
-                  ("→ Duralec (Diesel)", "#1D4ED8", "#1D4ED8")]
-        for col, (text, color, border) in zip(header_cols, labels):
-            with col:
-                st.markdown(
-                    f'<div style="font-size:12px;font-weight:700;color:{color};padding-bottom:4px;border-bottom:2px solid {border};">{text}</div>',
-                    unsafe_allow_html=True,
-                )
-        for row in crosswalk:
-            cols = st.columns([3, 2, 2, 2])
-            values = [
-                (row.get("current", ""), "#374151"),
-                (row.get("rs", "—"), "#4B2D8A" if row.get("rs", "—") != "—" else "#CBD5E1"),
-                (row.get("hmx", "—"), "#7C3AED" if row.get("hmx", "—") != "—" else "#CBD5E1"),
-                (row.get("rsd", "—"), "#1D4ED8" if row.get("rsd", "—") != "—" else "#CBD5E1"),
-            ]
-            for col, (val, color) in zip(cols, values):
-                with col:
-                    st.markdown(
-                        f'<div style="padding:8px 0;font-size:13px;font-weight:{"600" if color != "#374151" else "400"};color:{color};border-bottom:1px solid #F1F5F9;">{val}</div>',
-                        unsafe_allow_html=True,
-                    )
-
-    st.markdown("")
-    st.markdown("---")
-    st.markdown("#### Conversion Segments")
-    st.caption("When running the RP classifier against a full-code export, customers fall into these segments.")
-    st.markdown("")
-
-    for seg in segments:
-        color = seg.get("color", "#64748B")
         st.markdown(
-            f'<div style="border:1.5px solid {color};border-radius:10px;padding:14px 18px;margin-bottom:12px;">'
-            f'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
-            f'<span style="font-size:15px;font-weight:700;color:{color};">{seg.get("segment","")}</span>'
-            f'<span style="background:{color};color:white;padding:2px 12px;border-radius:10px;font-size:12px;font-weight:700;">Difficulty: {seg.get("difficulty","")}</span>'
-            f'</div>'
-            f'<div style="font-size:12px;color:#64748B;margin-bottom:6px;"><strong>Codes:</strong> {seg.get("codes","")}</div>'
-            f'<div style="font-size:13px;color:#C4B5E8;margin-bottom:6px;">{seg.get("rationale","")}</div>'
-            f'<div style="font-size:12px;color:{color};font-weight:600;">Suggested RP: {seg.get("suggested_sku","")}</div>'
-            f'</div>',
+            '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#8888a8;'
+            'text-transform:uppercase;margin-bottom:8px;">Viscosity Crosswalk</div>',
             unsafe_allow_html=True,
         )
 
-    st.markdown("")
+        # Header
+        st.markdown(
+            '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;'
+            'padding:8px 0;border-bottom:2px solid #2a2a45;">'
+            '<span style="font-size:11px;font-weight:700;color:#8888a8;">CURRENT OIL</span>'
+            '<span style="font-size:11px;font-weight:700;color:#4B2D8A;">RS SERIES</span>'
+            '<span style="font-size:11px;font-weight:700;color:#7C3AED;">HMX (HIGH MILEAGE)</span>'
+            '<span style="font-size:11px;font-weight:700;color:#1D4ED8;">DURALEC (DIESEL)</span>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        for row in crosswalk:
+            rs_val = row.get("rs", "\u2014")
+            hmx_val = row.get("hmx", "\u2014")
+            rsd_val = row.get("rsd", "\u2014")
+            st.markdown(
+                f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;'
+                f'padding:8px 0;border-bottom:1px solid rgba(42,42,69,0.5);">'
+                f'<span style="font-size:13px;color:#e8e8f0;font-weight:600;">{row.get("current", "")}</span>'
+                f'<span style="font-size:13px;color:{"#4B2D8A" if rs_val != chr(8212) else "#3a3a55"};font-weight:600;">{rs_val}</span>'
+                f'<span style="font-size:13px;color:{"#7C3AED" if hmx_val != chr(8212) else "#3a3a55"};font-weight:600;">{hmx_val}</span>'
+                f'<span style="font-size:13px;color:{"#1D4ED8" if rsd_val != chr(8212) else "#3a3a55"};font-weight:600;">{rsd_val}</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        st.markdown("")
+
+    if segments:
+        st.markdown("---")
+        st.markdown(
+            '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#8888a8;'
+            'text-transform:uppercase;margin-bottom:8px;">Conversion Segments</div>',
+            unsafe_allow_html=True,
+        )
+        st.caption("When classifying a full-code Duke of Oil export, each customer falls into one of these segments.")
+        st.markdown("")
+
+        for seg in segments:
+            color = seg.get("color", "#64748B")
+            st.markdown(
+                f'<div style="background:#1a1a2e;border:1px solid {color};border-radius:10px;'
+                f'padding:16px 20px;margin-bottom:10px;">'
+                f'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+                f'<span style="font-size:15px;font-weight:700;color:{color};">{seg.get("segment", "")}</span>'
+                f'<span style="background:{color};color:white;padding:2px 10px;border-radius:10px;'
+                f'font-size:11px;font-weight:700;">Difficulty: {seg.get("difficulty", "")}</span>'
+                f'</div>'
+                f'<div style="font-size:12px;color:#8888a8;margin-bottom:6px;"><strong>Codes:</strong> {seg.get("codes", "")}</div>'
+                f'<div style="font-size:13px;color:#C4B5E8;margin-bottom:6px;">{seg.get("rationale", "")}</div>'
+                f'<div style="font-size:12px;color:{color};font-weight:600;">Suggested RP: {seg.get("suggested_sku", "")}</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
     st.markdown("---")
-    st.markdown("#### How Invoice-Level Classification Works")
-    st.info(
-        "**Each invoice generates multiple rows** in a full-code export — one per operation code. "
-        "All rows for the same Invoice # share the same revenue total.\n\n"
-        "**Step 1:** Group all rows by Invoice #\n\n"
-        "**Step 2:** Find the oil product code on that invoice (ignore spec flags like GF6/DEXOS1, service tiers like S1–S6, and ancillary items like OF*, AF*, FB)\n\n"
-        "**Step 3:** Classify the oil code as Royal Purple or a specific competitor brand using the prefix rules above\n\n"
-        "**Step 4:** Assign a conversion segment and calculate RP ticket premium vs. competitor avg ticket"
+    st.markdown(
+        '<div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#8888a8;'
+        'text-transform:uppercase;margin-bottom:8px;">How Invoice Classification Works</div>',
+        unsafe_allow_html=True,
     )
+
+    steps = [
+        ("1", "Group all rows by Invoice #", "Each invoice generates multiple rows in a full-code export — one per operation code. All rows share the same revenue total."),
+        ("2", "Find the oil product code", "Ignore spec flags (GF6, DEXOS1), service tiers (S1-S6), and ancillary items (OF*, AF*, FB)."),
+        ("3", "Classify the oil code", "Use the prefix rules above to identify Royal Purple vs. specific competitor brands."),
+        ("4", "Assign conversion segment", "Calculate the RP ticket premium vs. competitor average ticket."),
+    ]
+
+    for num, title, desc in steps:
+        st.markdown(
+            f'<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;">'
+            f'<span style="background:#4B2D8A;color:white;min-width:28px;height:28px;border-radius:50%;'
+            f'display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">{num}</span>'
+            f'<div>'
+            f'<div style="font-size:13px;font-weight:700;color:#e8e8f0;">{title}</div>'
+            f'<div style="font-size:12px;color:#8888a8;">{desc}</div>'
+            f'</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
