@@ -18,6 +18,7 @@ import profit_calculator
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RP_Synthetic_Expert_Logo_Black_Text.png")
 LOGO_SIDEBAR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "RPMO_logo_BF_Outline.png")
 LOGO_NEVER_SETTLE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "25-RYP-02147 Employee LinkedIn Thumbnails P1-6.jpg")
+COCKPIT_HERO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "cockpit_hero.png")
 
 st.set_page_config(
     page_title="Royal Purple CockPit | Butler Performance Analytics",
@@ -142,25 +143,51 @@ def page_header(title, subtitle):
 
 
 if nav == "Home":
-    st.markdown(
-        """
-        <div style="background:linear-gradient(135deg,#1E0F3C 0%,#2D1B5E 40%,#4B2D8A 80%,#6B3FA0 100%);
-                    border-radius:14px;padding:48px 42px 40px;margin-bottom:28px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;right:0;width:300px;height:100%;
-                        background:radial-gradient(circle at 80% 30%,rgba(107,63,160,0.5) 0%,transparent 70%);"></div>
-            <div style="font-size:42px;font-weight:900;color:#FFFFFF;line-height:1.1;margin-bottom:4px;
-                        letter-spacing:-0.5px;">Royal Purple CockPit</div>
-            <div style="font-size:12px;font-weight:600;letter-spacing:2px;color:#C4B5E8;
-                        text-transform:uppercase;margin-bottom:16px;">Powered by Butler Performance Analytics</div>
-            <div style="font-size:15px;color:#C4B5E8;max-width:620px;line-height:1.7;">
-                Your centralized command center for Royal Purple installer analytics,
-                customer mapping, and product intelligence.
-                Upload reports, explore your network, and manage your product database — all in one place.
+    import base64 as _b64
+
+    _hero_b64 = ""
+    if os.path.exists(COCKPIT_HERO_PATH):
+        with open(COCKPIT_HERO_PATH, "rb") as _hf:
+            _hero_b64 = _b64.b64encode(_hf.read()).decode()
+
+    if _hero_b64:
+        st.markdown(
+            f"""
+            <div style="position:relative;border-radius:14px;overflow:hidden;margin-bottom:28px;">
+                <img src="data:image/png;base64,{_hero_b64}"
+                     style="width:100%;display:block;border-radius:14px;filter:brightness(0.55);" />
+                <div style="position:absolute;top:0;left:0;width:100%;height:100%;
+                            display:flex;flex-direction:column;justify-content:center;align-items:center;
+                            text-align:center;padding:24px;">
+                    <div style="font-size:48px;font-weight:900;color:#FFFFFF;line-height:1.1;
+                                letter-spacing:-0.5px;text-shadow:0 2px 20px rgba(0,0,0,0.6);">
+                        Royal Purple CockPit</div>
+                    <div style="font-size:11px;font-weight:600;letter-spacing:3px;color:#C4B5E8;
+                                text-transform:uppercase;margin-top:8px;
+                                text-shadow:0 1px 8px rgba(0,0,0,0.5);">
+                        Powered by Butler Performance Analytics</div>
+                    <div style="font-size:14px;color:#d4c8ef;max-width:560px;line-height:1.7;margin-top:14px;
+                                text-shadow:0 1px 6px rgba(0,0,0,0.5);">
+                        Your centralized command center for Royal Purple installer analytics,
+                        customer mapping, and product intelligence.
+                    </div>
+                </div>
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            """
+            <div style="background:linear-gradient(135deg,#1E0F3C 0%,#2D1B5E 40%,#4B2D8A 80%,#6B3FA0 100%);
+                        border-radius:14px;padding:48px 42px 40px;margin-bottom:28px;text-align:center;">
+                <div style="font-size:42px;font-weight:900;color:#FFFFFF;line-height:1.1;">Royal Purple CockPit</div>
+                <div style="font-size:12px;font-weight:600;letter-spacing:2px;color:#C4B5E8;
+                            text-transform:uppercase;margin-top:8px;">Powered by Butler Performance Analytics</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     customers_data = load_customers()
     distributors_data = load_distributors()
