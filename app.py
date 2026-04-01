@@ -118,6 +118,8 @@ st.markdown("""
 
 with st.sidebar:
     st.markdown("")
+    if os.path.exists(COCKPIT_HERO_PATH):
+        st.image(COCKPIT_HERO_PATH, use_container_width=True)
     st.markdown("<div style='text-align:center;padding:12px 0 4px;'><div style='font-size:18px;font-weight:900;color:#4B2D8A;letter-spacing:1px;'>ROYAL PURPLE</div><div style='width:120px;height:2px;background:linear-gradient(90deg,#4B2D8A,#C8A951);margin:6px auto;border-radius:1px;'></div><div style='font-size:11px;font-weight:700;letter-spacing:3px;color:#C8A951;'>COCKPIT</div></div>", unsafe_allow_html=True)
     st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#8888a8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
     st.markdown("---")
@@ -129,8 +131,6 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    if os.path.exists(COCKPIT_HERO_PATH):
-        st.image(COCKPIT_HERO_PATH, use_container_width=True)
     st.markdown("<div style='text-align:center;padding:6px 0;'><div style='font-size:9px;letter-spacing:2px;color:#8888a8;text-transform:uppercase;'>Powered by</div><div style='font-size:11px;font-weight:700;color:#4B2D8A;letter-spacing:0.5px;'>Butler Performance Analytics</div></div>", unsafe_allow_html=True)
 
 
