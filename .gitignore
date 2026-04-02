@@ -6,3 +6,4 @@ __pycache__/
 uv.lock
 .replit
 replit_agent/
+.streamlit/secrets.toml

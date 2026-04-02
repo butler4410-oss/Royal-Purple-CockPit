@@ -26,6 +26,49 @@ st.set_page_config(
     layout="wide",
 )
 
+# ── Password Gate ─────────────────────────────────────────────────
+def _check_auth():
+    """Block the app behind a password. Set APP_PASSWORD in Streamlit secrets or env."""
+    if st.session_state.get("authenticated"):
+        return True
+
+    _pw = os.environ.get("APP_PASSWORD") or st.secrets.get("APP_PASSWORD", "")
+    if not _pw:
+        return True  # No password configured — skip gate
+
+    st.markdown(
+        """
+        <style>
+        .stApp { background: linear-gradient(180deg, #0B0712 0%, #110A1B 100%) !important; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown("")
+    col_l, col_c, col_r = st.columns([1, 2, 1])
+    with col_c:
+        st.markdown(
+            '<div style="text-align:center;margin-top:60px;margin-bottom:20px;">'
+            '<div style="font-size:32px;font-weight:900;color:#9D6BFF;letter-spacing:1px;">ROYAL PURPLE</div>'
+            '<div style="width:120px;height:2px;background:linear-gradient(90deg,#9D6BFF,#FFD447);margin:8px auto;border-radius:1px;"></div>'
+            '<div style="font-size:14px;font-weight:700;letter-spacing:4px;color:#B7A8DB;text-transform:uppercase;">COCKPIT</div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        with st.form("login_form"):
+            password = st.text_input("Password", type="password", placeholder="Enter password")
+            submitted = st.form_submit_button("Sign In", use_container_width=True, type="primary")
+        if submitted:
+            if password == _pw:
+                st.session_state["authenticated"] = True
+                st.rerun()
+            else:
+                st.error("Incorrect password.")
+    return False
+
+if not _check_auth():
+    st.stop()
+
 # ── Royal Purple CockPit — Glassmorphism Skin ─────────────────────
 st.markdown("""
 <style>
